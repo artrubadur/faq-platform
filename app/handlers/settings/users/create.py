@@ -40,7 +40,7 @@ class Creation(StatesGroup):
 
 # Entry Point
 @router.callback_query(F.data == DIR)
-async def cb_handler(callback: CallbackQuery, state: FSMContext):
+async def user_create_cb_handler(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
     data = await state.get_data()
@@ -57,8 +57,8 @@ async def cb_handler(callback: CallbackQuery, state: FSMContext):
     await state.set_state(Creation.waiting_for_id)
 
 
-# ID / Identity
-async def process_id_handler(
+# Identity
+async def process_identity_handler(
     message: Message,
     state: FSMContext,
     input_id: int,
@@ -80,20 +80,20 @@ async def process_id_handler(
 
 
 @router.message(Creation.waiting_for_id)
-async def msg_id_handler(message: Message, state: FSMContext):
+async def user_create_msg_identity_handler(message: Message, state: FSMContext):
     try:
         input_id, input_username = await process_identity_msg(message)
     except ValueError as e:
         await send_invalid(message, PARENT_DIR, str(e), action=SendAction.ANSWER)
         return
 
-    await process_id_handler(
+    await process_identity_handler(
         message, state, input_id, input_username, send_action=SendAction.ANSWER
     )
 
 
 @router.callback_query(IdentityCallback.filter(F.dir == DIR))
-async def cb_id_handler(
+async def user_create_cb_identity_handler(
     callback: CallbackQuery, callback_data: IdentityCallback, state: FSMContext
 ):
     await callback.answer("")
@@ -102,7 +102,7 @@ async def cb_id_handler(
     input_id = callback_data.id
     input_username = callback_data.username
 
-    await process_id_handler(
+    await process_identity_handler(
         callback.message, state, input_id, input_username, send_action=SendAction.EDIT
     )
 
@@ -122,7 +122,7 @@ async def process_username_handler(
 
 
 @router.message(Creation.waiting_for_username)
-async def msg_username_handler(message: Message, state: FSMContext):
+async def user_create_msg_username_handler(message: Message, state: FSMContext):
     try:
         input_username = await process_username_msg(message)
     except ValueError as e:
@@ -135,7 +135,7 @@ async def msg_username_handler(message: Message, state: FSMContext):
 
 
 @router.callback_query(UsernameCallback.filter(F.dir == DIR))
-async def cb_username_handler(
+async def user_create_cb_username_handler(
     callback: CallbackQuery, callback_data: UsernameCallback, state: FSMContext
 ):
     await callback.answer("")
@@ -164,7 +164,7 @@ async def process_role_handler(
 
 
 @router.message(Creation.waiting_for_role)
-async def msg_confirm_handler(message: Message, state: FSMContext):
+async def user_create_msg_role_handler(message: Message, state: FSMContext):
     try:
         input_role = await process_role_msg(message)
     except ValueError as e:
@@ -177,7 +177,7 @@ async def msg_confirm_handler(message: Message, state: FSMContext):
 
 
 @router.callback_query(RoleCallback.filter(F.dir == DIR))
-async def cb_confirm_handler(
+async def user_create_cb_role_handler(
     callback: CallbackQuery, callback_data: RoleCallback, state: FSMContext
 ):
     await callback.answer("")
@@ -192,7 +192,7 @@ async def cb_confirm_handler(
 
 # Confirmation
 @router.callback_query(ConfirmCallback.filter(F.dir == DIR))
-async def cb_result_handler(callback: CallbackQuery, state: FSMContext):
+async def user_create_cb_confirm_handler(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
 

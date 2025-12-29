@@ -32,7 +32,7 @@ class Deletion(StatesGroup):
 
 # Entry point
 @router.callback_query(F.data == DIR)
-async def cb_handler(callback: CallbackQuery, state: FSMContext):
+async def user_delete_cb_handler(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
     data = await state.get_data()
@@ -50,7 +50,7 @@ async def cb_handler(callback: CallbackQuery, state: FSMContext):
 
 
 # Confirmation
-async def process_confirm_handler(
+async def process_identity_handler(
     message: Message,
     state: FSMContext,
     input_id: int,
@@ -79,20 +79,20 @@ async def process_confirm_handler(
 
 
 @router.message(Deletion.waiting_for_id)
-async def msg_confirm_handler(message: Message, state: FSMContext):
+async def user_delete_msg_identity_handler(message: Message, state: FSMContext):
     try:
         input_id, input_username = await process_identity_msg(message)
     except ValueError as e:
         await send_invalid(message, PARENT_DIR, str(e), action=SendAction.ANSWER)
         return
 
-    await process_confirm_handler(
+    await process_identity_handler(
         message, state, input_id, input_username, send_action=SendAction.ANSWER
     )
 
 
 @router.callback_query(IdentityCallback.filter(F.dir == DIR))
-async def cb_confirm_handler(
+async def user_delete_cb_identity_handler(
     callback: CallbackQuery, callback_data: IdentityCallback, state: FSMContext
 ):
     await callback.answer("")
@@ -101,14 +101,14 @@ async def cb_confirm_handler(
     input_id = callback_data.id
     input_username = callback_data.username
 
-    await process_confirm_handler(
+    await process_identity_handler(
         callback.message, state, input_id, input_username, send_action=SendAction.EDIT
     )
 
 
 # Result
 @router.callback_query(ConfirmCallback.filter(F.dir == DIR))
-async def cb_result_handler(callback: CallbackQuery, state: FSMContext):
+async def user_delete_cb_confirm_handler(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
 

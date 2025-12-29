@@ -30,7 +30,7 @@ class Finding(StatesGroup):
 
 # Entry point
 @router.callback_query(F.data == DIR)
-async def cb_handler(callback: CallbackQuery, state: FSMContext):
+async def user_get_cb_handler(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
     sender_id = callback.from_user.id
@@ -51,8 +51,8 @@ async def cb_handler(callback: CallbackQuery, state: FSMContext):
     await state.set_state(Finding.waiting_for_id)
 
 
-# Result
-async def process_result_handler(
+# Identity
+async def process_identity_handler(
     message: Message,
     state: FSMContext,
     input_id: int,
@@ -85,20 +85,20 @@ async def process_result_handler(
 
 
 @router.message(Finding.waiting_for_id)
-async def msg_result_handler(message: Message, state: FSMContext):
+async def user_get_msg_identity_handler(message: Message, state: FSMContext):
     try:
         input_id, input_username = await process_identity_msg(message)
     except ValueError as e:
         await send_invalid(message, PARENT_DIR, str(e), action=SendAction.ANSWER)
         return
 
-    await process_result_handler(
+    await process_identity_handler(
         message, state, input_id, input_username, send_action=SendAction.ANSWER
     )
 
 
 @router.callback_query(IdentityCallback.filter(F.dir == DIR))
-async def cb_result_handler(
+async def user_get_cb_identity_handler(
     callback: CallbackQuery, callback_data: IdentityCallback, state: FSMContext
 ):
     await callback.answer("")
@@ -107,6 +107,6 @@ async def cb_result_handler(
     input_id = callback_data.id
     input_username = callback_data.username
 
-    await process_result_handler(
+    await process_identity_handler(
         callback.message, state, input_id, input_username, send_action="edit"
     )

@@ -47,9 +47,9 @@ def format_edited_user_output(
     is_role_changed = role != edited_role
 
     return (
-        f"ID: {format_id(id)}{f" -> {format_id(edited_id)}" if is_id_changed else ""}\n"
-        f"Username: {format_username(username)}{f" -> {format_username(edited_username)}" if is_username_changed else ""}\n"
-        f"Role: {format_role(role)}{f" -> {format_role(edited_role)}" if is_role_changed else ""}"
+        f"ID: {format_id(id)}{f" ➡️ {format_id(edited_id)}" if is_id_changed else ""}\n"
+        f"Username: {format_username(username)}{f" ➡️ {format_username(edited_username)}" if is_username_changed else ""}\n"
+        f"Role: {format_role(role)}{f" ➡️ {format_role(edited_role)}" if is_role_changed else ""}"
     )
 
 

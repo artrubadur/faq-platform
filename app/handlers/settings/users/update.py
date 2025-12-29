@@ -48,7 +48,7 @@ class Update(StatesGroup):
 
 # Entry Point
 @router.callback_query(F.data == DIR)
-async def cb_handler(callback: CallbackQuery, state: FSMContext):
+async def user_update_cb_handler(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
     data = await state.get_data()
@@ -66,7 +66,7 @@ async def cb_handler(callback: CallbackQuery, state: FSMContext):
 
 
 # Confirm
-async def process_identity_confirm_handler(
+async def process_identity_handler(
     message: Message,
     state: FSMContext,
     input_id: int,
@@ -98,20 +98,20 @@ async def process_identity_confirm_handler(
 
 
 @router.message(Update.waiting_for_identity)
-async def msg_identity_confirm_handler(message: Message, state: FSMContext):
+async def user_update_msg_identity_handler(message: Message, state: FSMContext):
     try:
         input_id, input_username = await process_identity_msg(message)
     except ValueError as e:
         await send_invalid(message, PARENT_DIR, str(e), action=SendAction.ANSWER)
         return
 
-    await process_identity_confirm_handler(
+    await process_identity_handler(
         message, state, input_id, input_username, send_action=SendAction.ANSWER
     )
 
 
 @router.callback_query(IdentityCallback.filter(F.dir == DIR))
-async def cb_identity_confirm_handler(
+async def user_update_cb_identity_handler(
     callback: CallbackQuery, callback_data: IdentityCallback, state: FSMContext
 ):
     await callback.answer("")
@@ -120,13 +120,13 @@ async def cb_identity_confirm_handler(
     input_id = callback_data.id
     input_username = callback_data.username
 
-    await process_identity_confirm_handler(
+    await process_identity_handler(
         callback.message, state, input_id, input_username, send_action=SendAction.EDIT
     )
 
 
-# Field
-async def process_field_edit_handler(
+# Fields
+async def process_fields_handler(
     message: Message, state: FSMContext, *, send_action: SendAction
 ):
     data = await state.get_data()
@@ -149,27 +149,29 @@ async def process_field_edit_handler(
         action=send_action,
     )
 
+    await state.set_state(None)
+
 
 @router.callback_query(ConfirmCallback.filter(F.dir == DIR))
-async def cb_confirm_field_handler(callback: CallbackQuery, state: FSMContext):
+async def user_update_confirm_cb_fields_handler(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
-    await process_field_edit_handler(
+    await process_fields_handler(
         callback.message, state, send_action=SendAction.EDIT
     )
 
 
 @router.callback_query(CancelCallback.filter(F.dir == DIR))
-async def cb_cancel_field_handler(callback: CallbackQuery, state: FSMContext):
+async def user_update_cancel_cb_fields_handler(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
-    await process_field_edit_handler(
+    await process_fields_handler(
         callback.message, state, send_action=SendAction.EDIT
     )
 
 
 @router.callback_query(BackCallback.filter(F.dir == DIR))
-async def cb_back_field_handler(callback: CallbackQuery, state: FSMContext):
+async def user_update_back_cb_fields_handler(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
-    await process_field_edit_handler(
+    await process_fields_handler(
         callback.message, state, send_action=SendAction.EDIT
     )
 
@@ -177,7 +179,7 @@ async def cb_back_field_handler(callback: CallbackQuery, state: FSMContext):
 # Edit
 # Username
 @router.callback_query(EditCallback.filter(F.dir == DIR and F.field == "username"))
-async def cb_edit_username_handler(callback: CallbackQuery, state: FSMContext):
+async def user_update_cb_edit_username_handler(callback: CallbackQuery, state: FSMContext):
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
 
@@ -191,7 +193,7 @@ async def cb_edit_username_handler(callback: CallbackQuery, state: FSMContext):
 
 
 @router.message(Update.waiting_for_username)
-async def msg_username_edited_handler(message: Message, state: FSMContext):
+async def user_update_msg_edited_username_handler(message: Message, state: FSMContext):
     try:
         input_username = await process_username_msg(message)
     except ValueError as e:
@@ -200,11 +202,11 @@ async def msg_username_edited_handler(message: Message, state: FSMContext):
 
     await state.update_data(edited_username=input_username)
 
-    await process_field_edit_handler(message, state, send_action=SendAction.ANSWER)
+    await process_fields_handler(message, state, send_action=SendAction.ANSWER)
 
 
 @router.callback_query(UsernameCallback.filter(F.dir == DIR))
-async def cb_username_edited_handler(
+async def user_update_cb_edited_username_handler(
     callback: CallbackQuery, callback_data: UsernameCallback, state: FSMContext
 ):
     await callback.answer("")
@@ -213,14 +215,14 @@ async def cb_username_edited_handler(
     input_username = callback_data.username
 
     await state.update_data(edited_username=input_username)
-    await process_field_edit_handler(
+    await process_fields_handler(
         callback.message, state, send_action=SendAction.EDIT
     )
 
 
 # Role
 @router.callback_query(EditCallback.filter(F.dir == DIR and F.field == "role"))
-async def cb_edit_role_handler(callback: CallbackQuery, state: FSMContext):
+async def user_update_msg_edit_role_handler(callback: CallbackQuery, state: FSMContext):
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
 
@@ -229,7 +231,7 @@ async def cb_edit_role_handler(callback: CallbackQuery, state: FSMContext):
 
 
 @router.message(Update.waiting_for_role)
-async def msg_role_edited_handler(message: Message, state: FSMContext):
+async def user_update_msg_edited_role_handler(message: Message, state: FSMContext):
     try:
         input_role = await process_role_msg(message)
     except ValueError as e:
@@ -238,11 +240,11 @@ async def msg_role_edited_handler(message: Message, state: FSMContext):
 
     await state.update_data(edited_role=input_role)
 
-    await process_field_edit_handler(message, state, send_action=SendAction.ANSWER)
+    await process_fields_handler(message, state, send_action=SendAction.ANSWER)
 
 
 @router.callback_query(RoleCallback.filter(F.dir == DIR))
-async def cb_role_edited_handler(
+async def user_update_cb_edited_role_handler(
     callback: CallbackQuery, callback_data: RoleCallback, state: FSMContext
 ):
     await callback.answer("")
@@ -251,14 +253,14 @@ async def cb_role_edited_handler(
     input_role = callback_data.role
 
     await state.update_data(edited_role=input_role)
-    await process_field_edit_handler(
+    await process_fields_handler(
         callback.message, state, send_action=SendAction.EDIT
     )
 
 
 # Save
 @router.callback_query(SaveCallback.filter(F.dir == DIR))
-async def cb_edit_save_handler(callback: CallbackQuery, state: FSMContext):
+async def user_update_cb_save_handler(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
 
