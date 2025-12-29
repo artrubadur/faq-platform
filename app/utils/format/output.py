@@ -53,7 +53,5 @@ def format_edited_user_output(
     )
 
 
-def format_invalid_output(item: Optional[str] = None, exception: Optional[str] = None):
-    item_text = f": {item}" if item else ""
-    comment_text = f": {exception}" if exception else ""
-    return f"{EmojiStatus.FAILED} Invalid{item_text}{comment_text}."
+def format_exception_output(exception: Optional[str] = None):
+    return f"{EmojiStatus.FAILED} {exception or ""}."

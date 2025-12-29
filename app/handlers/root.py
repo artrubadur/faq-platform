@@ -1,29 +1,18 @@
 from aiogram import Router
 from aiogram.filters import Command, CommandObject, CommandStart
-from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import FSInputFile, Message, ReplyKeyboardRemove
+from aiogram.types import CallbackQuery, Message
 
-from app.dialogs.send.root import send_confirm_goto, send_invalid_path
+from app.dialogs.actions import SendAction
+from app.dialogs.rows.base import CloseCallback
+from app.dialogs.send.root import send_confirm_goto, send_invalid_path, send_start
 from app.utils.validate.root import validate_path
 
 router = Router()
 
 
-class Reg(StatesGroup):
-    name = State()
-    age = State()
-
-
-photo = FSInputFile("C:\\Users\\Юля\\Downloads\\загружено.gif")
-
-
 @router.message(CommandStart())
 async def cmd_start(message: Message):
-    await message.reply_document(
-        document=photo,
-        caption=f"You started the bot, {message.from_user.full_name}!",
-        reply_markup=ReplyKeyboardRemove(),
-    )
+    await send_start(message, action=SendAction.REPLY_DOCUMENT)
 
 
 @router.message(Command("goto"))
@@ -32,7 +21,13 @@ async def cmd_goto(message: Message, command: CommandObject):
     try:
         valid_path = validate_path(input_path)
     except ValueError as e:
-        await send_invalid_path(message, exception=str(e))
+        await send_invalid_path(message, exception=str(e), action=SendAction.ANSWER)
         return
 
-    await send_confirm_goto(message, valid_path)
+    await send_confirm_goto(message, valid_path, action=SendAction.ANSWER)
+
+
+@router.callback_query(CloseCallback.filter())
+async def cb_close_handler(callback: CallbackQuery):
+    await callback.answer()
+    await callback.message.delete()

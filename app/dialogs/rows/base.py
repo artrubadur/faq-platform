@@ -4,6 +4,20 @@ from aiogram.types import InlineKeyboardButton
 from app.core.constants.emoji import EmojiAction, EmojiNav, EmojiStatus
 
 
+class CloseCallback(CallbackData, prefix="close"):
+    pass
+
+
+def close_row():
+    return [
+        [
+            InlineKeyboardButton(
+                text=f"{EmojiNav.CLOSE} Close", callback_data=CloseCallback().pack()
+            )
+        ]
+    ]
+
+
 class BackCallback(CallbackData, prefix="back"):
     dir: str
 

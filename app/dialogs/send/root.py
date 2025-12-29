@@ -1,23 +1,39 @@
-from typing import Optional
-
-from aiogram.types import InlineKeyboardMarkup, Message
+from aiogram.types import InlineKeyboardMarkup, Message, ReplyKeyboardRemove
 
 import app.dialogs.rows.root as rows
 from app.core.constants.emoji import EmojiAction
-from app.utils.format.output import format_invalid_output
+from app.core.constants.files import Images
+from app.dialogs.actions import SendAction, do_action
+from app.utils.format.output import format_exception_output
 
 
-async def send_confirm_goto(message: Message, to_dir: str):
-    reply_markup = InlineKeyboardMarkup(inline_keyboard=rows.go_row(to_dir))
+async def send_start(message: Message, *, action: SendAction):
+    await do_action(
+        message,
+        action,
+        document=Images.GREETING.value,
+        caption=f"You started the bot, {message.from_user.full_name}!",
+        reply_markup=ReplyKeyboardRemove(),
+    )
 
-    await message.answer(
-        f"{EmojiAction.SELECT} Go to `{to_dir}`?",
+
+async def send_confirm_goto(message: Message, dir: str, *, action: SendAction):
+    reply_markup = InlineKeyboardMarkup(inline_keyboard=rows.go_row(dir))
+
+    await do_action(
+        message,
+        action,
+        text=f"{EmojiAction.SELECT} Go to `{dir}`?",
         parse_mode="Markdown",
         reply_markup=reply_markup,
     )
 
 
 async def send_invalid_path(
-    message: Message, item: Optional[str] = None, exception: Optional[str] = None
+    message: Message, exception: str | None = None, *, action: SendAction
 ):
-    await message.answer(format_invalid_output(item, exception))
+    await do_action(
+        message,
+        action,
+        text=format_exception_output(f"Failed to go: {exception}"),
+    )

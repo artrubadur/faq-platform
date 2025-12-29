@@ -1,11 +1,17 @@
 from enum import StrEnum
 
 
+class EmojiMenu(StrEnum):
+    SETTINGS = "⚙"
+    USERS = "👤"
+
+
 class EmojiNav(StrEnum):
     BACK = "◀️"
     CANCEL = "✖️"
     CANCEL_CHANGES = "🚫"
     REJECT = "❌"
+    CLOSE = "✖️"
 
 
 class EmojiAction(StrEnum):

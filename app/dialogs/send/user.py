@@ -4,9 +4,12 @@ import app.dialogs.markups.user as mu
 import app.dialogs.rows.base as brows
 import app.dialogs.rows.user as urows
 from app.core.constants.emoji import EmojiAction, EmojiStatus
-from app.dialogs import SendAction
-from app.dialogs.actions import do_action
-from app.utils.format.output import format_edited_user_output, format_user_output
+from app.dialogs.actions import SendAction, do_action
+from app.utils.format.output import (
+    format_edited_user_output,
+    format_exception_output,
+    format_user_output,
+)
 
 # Input
 
@@ -120,7 +123,7 @@ async def send_failed_creation(
     await do_action(
         message,
         action,
-        text=f"{EmojiStatus.FAILED} Failed to create the user: {exception}",
+        text=format_exception_output(f"Failed to create the user: {exception}"),
         reply_markup=mu.back,
     )
 
@@ -318,6 +321,6 @@ async def send_failed_update(
     await do_action(
         message,
         action,
-        text=f"{EmojiStatus.FAILED} Failed to update the user: {exception}",
+        text=format_exception_output(f"Failed to update the user: {exception}"),
         reply_markup=mu.back,
     )
