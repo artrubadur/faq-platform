@@ -5,7 +5,6 @@ from aiogram.types import CallbackQuery, Message
 from app.dialogs.actions import SendAction
 from app.dialogs.rows.base import CloseCallback
 from app.dialogs.send.root import send_confirm_goto, send_invalid_path, send_start
-from app.utils.validate.root import validate_path
 
 router = Router()
 
@@ -18,13 +17,13 @@ async def cmd_start(message: Message):
 @router.message(Command("goto"))
 async def cmd_goto(message: Message, command: CommandObject):
     input_path = command.args
-    try:
-        valid_path = validate_path(input_path)
-    except ValueError as e:
-        await send_invalid_path(message, exception=str(e), action=SendAction.ANSWER)
+    if input_path is None:
+        await send_invalid_path(
+            message, exception="The path is not set", action=SendAction.ANSWER
+        )
         return
 
-    await send_confirm_goto(message, valid_path, action=SendAction.ANSWER)
+    await send_confirm_goto(message, input_path, action=SendAction.ANSWER)
 
 
 @router.callback_query(CloseCallback.filter())
