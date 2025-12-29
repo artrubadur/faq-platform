@@ -1,4 +1,6 @@
 .venv
 .vscode
+.idea
 .env
 .ruff_cache
+__pycache__
