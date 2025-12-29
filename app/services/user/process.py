@@ -1,8 +1,8 @@
 # pyright: reportArgumentType=false
 from aiogram.types import Message
 
-from app.utils.format.input import format_input
 from app.services.user.validate import validate_id, validate_role, validate_username
+from app.utils.format.input import format_input
 
 
 async def process_identity_msg(message: Message):

@@ -9,5 +9,11 @@ def section_rows():
             InlineKeyboardButton(
                 text=f"{EmojiMenu.USERS} Users", callback_data="settings.users"
             ),
-        ]
+        ],
+        [
+            InlineKeyboardButton(
+                text=f"{EmojiMenu.QUESTIONS} Questions",
+                callback_data="settings.questions",
+            ),
+        ],
     ]

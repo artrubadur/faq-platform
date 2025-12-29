@@ -4,6 +4,7 @@ from enum import StrEnum
 class EmojiMenu(StrEnum):
     SETTINGS = "⚙"
     USERS = "👤"
+    QUESTIONS = "📚"
 
 
 class EmojiNav(StrEnum):

@@ -11,9 +11,8 @@ from app.utils.format.output import (
     format_user_output,
 )
 
+
 # Input
-
-
 async def send_enter_identity(
     message: Message,
     dir: str,
