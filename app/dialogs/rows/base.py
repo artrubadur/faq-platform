@@ -49,14 +49,15 @@ def cancel_row(dir: str):
 
 class ConfirmCallback(CallbackData, prefix="confirm"):
     dir: str
+    step: str
 
 
-def confirm_row(confirm_dir: str, cancel_dir: str):
+def confirm_row(confirm_dir: str, cancel_dir: str, step: str = ""):
     return [
         [
             InlineKeyboardButton(
                 text=EmojiStatus.CONFIRM,
-                callback_data=ConfirmCallback(dir=confirm_dir).pack(),
+                callback_data=ConfirmCallback(dir=confirm_dir, step=step).pack(),
             ),
             InlineKeyboardButton(
                 text=EmojiNav.REJECT,

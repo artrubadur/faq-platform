@@ -1,35 +1,31 @@
 from typing import Optional
 
-from app.core.constants.emoji import EmojiStatus
-
-
-def format_link(id: int, username: Optional[str]):
-    return f"<a href='tg://user?id={id}'>@{username or "N/A"}</a>"
+from app.core.constants.emoji import EmojiSymbol, EmojiStatus
 
 
 def format_id(id: int):
     return f"<code>{id}</code>"
 
+def format_user_link(id: int, username: Optional[str]):
+    return f"<a href='tg://user?id={id}'>@{username or "N/A"}</a>"
 
 def format_username(username: Optional[str]):
     return f"<code>{username or "N/A"}</code>"
 
 
-def format_role(role: str):
+def format_user_role(role: str):
     return f"<b>{role.upper()}</b>"
 
 
 def format_user_output(
     id: int, username: Optional[str] = None, role: Optional[str] = None
 ) -> str:
-    rows = []
-    if id is not None:
-        rows.append(f"Link: {format_link(id, username)}")
-        rows.append(f"ID: {format_id(id)}")
+    rows = [f"Link: {format_user_link(id, username)}", f"ID: {format_id(id)}"]
+
     if username is not None:
         rows.append(f"Username: {format_username(username)}")
     if role is not None:
-        rows.append(f"Role: {format_role(role)}")
+        rows.append(f"Role: {format_user_role(role)}")
 
     return "\n".join(rows)
 
@@ -47,11 +43,27 @@ def format_edited_user_output(
     is_role_changed = role != edited_role
 
     return (
-        f"ID: {format_id(id)}{f" ➡️ {format_id(edited_id)}" if is_id_changed else ""}\n"
-        f"Username: {format_username(username)}{f" ➡️ {format_username(edited_username)}" if is_username_changed else ""}\n"
-        f"Role: {format_role(role)}{f" ➡️ {format_role(edited_role)}" if is_role_changed else ""}"
+        f"ID: {format_id(id)}{f" {EmojiSymbol.CHANGE} {format_id(edited_id)}" if is_id_changed else ""}\n"
+        f"Username: {format_username(username)}{f" {EmojiSymbol.CHANGE} {format_username(edited_username)}" if is_username_changed else ""}\n"
+        f"Role: {format_user_role(role)}{f" {EmojiSymbol.CHANGE} {format_user_role(edited_role)}" if is_role_changed else ""}"
     )
 
 
 def format_exception_output(exception: Optional[str] = None):
     return f"{EmojiStatus.FAILED} {exception or ""}."
+
+
+def format_question_output(
+    id: int | None = None,
+    question_text: str | None = None,
+    answer_text: str | None = None,
+) -> str:
+    rows = []
+    if question_text is not None:
+        id_text = f"{EmojiSymbol.NUMBER}{format_id(id)} " if id is not None else ""
+        rows.append(f"{id_text}Question: {question_text}")
+    
+    if answer_text is not None:
+        rows.append(f"Answer: {answer_text}")
+
+    return "\n".join(rows)

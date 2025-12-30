@@ -8,10 +8,10 @@ from sqlalchemy.exc import NoResultFound
 from app.dialogs import SendAction
 from app.dialogs.rows.base import ConfirmCallback
 from app.dialogs.rows.user import IdentityCallback
+from app.dialogs.send.base import send_invalid
 from app.dialogs.send.user import (
     send_confirm_deletion,
     send_enter_identity,
-    send_invalid,
     send_not_found,
     send_successfully_deleted,
 )

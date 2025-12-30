@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, Message
 
 import app.dialogs.markups.user as mu
-import app.dialogs.rows.base as brows
+import app.dialogs.rows.base as rows
 import app.dialogs.rows.user as urows
 from app.core.constants.emoji import EmojiAction, EmojiStatus
 from app.dialogs.actions import SendAction, do_action
@@ -61,19 +61,6 @@ async def send_select_role(message: Message, dir: str, *, action: SendAction):
         message,
         action,
         text=f"{EmojiAction.SELECT} Select a role:",
-        reply_markup=reply_markup,
-    )
-
-
-# Output
-async def send_invalid(
-    message: Message, dir: str, text: str | None, action: SendAction
-):
-    reply_markup = InlineKeyboardMarkup(inline_keyboard=brows.back_row(dir))
-    await do_action(
-        message,
-        action,
-        text=f"{EmojiStatus.WARNING} {text}. Retry or back",
         reply_markup=reply_markup,
     )
 
@@ -252,7 +239,7 @@ async def send_changes(
         action,
         text=f"{changes_text}\n{EmojiAction.SELECT} Select field to edit:",
         parse_mode="HTML",
-        reply_markup=mu.field_update,
+        reply_markup=mu.field_save_update,
     )
 
 
@@ -265,7 +252,7 @@ async def send_edit_username(
 ):
     reply_markup = InlineKeyboardMarkup(
         inline_keyboard=urows.username_rows(dir, found_username, clear=True)
-        + brows.cancel_row("settings.users.update")
+        + rows.cancel_row("settings.users.update")
     )
 
     await do_action(
@@ -283,7 +270,7 @@ async def send_edit_role(
     action: SendAction,
 ):
     reply_markup = InlineKeyboardMarkup(
-        inline_keyboard=urows.role_rows(dir) + brows.cancel_row("settings.users.update")
+        inline_keyboard=urows.role_rows(dir) + rows.cancel_row("settings.users.update")
     )
 
     await do_action(

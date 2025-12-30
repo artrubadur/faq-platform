@@ -8,12 +8,12 @@ from sqlalchemy.exc import IntegrityError
 from app.dialogs import SendAction
 from app.dialogs.rows.base import ConfirmCallback
 from app.dialogs.rows.user import IdentityCallback, RoleCallback, UsernameCallback
+from app.dialogs.send.base import send_invalid
 from app.dialogs.send.user import (
     send_confirm_creation,
     send_enter_identity,
     send_enter_username,
     send_failed_creation,
-    send_invalid,
     send_select_role,
     send_successfully_created,
 )
@@ -153,6 +153,7 @@ async def process_role_handler(
     message: Message, state: FSMContext, input_role: str, *, send_action: SendAction
 ):
     await state.update_data(input_role=input_role)
+
     data = await state.get_data()
     input_id: int = data["input_id"]
     input_username: str | None = data["input_username"]
@@ -197,11 +198,9 @@ async def user_create_cb_confirm_handler(callback: CallbackQuery, state: FSMCont
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    input_id: int = data["input_id"]
-    input_username: str | None = data["input_username"]
-    input_role: str = data["input_role"]
-
-    await state.update_data(input_id=None, input_username=None, input_role=None)
+    input_id: int = data.pop("input_id")
+    input_username: str | None = data.pop("input_username")
+    input_role: str = data.pop("input_role")
 
     async with async_session() as session:
         repo = UsersRepository(session)

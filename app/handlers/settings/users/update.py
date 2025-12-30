@@ -14,6 +14,7 @@ from app.dialogs.rows.base import (
     SaveCallback,
 )
 from app.dialogs.rows.user import IdentityCallback, RoleCallback, UsernameCallback
+from app.dialogs.send.base import send_invalid
 from app.dialogs.send.user import (
     send_changes,
     send_confirm_update,
@@ -21,7 +22,6 @@ from app.dialogs.send.user import (
     send_edit_username,
     send_enter_identity,
     send_failed_update,
-    send_invalid,
     send_not_found,
     send_successfully_updated,
 )
