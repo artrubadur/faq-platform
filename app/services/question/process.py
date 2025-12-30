@@ -4,6 +4,7 @@ from aiogram.types import Message
 from app.services.question.validate import validate_id, validate_question_text
 from app.utils.format.input import format_input
 
+
 async def process_id_msg(message: Message):
     input_id = message.text
     if input_id is None:
@@ -11,6 +12,7 @@ async def process_id_msg(message: Message):
 
     valid_id = validate_id(input_id)
     return valid_id
+
 
 async def process_question_text_msg(message: Message):
     input_question_text = message.html_text

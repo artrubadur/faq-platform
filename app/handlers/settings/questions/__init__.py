@@ -1,8 +1,8 @@
 from aiogram import Router
 
-from .root import router as root_router
 from .create import router as create_router
 from .get import router as get_router
+from .root import router as root_router
 
 router = Router()
 

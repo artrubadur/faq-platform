@@ -1,9 +1,8 @@
+from aiogram.types import InlineKeyboardMarkup, Message
+
 import app.dialogs.rows.base as rows
 from app.core.constants.emoji import EmojiStatus
 from app.dialogs.actions import SendAction, do_action
-
-
-from aiogram.types import InlineKeyboardMarkup, Message
 
 
 async def send_invalid(

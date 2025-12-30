@@ -31,7 +31,7 @@ class Finding(StatesGroup):
 async def question_get_cb_handler(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
-    
+
     await send_enter_question_id(
         callback.message,
         action=SendAction.EDIT,

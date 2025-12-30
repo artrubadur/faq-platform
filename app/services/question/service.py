@@ -19,19 +19,18 @@ class QuestionsService:
 
     async def create_question(
         self, question_text: str, question_answer: str, check_similarity: bool
-    ) -> Question: # TODO: THE CHECK OF THE SIMILARITY WITH EXISTING QUSTIONS
+    ) -> Question:  # TODO: THE CHECK OF THE SIMILARITY WITH EXISTING QUSTIONS
         embedding = embedding_computer(question_text)
 
         if check_similarity and (similar_id := find_similar(embedding)) is not None:
             similar_question = await self.read_question(similar_id)
             raise SimilarityError("A similar question already exists", similar_question)
 
-        return await self.repository.create( # TODO: EXCEPTION HANDLING
+        return await self.repository.create(  # TODO: EXCEPTION HANDLING
             question_text,
             question_answer,
             embedding,
         )
-        
 
     async def read_question(self, id: int) -> Question:
         return await self.repository.read(id)

@@ -1,9 +1,9 @@
 from aiogram.types import Message
 
+import app.dialogs.markups.question as mu
 from app.core.constants.emoji import EmojiAction, EmojiStatus
 from app.dialogs.actions import SendAction, do_action
 from app.utils.format.output import format_id, format_question_output
-import app.dialogs.markups.question as mu
 
 
 # Input
@@ -17,6 +17,7 @@ async def send_enter_question_id(
         action,
         text=f"{EmojiAction.ENTER} Enter the question id",
     )
+
 
 async def send_enter_question_text(
     message: Message,
@@ -118,6 +119,7 @@ async def send_found_similar(
 #         reply_markup=mu.back,
 #     )
 
+
 # Finding
 async def send_successfully_found(
     message: Message,
@@ -139,9 +141,7 @@ async def send_successfully_found(
     )
 
 
-async def send_not_found(
-    message: Message, id: int, *, action: SendAction
-):
+async def send_not_found(message: Message, id: int, *, action: SendAction):
     await do_action(
         message,
         action,

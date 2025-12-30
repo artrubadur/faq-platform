@@ -50,7 +50,7 @@ class Update(StatesGroup):
 async def user_update_cb_handler(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
-    
+
     data = await state.get_data()
     found_id: int | None = data.get("found_id", None)
     found_username = data.get("found_username", None)

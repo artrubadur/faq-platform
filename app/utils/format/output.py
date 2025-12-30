@@ -1,13 +1,15 @@
 from typing import Optional
 
-from app.core.constants.emoji import EmojiSymbol, EmojiStatus
+from app.core.constants.emoji import EmojiStatus, EmojiSymbol
 
 
 def format_id(id: int):
     return f"<code>{id}</code>"
 
+
 def format_user_link(id: int, username: Optional[str]):
     return f"<a href='tg://user?id={id}'>@{username or "N/A"}</a>"
+
 
 def format_username(username: Optional[str]):
     return f"<code>{username or "N/A"}</code>"

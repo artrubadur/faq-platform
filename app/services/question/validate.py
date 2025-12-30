@@ -7,6 +7,7 @@ def validate_id(id: str | int) -> int:
 
     raise ValueError("ID is incorrect")
 
+
 def validate_question_text(question_text: str) -> str:
     lenght = len(question_text)
     if lenght > 384:

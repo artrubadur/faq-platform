@@ -32,6 +32,7 @@ class EmojiStatus(StrEnum):
     FAILED = "❌"
     WARNING = "⚠"
 
+
 class EmojiSymbol(StrEnum):
     CHANGE = "➡️"
     NUMBER = "#️⃣"

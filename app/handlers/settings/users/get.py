@@ -32,7 +32,7 @@ class Finding(StatesGroup):
 async def user_get_cb_handler(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
-    
+
     sender_id = callback.from_user.id
     sender_username = callback.from_user.username
     data = await state.get_data()
