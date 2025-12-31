@@ -148,7 +148,7 @@ async def process_fields_handler(
     )
 
 
-@router.callback_query(ConfirmCallback.filter(F.dir == DIR and F.step == "update"))
+@router.callback_query(ConfirmCallback.filter((F.dir == DIR) & (F.step == "update")))
 async def question_update_confirm_cb_fields_handler(
     callback: CallbackQuery, state: FSMContext
 ):
@@ -156,7 +156,7 @@ async def question_update_confirm_cb_fields_handler(
     await process_fields_handler(callback.message, state, send_action=SendAction.EDIT)
 
 
-@router.callback_query(CancelCallback.filter(F.dir == DIR and F.step == "update"))
+@router.callback_query(CancelCallback.filter(F.dir == PARENT_DIR))
 async def question_update_cancel_cb_fields_handler(
     callback: CallbackQuery, state: FSMContext
 ):
@@ -172,7 +172,7 @@ async def question_update_back_cb_fields_handler(
     await process_fields_handler(callback.message, state, send_action=SendAction.EDIT)
 
 
-@router.callback_query(EditCallback.filter(F.dir == DIR and F.field == "question_text"))
+@router.callback_query(EditCallback.filter((F.dir == DIR) & (F.field == "question_text")))
 async def question_update_cb_edit_question_text_handler(
     callback: CallbackQuery, last_message: LastMessage, state: FSMContext
 ):
@@ -205,7 +205,7 @@ async def question_update_msg_edited_question_text_handler(
     await state.set_state(None)
 
 
-@router.callback_query(ConfirmCallback.filter(F.dir == DIR and F.step == "recompute"))
+@router.callback_query(ConfirmCallback.filter((F.dir == DIR) & (F.step == "recompute")))
 async def question_update_cb_confirm_recompute_handler(
     callback: CallbackQuery, state: FSMContext
 ):
@@ -217,7 +217,7 @@ async def question_update_cb_confirm_recompute_handler(
     await process_fields_handler(callback.message, state, send_action=SendAction.EDIT)
 
 
-@router.callback_query(CancelCallback.filter(F.dir == DIR and F.step == "recompute"))
+@router.callback_query(CancelCallback.filter(F.dir == DIR))
 async def question_update_cb_cancel_recompute_handler(
     callback: CallbackQuery, state: FSMContext
 ):
@@ -229,7 +229,7 @@ async def question_update_cb_cancel_recompute_handler(
     await process_fields_handler(callback.message, state, send_action=SendAction.EDIT)
 
 
-@router.callback_query(EditCallback.filter(F.dir == DIR and F.field == "answer_text"))
+@router.callback_query(EditCallback.filter((F.dir == DIR) & (F.field == "answer_text")))
 async def question_update_cb_edit_answer_text_handler(
     callback: CallbackQuery, last_message: LastMessage, state: FSMContext
 ):

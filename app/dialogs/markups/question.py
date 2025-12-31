@@ -30,7 +30,7 @@ confirm_update = InlineKeyboardMarkup(
 )
 
 confirm_recompute = InlineKeyboardMarkup(
-    inline_keyboard=rows.confirm_row(f"{DIR}.update", DIR, "recompute")
+    inline_keyboard=rows.confirm_row(f"{DIR}.update", f"{DIR}.update", "recompute")
 )
 
 field_save_update = InlineKeyboardMarkup(

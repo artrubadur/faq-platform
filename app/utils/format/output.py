@@ -86,7 +86,7 @@ def format_edited_question(
         f"{answer_text}{f" {EmojiSymbol.CHANGE}\n{edited_answer_text}" if is_answer_text_changed else ""}",
     )
 
-    status = "NOT " if not recompute_embedding else ""
+    status = "<b>NOT</b> " if not recompute_embedding else ""
     result += f"{EmojiSymbol.EMBEDDING} Embedding will {status}be recomputed\n"
 
     return result

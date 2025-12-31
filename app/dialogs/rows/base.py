@@ -36,15 +36,14 @@ def back_row(dir: str):
 
 class CancelCallback(CallbackData, prefix="cancel"):
     dir: str
-    step: str
 
 
-def cancel_row(dir: str, step: str = ""):
+def cancel_row(dir: str):
     return [
         [
             InlineKeyboardButton(
                 text=f"{EmojiNav.CANCEL} Cancel",
-                callback_data=CancelCallback(dir=dir, step=step).pack(),
+                callback_data=CancelCallback(dir=dir).pack(),
             ),
         ]
     ]
@@ -64,7 +63,7 @@ def confirm_row(confirm_dir: str, cancel_dir: str, step: str = ""):
             ),
             InlineKeyboardButton(
                 text=EmojiNav.REJECT,
-                callback_data=CancelCallback(dir=cancel_dir, step=step).pack(),
+                callback_data=CancelCallback(dir=cancel_dir).pack(),
             ),
         ]
     ]
@@ -82,7 +81,7 @@ def save_row(save_dir: str, cancel_dir: str, step: str = ""):
             ),
             InlineKeyboardButton(
                 text=EmojiNav.CANCEL_CHANGES,
-                callback_data=CancelCallback(dir=cancel_dir, step=step).pack(),
+                callback_data=CancelCallback(dir=cancel_dir).pack(),
             ),
         ]
     ]

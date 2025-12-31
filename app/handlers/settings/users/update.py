@@ -185,7 +185,7 @@ async def user_update_back_cb_fields_handler(
     await process_fields_handler(callback.message, state, send_action=SendAction.EDIT)
 
 
-@router.callback_query(EditCallback.filter(F.dir == DIR and F.field == "username"))
+@router.callback_query(EditCallback.filter((F.dir == DIR) & (F.field == "username")))
 async def user_update_cb_edit_username_handler(
     callback: CallbackQuery, last_message: LastMessage, state: FSMContext
 ):
@@ -234,7 +234,7 @@ async def user_update_cb_edited_username_handler(
     await process_fields_handler(callback.message, state, send_action=SendAction.EDIT)
 
 
-@router.callback_query(EditCallback.filter(F.dir == DIR and F.field == "role"))
+@router.callback_query(EditCallback.filter((F.dir == DIR) & (F.field == "role")))
 async def user_update_msg_edit_role_handler(
     callback: CallbackQuery, last_message: LastMessage, state: FSMContext
 ):

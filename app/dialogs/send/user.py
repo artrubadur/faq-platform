@@ -138,7 +138,7 @@ async def send_not_found(
     send: Callable[..., Awaitable[Message]], id: int, username: str | None = None
 ) -> Message:
     return await send(
-        text=f"{EmojiStatus.FAILED} User {username or id}` not found",
+        text=f"{EmojiStatus.FAILED} User `{username or id}` not found",
         parse_mode="Markdown",
         reply_markup=mu.back,
     )

@@ -97,7 +97,7 @@ async def send_found_similar(
     )
 
 
-# async def send_failed_creation( # TODO: USAGE
+# async def send_failed_creation(
 #     send: Callable[..., Awaitable[Message]],
 #     exception="Unexcepted error.",
 # ) -> Message:
@@ -217,7 +217,7 @@ async def send_edit_question_text(
     send: Callable[..., Awaitable[Message]],
 ) -> Message:
     reply_markup = InlineKeyboardMarkup(
-        inline_keyboard=brows.cancel_row("settings.questions.update", "update")
+        inline_keyboard=brows.cancel_row("settings.questions.update")
     )
 
     return await send(
@@ -231,7 +231,7 @@ async def send_edit_answer_text(
     send: Callable[..., Awaitable[Message]],
 ) -> Message:
     reply_markup = InlineKeyboardMarkup(
-        inline_keyboard=brows.cancel_row("settings.questions.update", "update")
+        inline_keyboard=brows.cancel_row("settings.questions.update")
     )
 
     return await send(
