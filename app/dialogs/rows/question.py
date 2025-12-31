@@ -1,6 +1,12 @@
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton
 
+import app.dialogs.rows.base as rows
+
+DIR = "settings.questions"
+
+cancel_row = rows.cancel_row(DIR)
+
 
 class IdCallback(CallbackData, prefix="id"):
     dir: str

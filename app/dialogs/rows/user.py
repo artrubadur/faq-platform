@@ -1,8 +1,13 @@
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton
 
+import app.dialogs.rows.base as rows
 from app.core.constants.emoji import EmojiAction
 from app.storage.db.models.user import Role
+
+DIR = "settings.users"
+
+cancel_row = rows.cancel_row(DIR)
 
 
 class IdentityCallback(CallbackData, prefix="identity"):

@@ -18,7 +18,7 @@ async def send_enter_id(
     found_question_id: int | None = None,
 ) -> Message:
     reply_markup = InlineKeyboardMarkup(
-        inline_keyboard=qrows.id_row(dir, found_question_id)
+        inline_keyboard=qrows.id_row(dir, found_question_id) + qrows.cancel_row
     )
     return await send(
         text=f"{EmojiAction.ENTER} Enter the question id", reply_markup=reply_markup
@@ -29,8 +29,9 @@ async def send_enter_id(
 async def send_enter_question_text(
     send: Callable[..., Awaitable[Message]],
 ) -> Message:
+    reply_markup = InlineKeyboardMarkup(inline_keyboard=qrows.cancel_row)
     return await send(
-        text=f"{EmojiAction.ENTER} Enter the question text",
+        text=f"{EmojiAction.ENTER} Enter the question text", reply_markup=reply_markup
     )
 
 
@@ -38,8 +39,9 @@ async def send_enter_question_text(
 async def send_enter_answer_text(
     send: Callable[..., Awaitable[Message]],
 ) -> Message:
+    reply_markup = InlineKeyboardMarkup(inline_keyboard=qrows.cancel_row)
     return await send(
-        text=f"{EmojiAction.ENTER} Enter the answer text",
+        text=f"{EmojiAction.ENTER} Enter the answer text", reply_markup=reply_markup
     )
 
 
