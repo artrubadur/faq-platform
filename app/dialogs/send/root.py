@@ -1,4 +1,4 @@
-from typing import Awaitable, Callable
+from typing import Any, Awaitable, Callable
 
 from aiogram.types import InlineKeyboardMarkup, Message, ReplyKeyboardRemove
 
@@ -7,6 +7,7 @@ from app.core.constants.emojis import EmojiAction
 from app.core.constants.files import Images
 from app.dialogs.actions import action_wrapper
 from app.utils.format.output import format_exception
+from json import dumps
 
 
 @action_wrapper
@@ -17,6 +18,17 @@ async def send_start(
         document=Images.GREETING.value,
         caption=f"You started the bot, {full_name}!",
         reply_markup=ReplyKeyboardRemove(),
+    )
+
+
+@action_wrapper
+async def send_state(
+    send: Callable[..., Awaitable[Message]], data: dict[str, Any]
+) -> Message:
+    str_data = dumps(data, indent=2)
+
+    return await send(
+        text=f"Stored data:\n{str_data}",
     )
 
 
