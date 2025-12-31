@@ -25,6 +25,7 @@ from app.services.user.process import (
     process_username_msg,
 )
 from app.storage.db.engine import async_session
+from app.utils.history.last_message import LastMessage
 
 from .root import DIR as PARENT_DIR
 
@@ -40,7 +41,9 @@ class Creation(StatesGroup):
 
 
 @router.callback_query(F.data == DIR)
-async def user_create_cb_handler(callback: CallbackQuery, state: FSMContext):
+async def user_create_cb_handler(
+    callback: CallbackQuery, last_message: LastMessage, state: FSMContext
+):
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
 
@@ -48,18 +51,21 @@ async def user_create_cb_handler(callback: CallbackQuery, state: FSMContext):
     found_user_id: int | None = data.get("found_user_id", None)
     found_username = data.get("found_username", None)
 
-    await send_enter_identity(
+    sent_message = await send_enter_identity(
         callback.message,
         SendAction.EDIT,
         DIR,
         found_user_id,
         found_username,
     )
+    await last_message.set(sent_message, state)
+
     await state.set_state(Creation.waiting_for_identity)
 
 
 async def process_identity_handler(
     message: Message,
+    last_message: LastMessage,
     state: FSMContext,
     input_id: int,
     input_username: str | None,
@@ -72,29 +78,50 @@ async def process_identity_handler(
         data = await state.get_data()
         found_username = data.get("found_username", None)
 
-        await send_enter_username(message, send_action, DIR, found_username)
+        sent_message = await send_enter_username(
+            message, send_action, DIR, found_username
+        )
+        await last_message.set(sent_message, state)
+        
         await state.set_state(Creation.waiting_for_username)
     else:
-        await send_select_role(message, send_action, DIR)
+        sent_message = await send_select_role(message, send_action, DIR)
+        await last_message.set(sent_message, state)
+
         await state.set_state(Creation.waiting_for_role)
 
 
 @router.message(Creation.waiting_for_identity)
-async def user_create_msg_identity_handler(message: Message, state: FSMContext):
+async def user_create_msg_identity_handler(
+    message: Message, last_message: LastMessage, state: FSMContext
+):
+    await last_message.edit_reply_markup(message, state)
+
     try:
         input_id, input_username = await process_identity_msg(message)
     except ValueError as e:
-        await send_invalid(message, SendAction.ANSWER, PARENT_DIR, str(e))
+        sent_message = await send_invalid(
+            message, SendAction.ANSWER, PARENT_DIR, str(e)
+        )
+        await last_message.set(sent_message, state)
         return
 
     await process_identity_handler(
-        message, state, input_id, input_username, send_action=SendAction.ANSWER
+        message,
+        last_message,
+        state,
+        input_id,
+        input_username,
+        send_action=SendAction.ANSWER,
     )
 
 
 @router.callback_query(IdentityCallback.filter(F.dir == DIR))
 async def user_create_cb_identity_handler(
-    callback: CallbackQuery, callback_data: IdentityCallback, state: FSMContext
+    callback: CallbackQuery,
+    last_message: LastMessage,
+    callback_data: IdentityCallback,
+    state: FSMContext,
 ):
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
@@ -103,12 +130,18 @@ async def user_create_cb_identity_handler(
     input_username = callback_data.username
 
     await process_identity_handler(
-        callback.message, state, input_id, input_username, send_action=SendAction.EDIT
+        callback.message,
+        last_message,
+        state,
+        input_id,
+        input_username,
+        send_action=SendAction.EDIT,
     )
 
 
 async def process_username_handler(
     message: Message,
+    last_message: LastMessage,
     state: FSMContext,
     input_username: str | None,
     *,
@@ -116,26 +149,38 @@ async def process_username_handler(
 ):
     await state.update_data(input_username=input_username)
 
-    await send_select_role(message, send_action, DIR)
+    sent_message = await send_select_role(message, send_action, DIR)
+    await last_message.set(sent_message, state)
+
     await state.set_state(Creation.waiting_for_role)
 
 
 @router.message(Creation.waiting_for_username)
-async def user_create_msg_username_handler(message: Message, state: FSMContext):
+async def user_create_msg_username_handler(
+    message: Message, last_message: LastMessage, state: FSMContext
+):
+    await last_message.edit_reply_markup(message, state)
+
     try:
         input_username = await process_username_msg(message)
     except ValueError as e:
-        await send_invalid(message, SendAction.ANSWER, PARENT_DIR, str(e))
+        sent_message = await send_invalid(
+            message, SendAction.ANSWER, PARENT_DIR, str(e)
+        )
+        await last_message.set(sent_message, state)
         return
 
     await process_username_handler(
-        message, state, input_username, send_action=SendAction.ANSWER
+        message, last_message, state, input_username, send_action=SendAction.ANSWER
     )
 
 
 @router.callback_query(UsernameCallback.filter(F.dir == DIR))
 async def user_create_cb_username_handler(
-    callback: CallbackQuery, callback_data: UsernameCallback, state: FSMContext
+    callback: CallbackQuery,
+    last_message: LastMessage,
+    callback_data: UsernameCallback,
+    state: FSMContext,
 ):
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
@@ -143,12 +188,21 @@ async def user_create_cb_username_handler(
     input_username = callback_data.username
 
     await process_username_handler(
-        callback.message, state, input_username, send_action=SendAction.EDIT
+        callback.message,
+        last_message,
+        state,
+        input_username,
+        send_action=SendAction.EDIT,
     )
 
 
 async def process_role_handler(
-    message: Message, state: FSMContext, input_role: str, *, send_action: SendAction
+    message: Message,
+    last_message: LastMessage,
+    state: FSMContext,
+    input_role: str,
+    *,
+    send_action: SendAction,
 ):
     await state.update_data(input_role=input_role)
 
@@ -156,28 +210,40 @@ async def process_role_handler(
     input_id: int = data["input_id"]
     input_username: str | None = data["input_username"]
 
-    await send_confirm_creation(
+    sent_message = await send_confirm_creation(
         message, send_action, input_id, input_username, input_role
     )
+    await last_message.set(sent_message, state)
+
     await state.set_state(None)
 
 
 @router.message(Creation.waiting_for_role)
-async def user_create_msg_role_handler(message: Message, state: FSMContext):
+async def user_create_msg_role_handler(
+    message: Message, last_message: LastMessage, state: FSMContext
+):
+    await last_message.edit_reply_markup(message, state)
+
     try:
         input_role = await process_role_msg(message)
     except ValueError as e:
-        await send_invalid(message, SendAction.ANSWER, PARENT_DIR, str(e))
+        sent_message = await send_invalid(
+            message, SendAction.ANSWER, PARENT_DIR, str(e)
+        )
+        await last_message.set(sent_message, state)
         return
 
     await process_role_handler(
-        message, state, input_role, send_action=SendAction.ANSWER
+        message, last_message, state, input_role, send_action=SendAction.ANSWER
     )
 
 
 @router.callback_query(RoleCallback.filter(F.dir == DIR))
 async def user_create_cb_role_handler(
-    callback: CallbackQuery, callback_data: RoleCallback, state: FSMContext
+    callback: CallbackQuery,
+    last_message: LastMessage,
+    callback_data: RoleCallback,
+    state: FSMContext,
 ):
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
@@ -185,7 +251,7 @@ async def user_create_cb_role_handler(
     input_role = callback_data.role
 
     await process_role_handler(
-        callback.message, state, input_role, send_action=SendAction.EDIT
+        callback.message, last_message, state, input_role, send_action=SendAction.EDIT
     )
 
 
@@ -213,5 +279,5 @@ async def user_create_cb_confirm_handler(callback: CallbackQuery, state: FSMCont
             )
         except IntegrityError:
             await send_failed_creation(
-                callback.message, SendAction.EDIT, "User already exists."
+                callback.message, SendAction.EDIT, "User already exists"
             )

@@ -17,6 +17,7 @@ from app.repositories.questions import QuestionsRepository
 from app.services.question.process import process_id_msg
 from app.services.question.service import QuestionsService
 from app.storage.db.engine import async_session
+from app.utils.history.last_message import LastMessage
 
 from .root import DIR as PARENT_DIR
 
@@ -30,14 +31,20 @@ class Finding(StatesGroup):
 
 
 @router.callback_query(F.data == DIR)
-async def question_get_cb_handler(callback: CallbackQuery, state: FSMContext):
+async def question_get_cb_handler(
+    callback: CallbackQuery, last_message: LastMessage, state: FSMContext
+):
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
     found_question_id: int | None = data.get("found_question_id", None)
 
-    await send_enter_id(callback.message, SendAction.EDIT, DIR, found_question_id)
+    sent_message = await send_enter_id(
+        callback.message, SendAction.EDIT, DIR, found_question_id
+    )
+    await last_message.set(sent_message, state)
+
     await state.set_state(Finding.waiting_for_id)
 
 
@@ -64,11 +71,18 @@ async def process_id_handler(
 
 
 @router.message(Finding.waiting_for_id)
-async def question_get_msg_id_handler(message: Message, state: FSMContext):
+async def question_get_msg_id_handler(
+    message: Message, last_message: LastMessage, state: FSMContext
+):
+    await last_message.edit_reply_markup(message, state)
+
     try:
         input_id = await process_id_msg(message)
     except ValueError as e:
-        await send_invalid(message, SendAction.ANSWER, PARENT_DIR, str(e))
+        sent_message = await send_invalid(
+            message, SendAction.ANSWER, PARENT_DIR, str(e)
+        )
+        await last_message.set(sent_message, state)
         return
 
     await process_id_handler(message, state, input_id, send_action=SendAction.ANSWER)

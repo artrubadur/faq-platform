@@ -22,6 +22,7 @@ from app.services.question.process import (
 )
 from app.services.question.service import QuestionsService
 from app.storage.db.engine import async_session
+from app.utils.history.last_message import LastMessage
 
 from .root import DIR as PARENT_DIR
 
@@ -44,31 +45,45 @@ async def question_create_cb_handler(callback: CallbackQuery, state: FSMContext)
         callback.message,
         SendAction.EDIT,
     )
+
     await state.set_state(Creation.waiting_for_question_text)
 
 
 @router.message(Creation.waiting_for_question_text)
 async def question_create_msg_question_text_handler(
-    message: Message, state: FSMContext
+    message: Message, last_message: LastMessage, state: FSMContext
 ):
+    await last_message.edit_reply_markup(message, state)
+
     try:
         input_question_text = await process_question_text_msg(message)
     except ValueError as e:
-        await send_invalid(message, SendAction.ANSWER, PARENT_DIR, str(e))
+        sent_message = await send_invalid(
+            message, SendAction.ANSWER, PARENT_DIR, str(e)
+        )
+        await last_message.set(sent_message, state)
         return
 
     await state.update_data(input_question_text=input_question_text)
 
     await send_enter_answer_text(message, SendAction.ANSWER)
+
     await state.set_state(Creation.waiting_for_answer_text)
 
 
 @router.message(Creation.waiting_for_answer_text)
-async def question_create_msg_answer_text_handler(message: Message, state: FSMContext):
+async def question_create_msg_answer_text_handler(
+    message: Message, last_message: LastMessage, state: FSMContext
+):
+    await last_message.edit_reply_markup(message, state)
+
     try:
         input_answer_text = await process_answer_text_msg(message)
     except ValueError as e:
-        await send_invalid(message, SendAction.ANSWER, PARENT_DIR, str(e))
+        sent_message = await send_invalid(
+            message, SendAction.ANSWER, PARENT_DIR, str(e)
+        )
+        await last_message.set(sent_message, state)
         return
 
     await state.update_data(input_answer_text=input_answer_text)
@@ -79,6 +94,7 @@ async def question_create_msg_answer_text_handler(message: Message, state: FSMCo
     await send_confirm_creation(
         message, SendAction.ANSWER, input_question_text, input_answer_text
     )
+
     await state.set_state(None)
 
 

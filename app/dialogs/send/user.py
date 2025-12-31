@@ -39,7 +39,7 @@ async def send_enter_username(
     sender_username: str | None = None,
 ) -> Message:
     reply_markup = InlineKeyboardMarkup(
-        inline_keyboard=urows.username_rows(dir, found_username, sender_username)
+        inline_keyboard=urows.username_rows(dir, found_username, sender_username, empty=True)
     )
     return await send(
         text=f"{EmojiAction.ENTER} Enter a username",
@@ -215,7 +215,7 @@ async def send_edit_username(
     found_username: str | None = None,
 ) -> Message:
     reply_markup = InlineKeyboardMarkup(
-        inline_keyboard=urows.username_rows(dir, found_username, clear=True)
+        inline_keyboard=urows.username_rows(dir, found_username, empty=True)
         + rows.cancel_row("settings.users.update")
     )
 

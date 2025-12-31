@@ -23,7 +23,7 @@ class EmojiAction(StrEnum):
     SAVE = "💾"
     ENTER = "📝"
     SELECT = "⏩"
-    CLEAR = "🧹"
+    EMPTY = "🧹"
 
 
 class EmojiStatus(StrEnum):

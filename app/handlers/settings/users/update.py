@@ -33,6 +33,7 @@ from app.services.user.process import (
     process_username_msg,
 )
 from app.storage.db.engine import async_session
+from app.utils.history.last_message import LastMessage
 
 from .root import DIR as PARENT_DIR
 
@@ -48,7 +49,9 @@ class Update(StatesGroup):
 
 
 @router.callback_query(F.data == DIR)
-async def user_update_cb_handler(callback: CallbackQuery, state: FSMContext):
+async def user_update_cb_handler(
+    callback: CallbackQuery, last_message: LastMessage, state: FSMContext
+):
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
 
@@ -56,13 +59,15 @@ async def user_update_cb_handler(callback: CallbackQuery, state: FSMContext):
     found_user_id: int | None = data.get("found_user_id", None)
     found_username = data.get("found_username", None)
 
-    await send_enter_identity(
+    sent_message = await send_enter_identity(
         callback.message,
         SendAction.EDIT,
         DIR,
         found_user_id,
         found_username,
     )
+    await last_message.set(sent_message, state)
+
     await state.set_state(Update.waiting_for_identity)
 
 
@@ -98,11 +103,18 @@ async def process_identity_handler(
 
 
 @router.message(Update.waiting_for_identity)
-async def user_update_msg_identity_handler(message: Message, state: FSMContext):
+async def user_update_msg_identity_handler(
+    message: Message, last_message: LastMessage, state: FSMContext
+):
+    await last_message.edit_reply_markup(message, state)
+
     try:
         input_id, input_username = await process_identity_msg(message)
     except ValueError as e:
-        await send_invalid(message, SendAction.ANSWER, PARENT_DIR, str(e))
+        sent_message = await send_invalid(
+            message, SendAction.ANSWER, PARENT_DIR, str(e)
+        )
+        await last_message.set(sent_message, state)
         return
 
     await process_identity_handler(
@@ -177,7 +189,7 @@ async def user_update_back_cb_fields_handler(
 
 @router.callback_query(EditCallback.filter(F.dir == DIR and F.field == "username"))
 async def user_update_cb_edit_username_handler(
-    callback: CallbackQuery, state: FSMContext
+    callback: CallbackQuery, last_message: LastMessage, state: FSMContext
 ):
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
@@ -185,16 +197,25 @@ async def user_update_cb_edit_username_handler(
     data = await state.get_data()
     found_username = data.get("found_username", None)
 
-    await send_edit_username(callback.message, SendAction.EDIT, DIR, found_username)
+    sent_message = await send_edit_username(
+        callback.message, SendAction.EDIT, DIR, found_username
+    )
+    await last_message.set(sent_message, state)
+
     await state.set_state(Update.waiting_for_username)
 
 
 @router.message(Update.waiting_for_username)
-async def user_update_msg_edited_username_handler(message: Message, state: FSMContext):
+async def user_update_msg_edited_username_handler(
+    message: Message, last_message: LastMessage, state: FSMContext
+):
+    await last_message.edit_reply_markup(message, state)
+
     try:
         input_username = await process_username_msg(message)
     except ValueError as e:
-        await send_invalid(message, SendAction.ANSWER, DIR, str(e))
+        sent_message = await send_invalid(message, SendAction.ANSWER, DIR, str(e))
+        await last_message.set(sent_message, state)
         return
 
     await state.update_data(edited_username=input_username)
@@ -210,26 +231,35 @@ async def user_update_cb_edited_username_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     input_username = callback_data.username
-
     await state.update_data(edited_username=input_username)
+
     await process_fields_handler(callback.message, state, send_action=SendAction.EDIT)
 
 
 @router.callback_query(EditCallback.filter(F.dir == DIR and F.field == "role"))
-async def user_update_msg_edit_role_handler(callback: CallbackQuery, state: FSMContext):
+async def user_update_msg_edit_role_handler(
+    callback: CallbackQuery, last_message: LastMessage, state: FSMContext
+):
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    await send_edit_role(callback.message, SendAction.EDIT, DIR)
+    sent_message = await send_edit_role(callback.message, SendAction.EDIT, DIR)
+    await last_message.set(sent_message, state)
+
     await state.set_state(Update.waiting_for_role)
 
 
 @router.message(Update.waiting_for_role)
-async def user_update_msg_edited_role_handler(message: Message, state: FSMContext):
+async def user_update_msg_edited_role_handler(
+    message: Message, last_message: LastMessage, state: FSMContext
+):
+    await last_message.edit_reply_markup(message, state)
+
     try:
         input_role = await process_role_msg(message)
     except ValueError as e:
-        await send_invalid(message, SendAction.ANSWER, DIR, str(e))
+        sent_message = await send_invalid(message, SendAction.ANSWER, DIR, str(e))
+        await last_message.set(sent_message, state)
         return
 
     await state.update_data(edited_role=input_role)

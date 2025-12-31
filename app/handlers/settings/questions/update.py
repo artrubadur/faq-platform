@@ -33,11 +33,7 @@ from app.services.question.process import (
 )
 from app.services.question.service import QuestionsService
 from app.storage.db.engine import async_session
-from app.utils.history.last_message import (
-    last_msg_delete,
-    last_msg_remove_kb,
-    last_msg_save,
-)
+from app.utils.history.last_message import LastMessage
 
 from .root import DIR as PARENT_DIR
 
@@ -53,14 +49,20 @@ class Update(StatesGroup):
 
 
 @router.callback_query(F.data == DIR)
-async def question_update_cb_handler(callback: CallbackQuery, state: FSMContext):
+async def question_update_cb_handler(
+    callback: CallbackQuery, last_message: LastMessage, state: FSMContext
+):
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
     found_question_id: int | None = data.get("found_question_id", None)
 
-    await send_enter_id(callback.message, SendAction.EDIT, DIR, found_question_id)
+    sent_message = await send_enter_id(
+        callback.message, SendAction.EDIT, DIR, found_question_id
+    )
+    await last_message.set(sent_message, state)
+
     await state.set_state(Update.waiting_for_id)
 
 
@@ -91,13 +93,18 @@ async def process_id_handler(
 
 
 @router.message(Update.waiting_for_id)
-async def question_update_msg_id_handler(message: Message, state: FSMContext):
+async def question_update_msg_id_handler(
+    message: Message, last_message: LastMessage, state: FSMContext
+):
+    await last_message.edit_reply_markup(message, state)
+
     try:
         input_id = await process_id_msg(message)
     except ValueError as e:
-        await last_msg_delete(message, state)
-        msg = await send_invalid(message, SendAction.ANSWER, PARENT_DIR, str(e))
-        await last_msg_save(msg, state)
+        sent_message = await send_invalid(
+            message, SendAction.ANSWER, PARENT_DIR, str(e)
+        )
+        await last_message.set(sent_message, state)
         return
 
     await process_id_handler(message, state, input_id, send_action=SendAction.ANSWER)
@@ -167,27 +174,28 @@ async def question_update_back_cb_fields_handler(
 
 @router.callback_query(EditCallback.filter(F.dir == DIR and F.field == "question_text"))
 async def question_update_cb_edit_question_text_handler(
-    callback: CallbackQuery, state: FSMContext
+    callback: CallbackQuery, last_message: LastMessage, state: FSMContext
 ):
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    msg = await send_edit_question_text(callback.message, SendAction.EDIT)
-    await last_msg_save(msg, state)
+    sent_message = await send_edit_question_text(callback.message, SendAction.EDIT)
+    await last_message.set(sent_message, state)
 
     await state.set_state(Update.waiting_for_question_text)
 
 
 @router.message(Update.waiting_for_question_text)
 async def question_update_msg_edited_question_text_handler(
-    message: Message, state: FSMContext
+    message: Message, last_message: LastMessage, state: FSMContext
 ):
-    await last_msg_remove_kb(message, state)
+    await last_message.edit_reply_markup(message, state)
+
     try:
         input_question_text = await process_question_text_msg(message)
     except ValueError as e:
-        msg = await send_invalid(message, SendAction.ANSWER, DIR, str(e))
-        await last_msg_save(msg, state)
+        sent_message = await send_invalid(message, SendAction.ANSWER, DIR, str(e))
+        await last_message.set(sent_message, state)
         return
 
     await state.update_data(edited_question_text=input_question_text)
@@ -223,27 +231,28 @@ async def question_update_cb_cancel_recompute_handler(
 
 @router.callback_query(EditCallback.filter(F.dir == DIR and F.field == "answer_text"))
 async def question_update_cb_edit_answer_text_handler(
-    callback: CallbackQuery, state: FSMContext
+    callback: CallbackQuery, last_message: LastMessage, state: FSMContext
 ):
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    msg = await send_edit_answer_text(callback.message, SendAction.EDIT)
-    await last_msg_save(msg, state)
+    sent_message = await send_edit_answer_text(callback.message, SendAction.EDIT)
+    await last_message.set(sent_message, state)
 
     await state.set_state(Update.waiting_for_answer_text)
 
 
 @router.message(Update.waiting_for_answer_text)
 async def question_update_msg_edited_answer_text_handler(
-    message: Message, state: FSMContext
+    message: Message, last_message: LastMessage, state: FSMContext
 ):
-    await last_msg_remove_kb(message, state)
+    await last_message.edit_reply_markup(message, state)
+
     try:
         input_answer_text = await process_answer_text_msg(message)
     except ValueError as e:
-        msg = await send_invalid(message, SendAction.ANSWER, DIR, str(e))
-        await last_msg_save(msg, state)
+        sent_message = await send_invalid(message, SendAction.ANSWER, DIR, str(e))
+        await last_message.set(sent_message, state)
         return
 
     await state.update_data(edited_answer_text=input_answer_text)
@@ -254,7 +263,7 @@ async def question_update_msg_edited_answer_text_handler(
 
 
 @router.callback_query(SaveCallback.filter(F.dir == DIR))
-async def user_update_cb_save_handler(callback: CallbackQuery, state: FSMContext):
+async def question_update_cb_save_handler(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
 

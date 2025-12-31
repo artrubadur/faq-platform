@@ -55,7 +55,7 @@ def username_rows(
     dir: str,
     found_username: str | None = None,
     sender_username: str | None = None,
-    clear=False,
+    empty=False,
 ):
     rows = []
     if found_username is not None:
@@ -76,12 +76,12 @@ def username_rows(
                 )
             ]
         )
-    if clear:
+    if empty:
         callback_data = UsernameCallback(dir=dir, username=None).pack()
         rows.append(
             [
                 InlineKeyboardButton(
-                    text=f"{EmojiAction.CLEAR} Clear", callback_data=callback_data
+                    text=f"{EmojiAction.EMPTY} Empty", callback_data=callback_data
                 )
             ]
         )

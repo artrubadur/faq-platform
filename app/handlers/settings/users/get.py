@@ -17,6 +17,7 @@ from app.repositories import UsersRepository
 from app.services import UsersService
 from app.services.user.process import process_identity_msg
 from app.storage.db.engine import async_session
+from app.utils.history.last_message import LastMessage
 
 from .root import DIR as PARENT_DIR
 
@@ -30,7 +31,9 @@ class Finding(StatesGroup):
 
 
 @router.callback_query(F.data == DIR)
-async def user_get_cb_handler(callback: CallbackQuery, state: FSMContext):
+async def user_get_cb_handler(
+    callback: CallbackQuery, last_message: LastMessage, state: FSMContext
+):
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
 
@@ -40,7 +43,7 @@ async def user_get_cb_handler(callback: CallbackQuery, state: FSMContext):
     found_user_id: int | None = data.get("found_user_id", None)
     found_username = data.get("found_username", None)
 
-    await send_enter_identity(
+    sent_message = await send_enter_identity(
         callback.message,
         SendAction.EDIT,
         DIR,
@@ -49,6 +52,8 @@ async def user_get_cb_handler(callback: CallbackQuery, state: FSMContext):
         sender_id,
         sender_username,
     )
+    await last_message.set(sent_message, state)
+
     await state.set_state(Finding.waiting_for_identity)
 
 
@@ -85,11 +90,18 @@ async def process_identity_handler(
 
 
 @router.message(Finding.waiting_for_identity)
-async def user_get_msg_identity_handler(message: Message, state: FSMContext):
+async def user_get_msg_identity_handler(
+    message: Message, last_message: LastMessage, state: FSMContext
+):
+    await last_message.edit_reply_markup(message, state)
+
     try:
         input_id, input_username = await process_identity_msg(message)
     except ValueError as e:
-        await send_invalid(message, SendAction.ANSWER, PARENT_DIR, str(e))
+        sent_message = await send_invalid(
+            message, SendAction.ANSWER, PARENT_DIR, str(e)
+        )
+        await last_message.set(sent_message, state)
         return
 
     await process_identity_handler(
