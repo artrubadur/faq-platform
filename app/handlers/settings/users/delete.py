@@ -39,8 +39,8 @@ async def user_delete_cb_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    found_user_id: int | None = data.get("found_user_id", None)
-    found_username = data.get("found_username", None)
+    found_user_id: int | None = data.get("glb_found_user_id", None)
+    found_username = data.get("glb_found_username", None)
 
     sent_message = await send_enter_identity(
         callback.message,
@@ -62,13 +62,12 @@ async def process_identity_handler(
     *,
     send_action: SendAction,
 ):
-    await state.update_data(input_id=input_id)
-
     async with async_session() as session:
         repo = UsersRepository(session)
         service = UsersService(repo)
         try:
             user = await service.read_user(input_id)
+            await state.update_data(tmp_input_id=input_id)
             await send_confirm_deletion(
                 message,
                 send_action,
@@ -123,7 +122,8 @@ async def user_delete_cb_confirm_handler(callback: CallbackQuery, state: FSMCont
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    input_id: int = data.pop("input_id")
+    input_id: int = data.pop("tmp_input_id")
+    await state.set_data(data)
 
     async with async_session() as session:
         repo = UsersRepository(session)

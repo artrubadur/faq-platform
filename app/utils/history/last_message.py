@@ -10,11 +10,11 @@ class LastMessage:
         self.bot = bot
 
     async def set(self, message: Message, state: FSMContext):
-        await state.update_data(last_bot_message_id=message.message_id)
+        await state.update_data(glb_last_bot_message_id=message.message_id)
 
     async def get_id(self, state: FSMContext) -> int | None:
         data = await state.get_data()
-        return data.get("last_bot_message_id", None)
+        return data.get("glb_last_bot_message_id", None)
 
     async def edit_reply_markup(
         self,

@@ -39,8 +39,8 @@ async def user_get_cb_handler(
     sender_id = callback.from_user.id
     sender_username = callback.from_user.username
     data = await state.get_data()
-    found_user_id: int | None = data.get("found_user_id", None)
-    found_username = data.get("found_username", None)
+    found_user_id: int | None = data.get("glb_found_user_id", None)
+    found_username = data.get("glb_found_username", None)
 
     sent_message = await send_enter_identity(
         callback.message,
@@ -70,7 +70,7 @@ async def process_identity_handler(
         try:
             user = await service.read_user(input_id)
             await state.update_data(
-                found_user_id=user.telegram_id, found_username=user.username
+                glb_found_user_id=user.telegram_id, glb_found_username=user.username
             )
             await send_successfully_found(
                 message,
@@ -81,7 +81,7 @@ async def process_identity_handler(
             )
         except NoResultFound:
             await state.update_data(
-                found_user_id=input_id, found_username=input_username
+                glb_found_user_id=input_id, glb_found_username=input_username
             )
             await send_partially_found(message, send_action, input_id, input_username)
 

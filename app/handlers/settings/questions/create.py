@@ -63,7 +63,7 @@ async def question_create_msg_question_text_handler(
         await last_message.set(sent_message, state)
         return
 
-    await state.update_data(input_question_text=input_question_text)
+    await state.update_data(tmp_input_question_text=input_question_text)
 
     await send_enter_answer_text(message, SendAction.ANSWER)
 
@@ -85,10 +85,10 @@ async def question_create_msg_answer_text_handler(
         await last_message.set(sent_message, state)
         return
 
-    await state.update_data(input_answer_text=input_answer_text)
+    await state.update_data(tmp_input_answer_text=input_answer_text)
 
     data = await state.get_data()
-    input_question_text: str = data["input_question_text"]
+    input_question_text: str = data["tmp_input_question_text"]
 
     await send_confirm_creation(
         message, SendAction.ANSWER, input_question_text, input_answer_text
@@ -105,10 +105,8 @@ async def question_create_cb_create_confirm_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    input_question_text: str = data["input_question_text"]
-    input_answer_text: str = data["input_answer_text"]
-
-    await state.update_data(input_id=None, input_username=None, input_role=None)
+    input_question_text: str = data["tmp_input_question_text"]
+    input_answer_text: str = data["tmp_input_answer_text"]
 
     async with async_session() as session:
         repo = QuestionsRepository(session)
@@ -117,7 +115,7 @@ async def question_create_cb_create_confirm_handler(
             qustion = await service.create_question(
                 input_question_text, input_answer_text, True
             )
-            del data["input_question_text"], data["input_answer_text"]
+            await state.set_data(data)
             await send_successfully_created(
                 callback.message,
                 SendAction.EDIT,
@@ -142,10 +140,9 @@ async def question_create_cb_similar_confirm_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    input_question_text: str = data.pop("input_question_text")
-    input_answer_text: str = data.pop("input_answer_text")
-
-    await state.update_data(input_id=None, input_username=None, input_role=None)
+    input_question_text: str = data.pop("tmp_input_question_text")
+    input_answer_text: str = data.pop("tmp_input_answer_text")
+    await state.set_data(data)
 
     async with async_session() as session:
         repo = QuestionsRepository(session)

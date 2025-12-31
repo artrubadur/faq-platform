@@ -55,7 +55,7 @@ async def question_update_cb_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    found_question_id: int | None = data.get("found_question_id", None)
+    found_question_id: int | None = data.get("glb_found_question_id", None)
 
     sent_message = await send_enter_id(
         callback.message, SendAction.EDIT, DIR, found_question_id
@@ -74,9 +74,9 @@ async def process_id_handler(
         try:
             question = await service.read_question(input_id)
             await state.update_data(
-                input_id=input_id,
-                orig_question_text=question.question_text,
-                orig_answer_text=question.answer_text,
+                tmp_input_id=input_id,
+                tmp_orig_question_text=question.question_text,
+                tmp_orig_answer_text=question.answer_text,
             )
             await send_confirm_update(
                 message,
@@ -127,13 +127,13 @@ async def process_fields_handler(
     message: Message, state: FSMContext, *, send_action: SendAction
 ):
     data = await state.get_data()
-    id: str = data["input_id"]
-    question_text: str = data["orig_question_text"]
-    answer_text: str = data["orig_answer_text"]
+    id: str = data["tmp_input_id"]
+    question_text: str = data["tmp_orig_question_text"]
+    answer_text: str = data["tmp_orig_answer_text"]
 
-    edited_question_text: str = data.get("edited_question_text", question_text)
-    edited_answer_text: str = data.get("edited_answer_text", answer_text)
-    recompute_embedding: bool = data.get("recompute_embedding", False)
+    edited_question_text: str = data.get("tmp_edited_question_text", question_text)
+    edited_answer_text: str = data.get("tmp_edited_answer_text", answer_text)
+    recompute_embedding: bool = data.get("tmp_recompute_embedding", False)
 
     await send_changes(
         message,
@@ -199,7 +199,7 @@ async def question_update_msg_edited_question_text_handler(
         await last_message.set(sent_message, state)
         return
 
-    await state.update_data(edited_question_text=input_question_text)
+    await state.update_data(tmp_edited_question_text=input_question_text)
 
     await send_confirm_recompute(message, SendAction.ANSWER)
 
@@ -213,7 +213,7 @@ async def question_update_cb_confirm_recompute_handler(
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    await state.update_data(recompute_embedding=True)
+    await state.update_data(tmp_recompute_embedding=True)
 
     await process_fields_handler(callback.message, state, send_action=SendAction.EDIT)
 
@@ -225,7 +225,7 @@ async def question_update_cb_cancel_recompute_handler(
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    await state.update_data(recompute_embedding=False)
+    await state.update_data(tmp_recompute_embedding=False)
 
     await process_fields_handler(callback.message, state, send_action=SendAction.EDIT)
 
@@ -256,7 +256,7 @@ async def question_update_msg_edited_answer_text_handler(
         await last_message.set(sent_message, state)
         return
 
-    await state.update_data(edited_answer_text=input_answer_text)
+    await state.update_data(tmp_edited_answer_text=input_answer_text)
 
     await process_fields_handler(message, state, send_action=SendAction.ANSWER)
 
@@ -272,10 +272,10 @@ async def question_update_cb_save_handler(callback: CallbackQuery, state: FSMCon
     id: str = data.pop("input_id")
     question_text = data.pop("orig_question_text")
     answer_text = data.pop("orig_answer_text")
-
     edited_question_text: str = data.pop("edited_question_text", question_text)
     edited_answer_text: str = data.pop("edited_answer_text", answer_text)
     recompute_embedding: bool = data.pop("recompute_embedding", False)
+    await state.set_data(data)
 
     async with async_session() as session:
         repo = QuestionsRepository(session)

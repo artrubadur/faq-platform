@@ -39,7 +39,7 @@ async def question_get_cb_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    found_question_id: int | None = data.get("found_question_id", None)
+    found_question_id: int | None = data.get("glb_found_question_id", None)
 
     sent_message = await send_enter_id(
         callback.message, SendAction.EDIT, DIR, found_question_id
@@ -52,13 +52,12 @@ async def question_get_cb_handler(
 async def process_id_handler(
     message: Message, state: FSMContext, input_id: int, *, send_action: SendAction
 ):
-    await state.update_data(input_id=input_id)
-
     async with async_session() as session:
         repo = QuestionsRepository(session)
         service = QuestionsService(repo)
         try:
             question = await service.read_question(input_id)
+            await state.update_data(tmp_input_id=input_id)
             await send_confirm_deletion(
                 message,
                 SendAction.ANSWER,
@@ -112,7 +111,8 @@ async def question_delete_cb_confirm_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    input_id: int = data.pop("input_id")
+    input_id: int = data.pop("tmp_input_id")
+    await state.set_data(data)
 
     async with async_session() as session:
         repo = QuestionsRepository(session)

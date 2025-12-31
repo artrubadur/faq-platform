@@ -30,7 +30,7 @@ def identity_rows(
         rows.append(
             [
                 InlineKeyboardButton(
-                    text=f"Found ({found_username or found_user_id})",
+                    text=f"Found ({f"@{found_username}" if found_username is not None else found_user_id})",
                     callback_data=callback_data,
                 )
             ]
@@ -42,7 +42,7 @@ def identity_rows(
         rows.append(
             [
                 InlineKeyboardButton(
-                    text=f"Me ({sender_username or sender_id})",
+                    text=f"Me ({f"@{sender_username}" if sender_username is not None else sender_id})",
                     callback_data=callback_data,
                 )
             ]

@@ -1,7 +1,7 @@
 from aiogram import Router
 from aiogram.filters import Command, CommandObject, CommandStart
-from aiogram.types import CallbackQuery, Message
 from aiogram.fsm.context import FSMContext
+from aiogram.types import CallbackQuery, Message
 
 from app.dialogs.actions import SendAction
 from app.dialogs.rows.base import CloseCallback

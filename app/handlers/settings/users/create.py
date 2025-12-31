@@ -47,8 +47,8 @@ async def user_create_cb_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    found_user_id: int | None = data.get("found_user_id", None)
-    found_username = data.get("found_username", None)
+    found_user_id: int | None = data.get("glb_found_user_id", None)
+    found_username = data.get("glb_found_username", None)
 
     sent_message = await send_enter_identity(
         callback.message,
@@ -71,11 +71,11 @@ async def process_identity_handler(
     *,
     send_action: SendAction,
 ):
-    await state.update_data(input_id=input_id, input_username=input_username)
+    await state.update_data(tmp_input_id=input_id, tmp_input_username=input_username)
 
     if input_username is None:
         data = await state.get_data()
-        found_username = data.get("found_username", None)
+        found_username = data.get("glb_found_username", None)
 
         sent_message = await send_enter_username(
             message, send_action, DIR, found_username
@@ -146,7 +146,7 @@ async def process_username_handler(
     *,
     send_action: SendAction,
 ):
-    await state.update_data(input_username=input_username)
+    await state.update_data(tmp_input_username=input_username)
 
     sent_message = await send_select_role(message, send_action, DIR)
     await last_message.set(sent_message, state)
@@ -203,11 +203,11 @@ async def process_role_handler(
     *,
     send_action: SendAction,
 ):
-    await state.update_data(input_role=input_role)
+    await state.update_data(tmp_input_role=input_role)
 
     data = await state.get_data()
-    input_id: int = data["input_id"]
-    input_username: str | None = data["input_username"]
+    input_id: int = data["tmp_input_id"]
+    input_username: str | None = data["tmp_input_username"]
 
     sent_message = await send_confirm_creation(
         message, send_action, input_id, input_username, input_role
@@ -260,9 +260,10 @@ async def user_create_cb_confirm_handler(callback: CallbackQuery, state: FSMCont
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    input_id: int = data.pop("input_id")
-    input_username: str | None = data.pop("input_username")
-    input_role: str = data.pop("input_role")
+    input_id: int = data.pop("tmp_input_id")
+    input_username: str | None = data.pop("tmp_input_username")
+    input_role: str = data.pop("tmp_input_role")
+    await state.set_data(data)
 
     async with async_session() as session:
         repo = UsersRepository(session)

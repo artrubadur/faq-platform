@@ -1,3 +1,4 @@
+from json import dumps
 from typing import Any, Awaitable, Callable
 
 from aiogram.types import InlineKeyboardMarkup, Message, ReplyKeyboardRemove
@@ -7,7 +8,6 @@ from app.core.constants.emojis import EmojiAction
 from app.core.constants.files import Images
 from app.dialogs.actions import action_wrapper
 from app.utils.format.output import format_exception
-from json import dumps
 
 
 @action_wrapper

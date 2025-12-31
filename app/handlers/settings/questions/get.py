@@ -37,7 +37,7 @@ async def question_get_cb_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    found_question_id: int | None = data.get("found_question_id", None)
+    found_question_id: int | None = data.get("glb_found_question_id", None)
 
     sent_message = await send_enter_id(
         callback.message, SendAction.EDIT, DIR, found_question_id
@@ -55,7 +55,7 @@ async def process_id_handler(
         service = QuestionsService(repo)
         try:
             question = await service.read_question(input_id)
-            await state.update_data(found_question_id=question.id)
+            await state.update_data(glb_found_question_id=question.id)
             await send_successfully_found(
                 message,
                 send_action,

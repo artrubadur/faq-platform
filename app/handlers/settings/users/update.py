@@ -55,8 +55,8 @@ async def user_update_cb_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    found_user_id: int | None = data.get("found_user_id", None)
-    found_username = data.get("found_username", None)
+    found_user_id: int | None = data.get("glb_found_user_id", None)
+    found_username = data.get("glb_found_username", None)
 
     sent_message = await send_enter_identity(
         callback.message,
@@ -84,9 +84,9 @@ async def process_identity_handler(
         try:
             user = await service.read_user(input_id)
             await state.update_data(
-                orig_id=user.telegram_id,
-                orig_username=user.username,
-                orig_role=user.role.value,
+                tmp_orig_id=user.telegram_id,
+                tmp_orig_username=user.username,
+                tmp_orig_role=user.role.value,
             )
             await send_confirm_update(
                 message,
@@ -140,12 +140,12 @@ async def process_fields_handler(
     message: Message, state: FSMContext, *, send_action: SendAction
 ):
     data = await state.get_data()
-    id: int = data["orig_id"]
-    username: str | None = data["orig_username"]
-    role: str = data["orig_role"]
+    id: int = data["tmp_orig_id"]
+    username: str | None = data["tmp_orig_username"]
+    role: str = data["tmp_orig_role"]
 
-    edited_username: str | None = data.get("edited_username", username)
-    edited_role: str = data.get("edited_role", role)
+    edited_username: str | None = data.get("tmp_edited_username", username)
+    edited_role: str = data.get("tmp_edited_role", role)
 
     await send_changes(
         message,
@@ -192,7 +192,7 @@ async def user_update_cb_edit_username_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    found_username = data.get("found_username", None)
+    found_username = data.get("glb_found_username", None)
 
     sent_message = await send_edit_username(
         callback.message, SendAction.EDIT, DIR, found_username
@@ -215,7 +215,7 @@ async def user_update_msg_edited_username_handler(
         await last_message.set(sent_message, state)
         return
 
-    await state.update_data(edited_username=input_username)
+    await state.update_data(tmp_edited_username=input_username)
 
     await process_fields_handler(message, state, send_action=SendAction.ANSWER)
 
@@ -228,7 +228,7 @@ async def user_update_cb_edited_username_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     input_username = callback_data.username
-    await state.update_data(edited_username=input_username)
+    await state.update_data(tmp_edited_username=input_username)
 
     await process_fields_handler(callback.message, state, send_action=SendAction.EDIT)
 
@@ -259,7 +259,7 @@ async def user_update_msg_edited_role_handler(
         await last_message.set(sent_message, state)
         return
 
-    await state.update_data(edited_role=input_role)
+    await state.update_data(tmp_edited_role=input_role)
 
     await process_fields_handler(message, state, send_action=SendAction.ANSWER)
 
@@ -272,7 +272,7 @@ async def user_update_cb_edited_role_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     input_role = callback_data.role
-    await state.update_data(edited_role=input_role)
+    await state.update_data(tmp_edited_role=input_role)
 
     await process_fields_handler(callback.message, state, send_action=SendAction.EDIT)
 
@@ -283,12 +283,12 @@ async def user_update_cb_save_handler(callback: CallbackQuery, state: FSMContext
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    id: int = data.pop("orig_id")
-    username: str | None = data.pop("orig_username")
-    role: str = data.pop("orig_role")
-
-    edited_username: str | None = data.pop("edited_username", username)
-    edited_role: str = data.pop("edited_role", role)
+    id: int = data.pop("tmp_orig_id")
+    username: str | None = data.pop("tmp_orig_username")
+    role: str = data.pop("tmp_orig_role")
+    edited_username: str | None = data.pop("tmp_edited_username", username)
+    edited_role: str = data.pop("tmp_edited_role", role)
+    await state.set_data(data)
 
     async with async_session() as session:
         repo = UsersRepository(session)

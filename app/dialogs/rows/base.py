@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton
 
-from app.core.constants.dirs import CREATE, DELETE, UPDATE, GET
+from app.core.constants.dirs import CREATE, DELETE, GET, UPDATE
 from app.core.constants.emojis import EmojiAction, EmojiNav, EmojiStatus
 
 
