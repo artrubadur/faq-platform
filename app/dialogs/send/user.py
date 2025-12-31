@@ -251,7 +251,7 @@ async def send_successfully_updated(
     role: str,
 ) -> Message:
     return await send(
-        text=f"{EmojiStatus.SUCCESSFUL} The qser has been successfully updated:\n{format_user(id=id, username=username, role=role)}",
+        text=f"{EmojiStatus.SUCCESSFUL} The user has been successfully updated:\n{format_user(id=id, username=username, role=role)}",
         parse_mode="HTML",
         reply_markup=mu.back,
     )
