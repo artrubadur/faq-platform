@@ -3,16 +3,6 @@ import re
 from app.storage.db.models.user import Role
 
 
-def validate_id(id: str | int) -> int:
-    if isinstance(id, int):
-        return id
-
-    if id.isdigit():
-        return int(id)
-
-    raise ValueError("ID is incorrect")
-
-
 def validate_username(username: str | None) -> str | None:
     if username is None:
         return None

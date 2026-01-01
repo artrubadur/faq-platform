@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from enum import Enum
 
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton
@@ -7,7 +8,7 @@ from app.core.constants.dirs import CREATE, DELETE, GET, UPDATE
 from app.core.constants.emojis import EmojiAction, EmojiNav, EmojiStatus
 
 
-class CloseCallback(CallbackData, prefix="close"):
+class CloseCallback(CallbackData, prefix="cls"):
     pass
 
 
@@ -21,7 +22,7 @@ def close_row():
     ]
 
 
-class BackCallback(CallbackData, prefix="back"):
+class BackCallback(CallbackData, prefix="bck"):
     dir: str
 
 
@@ -35,7 +36,7 @@ def back_row(dir: str):
     ]
 
 
-class CancelCallback(CallbackData, prefix="cancel"):
+class CancelCallback(CallbackData, prefix="cnc"):
     dir: str
 
 
@@ -50,7 +51,7 @@ def cancel_row(dir: str):
     ]
 
 
-class ConfirmCallback(CallbackData, prefix="confirm"):
+class ConfirmCallback(CallbackData, prefix="cfm"):
     dir: str
     step: str
 
@@ -70,7 +71,7 @@ def confirm_row(confirm_dir: str, cancel_dir: str, step: str = ""):
     ]
 
 
-class SaveCallback(CallbackData, prefix="save"):
+class SaveCallback(CallbackData, prefix="sav"):
     dir: str
 
 
@@ -109,7 +110,7 @@ def crud_rows(dir: str):
     ]
 
 
-class EditCallback(CallbackData, prefix="edit"):
+class EditCallback(CallbackData, prefix="edt"):
     dir: str
     field: str
 
@@ -131,3 +132,83 @@ def field_rows(dir: str, cancel_dir: str, fields: list[FieldButton]):
         for field in fields
     ]
     return field_rows + save_row(dir, cancel_dir)
+
+
+class PaginPageCallback(CallbackData, prefix="pgp"):
+    dir: str
+    page: int
+
+
+def pagin_page_row(dir: str, has_prev: bool, has_next: bool):
+    result = []
+    if has_prev:
+        result.append(
+            InlineKeyboardButton(
+                text=EmojiNav.LEFT,
+                callback_data=PaginPageCallback(dir=dir, page=-1).pack(),
+            )
+        )
+    if has_next:
+        result.append(
+            InlineKeyboardButton(
+                text=EmojiNav.RIGHT,
+                callback_data=PaginPageCallback(dir=dir, page=1).pack(),
+            )
+        )
+    return [result]
+
+
+class PaginSizeCallback(CallbackData, prefix="pgs"):
+    dir: str
+    size: int
+
+
+def pagin_size_row(dir: str, sizes: list[int], current: int):
+    return [
+        [
+            InlineKeyboardButton(
+                text=f"{size}",
+                callback_data=PaginSizeCallback(dir=dir, size=size).pack(),
+            )
+            for size in sizes
+            if size != current
+        ]
+    ]
+
+
+class PaginOrderCallback(CallbackData, prefix="pgo"):
+    dir: str
+    column: str
+
+
+def pagin_order_row(dir: str, column_enum: type[Enum], current: str):
+    return [
+        [
+            InlineKeyboardButton(
+                text=col.name,
+                callback_data=PaginOrderCallback(dir=dir, column=col.value).pack(),
+            )
+            for col in column_enum
+            if col.value != current
+        ]
+    ]
+
+
+class PaginDirectionCallback(CallbackData, prefix="pgd"):
+    dir: str
+    ascending: bool
+
+
+def pagin_direction_row(dir: str, current: bool):
+    return [
+        [
+            InlineKeyboardButton(
+                text=(
+                    EmojiNav.DOWN if current else EmojiNav.UP
+                ),  # if current is ascending
+                callback_data=PaginDirectionCallback(
+                    dir=dir, ascending=(not current)
+                ).pack(),
+            )
+        ]
+    ]

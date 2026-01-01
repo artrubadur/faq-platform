@@ -66,7 +66,7 @@ async def process_identity_handler(
         repo = UsersRepository(session)
         service = UsersService(repo)
         try:
-            user = await service.read_user(input_id)
+            user = await service.get_user(input_id)
             await state.update_data(tmp_input_id=input_id)
             await send_confirm_deletion(
                 message,

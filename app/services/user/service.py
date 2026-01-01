@@ -13,8 +13,18 @@ class UsersService:
             role,
         )
 
-    async def read_user(self, id: int) -> User:
-        return await self.repository.read(id)
+    async def get_user(self, id: int) -> User:
+        return await self.repository.get(id)
+
+    async def get_user_amount(self) -> int:
+        return await self.repository.get_amount()
+
+    async def get_paginated_users(
+        self, page: int, page_size: int, order_by: str, ascending: bool
+    ) -> list[User]:
+        offset = (page - 1) * page_size
+        users = await self.repository.get_slice(offset, page_size, order_by, ascending)
+        return list(users)
 
     async def delete_user(self, id: int) -> User:
         return await self.repository.delete(id)

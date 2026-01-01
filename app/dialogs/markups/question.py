@@ -6,11 +6,10 @@ from app.core.constants.dirs import (
     QUESTIONS_CREATE,
     QUESTIONS_DELETE,
     QUESTIONS_UPDATE,
-    SETTINGS,
 )
 
 main = InlineKeyboardMarkup(
-    inline_keyboard=rows.crud_rows(QUESTIONS[1]) + rows.back_row(SETTINGS),
+    inline_keyboard=rows.crud_rows(QUESTIONS[1]) + rows.back_row(QUESTIONS[0]),
 )
 
 back = InlineKeyboardMarkup(inline_keyboard=rows.back_row(QUESTIONS[1]))

@@ -7,5 +7,5 @@ STATIC_DIR = Path.cwd() / "static"
 GREETING = FSInputFile(str(STATIC_DIR / "greeting.gif"))
 
 
-class Images(Enum):
+class Image(Enum):
     GREETING = FSInputFile(str(STATIC_DIR / "greeting.gif"))

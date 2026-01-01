@@ -1,7 +1,8 @@
 # pyright: reportArgumentType=false
 from aiogram.types import Message
 
-from app.services.user.validate import validate_id, validate_role, validate_username
+from app.services.common.validate import validate_int
+from app.services.user.validate import validate_role, validate_username
 from app.utils.format.input import format_input
 
 
@@ -20,7 +21,7 @@ async def process_identity_msg(message: Message):
     else:
         raise ValueError("Invalid message type")
 
-    valid_id = validate_id(input_id)
+    valid_id = validate_int(input_id)
     return valid_id, input_username
 
 

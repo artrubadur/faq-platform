@@ -13,6 +13,10 @@ class EmojiNav(StrEnum):
     CANCEL_CHANGES = "🚫"
     REJECT = "❌"
     CLOSE = "✖️"
+    RIGHT = "▶️"
+    LEFT = "◀️"
+    DOWN = "🔽"
+    UP = "🔼"
 
 
 class EmojiAction(StrEnum):

@@ -1,7 +1,8 @@
 # pyright: reportArgumentType=false
 from aiogram.types import Message
 
-from app.services.question.validate import validate_id, validate_question_text
+from app.services.common.validate import validate_int
+from app.services.question.validate import validate_question_text
 from app.utils.format.input import format_input
 
 
@@ -10,7 +11,8 @@ async def process_id_msg(message: Message):
     if input_id is None:
         raise ValueError("Invalid message type")
 
-    valid_id = validate_id(input_id)
+    formatted_id = format_input(input_id)
+    valid_id = validate_int(formatted_id)
     return valid_id
 
 

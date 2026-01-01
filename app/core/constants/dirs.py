@@ -4,6 +4,7 @@ CREATE = "create"
 GET = "get"
 UPDATE = "update"
 DELETE = "delete"
+LIST = "list"
 
 USERS = (SETTINGS, f"{SETTINGS}.users")
 
@@ -11,6 +12,7 @@ USERS_CREATE = (USERS[1], f"{USERS[1]}.{CREATE}")
 USERS_GET = (USERS[1], f"{USERS[1]}.{GET}")
 USERS_UPDATE = (USERS[1], f"{USERS[1]}.{UPDATE}")
 USERS_DELETE = (USERS[1], f"{USERS[1]}.{DELETE}")
+USERS_LIST = (USERS[1], f"{USERS[1]}.{LIST}")
 
 QUESTIONS = (SETTINGS, f"{SETTINGS}.questions")
 

@@ -5,7 +5,7 @@ from aiogram.types import InlineKeyboardMarkup, Message, ReplyKeyboardRemove
 
 import app.dialogs.rows.root as rows
 from app.core.constants.emojis import EmojiAction
-from app.core.constants.files import Images
+from app.core.constants.files import Image
 from app.dialogs.actions import action_wrapper
 from app.utils.format.output import format_exception
 
@@ -15,7 +15,7 @@ async def send_start(
     send: Callable[..., Awaitable[Message]], full_name: str
 ) -> Message:
     return await send(
-        document=Images.GREETING.value,
+        document=Image.GREETING.value,
         caption=f"You started the bot, {full_name}!",
         reply_markup=ReplyKeyboardRemove(),
     )

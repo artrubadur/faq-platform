@@ -68,7 +68,7 @@ async def process_identity_handler(
         repo = UsersRepository(session)
         service = UsersService(repo)
         try:
-            user = await service.read_user(input_id)
+            user = await service.get_user(input_id)
             await state.update_data(
                 glb_found_user_id=user.telegram_id, glb_found_username=user.username
             )
