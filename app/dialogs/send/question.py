@@ -3,11 +3,13 @@ from typing import Awaitable, Callable
 from aiogram.types import InlineKeyboardMarkup, Message
 
 import app.dialogs.markups.question as mu
-import app.dialogs.rows.base as brows
+import app.dialogs.rows.common as brows
 import app.dialogs.rows.question as qrows
 from app.core.constants.emojis import EmojiAction, EmojiStatus
 from app.dialogs.actions import action_wrapper
-from app.utils.format.output import format_edited_question, format_id, format_question
+from app.repositories.questions import QuestionColumn
+from app.storage.db.models.question import Question
+from app.utils.format.output import format_edited_question, format_id, format_question, format_question_table, format_user_table
 
 
 # Input
@@ -279,3 +281,30 @@ async def send_successfully_updated(
 #         text=format_exception(f"Failed to update the question: {exception}"),
 #         reply_markup=mu.back,
 #     )
+
+
+@action_wrapper
+async def send_pagination(
+    send: Callable[..., Awaitable[Message]],
+    questions: list[Question],
+    order: str,
+    ascending: bool,
+    page: int,
+    max_page: int,
+    page_size: int,
+) -> Message:
+
+    has_prev = page > 1
+    has_next = page != max_page
+    index_offset = (page - 1) * page_size
+
+    columns = [m.value for m in QuestionColumn][:-1]
+
+    reply_markup = mu.make_listing_markup(
+        columns, order, ascending, page_size, has_prev, has_next
+    )
+
+    table = format_question_table(questions, columns, index_offset)
+    text = f"{EmojiAction.LIST} List: {page}/{max_page}\n```\n{table}\n```"
+
+    return await send(text=text, reply_markup=reply_markup, parse_mode="Markdown")

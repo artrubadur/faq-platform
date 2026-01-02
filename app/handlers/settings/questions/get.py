@@ -8,7 +8,7 @@ from sqlalchemy.exc import NoResultFound
 from app.core.constants.dirs import QUESTIONS_GET
 from app.dialogs import SendAction
 from app.dialogs.rows.question import IdCallback
-from app.dialogs.send.base import send_invalid
+from app.dialogs.send.common import send_invalid
 from app.dialogs.send.question import (
     send_enter_id,
     send_not_found,
@@ -54,7 +54,7 @@ async def process_id_handler(
         repo = QuestionsRepository(session)
         service = QuestionsService(repo)
         try:
-            question = await service.read_question(input_id)
+            question = await service.get_question(input_id)
             await state.update_data(glb_found_question_id=question.id)
             await send_successfully_found(
                 message,

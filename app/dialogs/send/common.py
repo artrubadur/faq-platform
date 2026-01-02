@@ -2,7 +2,7 @@ from typing import Awaitable, Callable
 
 from aiogram.types import InlineKeyboardMarkup, Message
 
-import app.dialogs.rows.base as rows
+import app.dialogs.rows.common as rows
 from app.core.constants.emojis import EmojiStatus
 from app.dialogs.actions import action_wrapper
 

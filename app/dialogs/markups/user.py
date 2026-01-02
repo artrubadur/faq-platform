@@ -1,8 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup
 
-import app.dialogs.rows.base as rows
+import app.dialogs.rows.common as rows
 from app.core.constants.dirs import (
-    SETTINGS,
     USERS,
     USERS_CREATE,
     USERS_DELETE,
@@ -13,7 +12,7 @@ from app.core.constants.dirs import (
 main = InlineKeyboardMarkup(
     inline_keyboard=rows.crud_rows(USERS[1])
     + rows.list_row(USERS[1])
-    + rows.back_row(SETTINGS),
+    + rows.back_row(USERS[0]),
 )
 
 back = InlineKeyboardMarkup(inline_keyboard=rows.back_row(USERS[1]))

@@ -5,7 +5,7 @@ from aiogram.types import CallbackQuery, Message
 
 from app.core.constants.dirs import SETTINGS
 from app.dialogs import SendAction
-from app.dialogs.rows.base import BackCallback
+from app.dialogs.rows.common import BackCallback
 from app.dialogs.send.settings import send_settings_menu
 
 router = Router()

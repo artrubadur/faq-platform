@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
 
-from app.core.constants.dirs import USERS_LIST
+from app.core.constants.dirs import QUESTIONS_LIST
 from app.dialogs.actions import SendAction
 from app.dialogs.rows.common import (
     PaginOrderCallback,
@@ -12,16 +12,16 @@ from app.dialogs.rows.common import (
     PaginSizeCallback,
 )
 from app.dialogs.send.common import send_invalid
-from app.dialogs.send.user import send_pagination
-from app.repositories import UsersRepository
-from app.services import UsersService
+from app.dialogs.send.question import send_pagination
+from app.repositories.questions import QuestionsRepository
 from app.services.common.process import process_page_msg
+from app.services.question.service import QuestionsService
 from app.storage.db.engine import async_session
 from app.utils.history.last_message import LastMessage
 
 router = Router()
 
-PARENT_DIR, DIR = USERS_LIST
+PARENT_DIR, DIR = QUESTIONS_LIST
 
 
 class Listing(StatesGroup):
@@ -42,11 +42,11 @@ async def process(
     page_size: int = data["tmp_page_size"]
 
     async with async_session() as session:
-        repo = UsersRepository(session)
-        service = UsersService(repo)
+        repo = QuestionsRepository(session)
+        service = QuestionsService(repo)
 
         if "tmp_amount" not in data:
-            amount = await service.get_user_amount()
+            amount = await service.get_questions_amount()
             await state.update_data(tmp_amount=amount)
         else:
             amount = data["tmp_amount"]
@@ -54,7 +54,7 @@ async def process(
         max_page = (amount + page_size - 1) // page_size
         page = min(max_page, page)
 
-        users = await service.get_paginated_users(page, page_size, order, ascending)
+        users = await service.get_paginated_questions(page, page_size, order, ascending)
         sent_message = await send_pagination(
             message,
             send_action,
@@ -69,7 +69,7 @@ async def process(
 
 
 @router.callback_query(F.data == DIR)
-async def user_list_cb_handler(
+async def question_list_cb_handler(
     callback: CallbackQuery, last_message: LastMessage, state: FSMContext
 ):
     await callback.answer()
@@ -85,7 +85,7 @@ async def user_list_cb_handler(
 
 
 @router.message(Listing.waiting_for_page)
-async def user_list_msg_page_handler(
+async def question_list_msg_page_handler(
     message: Message, last_message: LastMessage, state: FSMContext
 ):
     await last_message.delete(message, state)
@@ -105,7 +105,7 @@ async def user_list_msg_page_handler(
 
 
 @router.callback_query(PaginPageCallback.filter(F.dir == DIR))
-async def user_list_cb_page_handler(
+async def question_list_cb_page_handler(
     callback: CallbackQuery,
     last_message: LastMessage,
     callback_data: PaginPageCallback,
@@ -121,7 +121,7 @@ async def user_list_cb_page_handler(
 
 
 @router.callback_query(PaginSizeCallback.filter(F.dir == DIR))
-async def user_list_cb_size_handler(
+async def question_list_cb_size_handler(
     callback: CallbackQuery,
     last_message: LastMessage,
     callback_data: PaginSizeCallback,
@@ -135,7 +135,7 @@ async def user_list_cb_size_handler(
 
 
 @router.callback_query(PaginOrderCallback.filter(F.dir == DIR))
-async def user_list_cb_order_handler(
+async def question_list_cb_order_handler(
     callback: CallbackQuery,
     last_message: LastMessage,
     callback_data: PaginOrderCallback,

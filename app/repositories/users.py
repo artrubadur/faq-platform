@@ -32,10 +32,7 @@ class UsersRepository:
     async def get_slice(self, offset: int, limit: int, order_by: str, ascending: bool):
         col = getattr(User, order_by)
 
-        if ascending:
-            order_expr = col.asc()
-        else:
-            order_expr = col.desc()
+        order_expr = col.asc() if ascending else col.desc()
 
         result = await self.session.execute(
             select(User).order_by(order_expr).offset(offset).limit(limit)

@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError, NoResultFound
 
 from app.core.constants.dirs import USERS_UPDATE
 from app.dialogs import SendAction
-from app.dialogs.rows.base import (
+from app.dialogs.rows.common import (
     BackCallback,
     CancelCallback,
     ConfirmCallback,
@@ -15,7 +15,7 @@ from app.dialogs.rows.base import (
     SaveCallback,
 )
 from app.dialogs.rows.user import IdentityCallback, RoleCallback, UsernameCallback
-from app.dialogs.send.base import send_invalid
+from app.dialogs.send.common import send_invalid
 from app.dialogs.send.user import (
     send_changes,
     send_confirm_update,

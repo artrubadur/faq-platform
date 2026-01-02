@@ -7,9 +7,9 @@ from sqlalchemy.exc import NoResultFound
 
 from app.core.constants.dirs import USERS_DELETE
 from app.dialogs import SendAction
-from app.dialogs.rows.base import ConfirmCallback
+from app.dialogs.rows.common import ConfirmCallback
 from app.dialogs.rows.user import IdentityCallback
-from app.dialogs.send.base import send_invalid
+from app.dialogs.send.common import send_invalid
 from app.dialogs.send.user import (
     send_confirm_deletion,
     send_enter_identity,

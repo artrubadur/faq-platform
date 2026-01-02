@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
 from app.dialogs.actions import SendAction
-from app.dialogs.rows.base import CloseCallback
+from app.dialogs.rows.common import CloseCallback
 from app.dialogs.send.root import (
     send_confirm_goto,
     send_invalid_path,

@@ -23,7 +23,7 @@ class QuestionsService:
         embedding = embedding_computer(question_text)
 
         if check_similarity and (similar_id := find_similar(embedding)) is not None:
-            similar_question = await self.read_question(similar_id)
+            similar_question = await self.get_question(similar_id)
             raise SimilarityError("A similar question already exists", similar_question)
 
         return await self.repository.create(  # TODO: EXCEPTION HANDLING
@@ -32,9 +32,19 @@ class QuestionsService:
             embedding,
         )
 
-    async def read_question(self, id: int) -> Question:
-        return await self.repository.read(id)
+    async def get_question(self, id: int) -> Question:
+        return await self.repository.get(id)
 
+    async def get_questions_amount(self) -> int:
+        return await self.repository.get_amount()
+
+    async def get_paginated_questions(
+        self, page: int, page_size: int, order_by: str, ascending: bool
+    ) -> list[Question]:
+        offset = (page - 1) * page_size
+        questions = await self.repository.get_slice(offset, page_size, order_by, ascending)
+        return list(questions)
+    
     async def delete_question(self, id: int) -> Question:
         return await self.repository.delete(id)
 

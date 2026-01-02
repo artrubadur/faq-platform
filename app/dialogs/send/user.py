@@ -3,7 +3,7 @@ from typing import Awaitable, Callable
 from aiogram.types import InlineKeyboardMarkup, Message
 
 import app.dialogs.markups.user as mu
-import app.dialogs.rows.base as brows
+import app.dialogs.rows.common as brows
 import app.dialogs.rows.user as urows
 from app.core.constants.emojis import EmojiAction, EmojiStatus
 from app.dialogs.actions import action_wrapper
@@ -12,7 +12,7 @@ from app.storage.db.models.user import User
 from app.utils.format.output import (
     format_edited_user,
     format_exception,
-    format_table,
+    format_user_table,
     format_user,
 )
 
@@ -288,13 +288,15 @@ async def send_pagination(
 
     has_prev = page > 1
     has_next = page != max_page
+    index_offset = (page - 1) * page_size
+
     columns = [m.value for m in UserColumn]
 
     reply_markup = mu.make_listing_markup(
         columns, order, ascending, page_size, has_prev, has_next
     )
 
-    table = format_table(users, columns)
-    text = f"{EmojiAction.LIST} List of users: {page}/{max_page}\n```\n{table}\n```"
+    table = format_user_table(users, columns, index_offset)
+    text = f"{EmojiAction.LIST} User list: {page}/{max_page}\n```\n{table}\n```"
 
     return await send(text=text, reply_markup=reply_markup, parse_mode="Markdown")

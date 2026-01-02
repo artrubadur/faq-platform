@@ -1,6 +1,8 @@
 from enum import Enum
 
 from app.core.constants.emojis import EmojiStatus, EmojiSymbol
+from app.storage.db.models.question import Question
+from app.storage.db.models.user import User
 
 
 def format_exception(exception: str | None = None):
@@ -94,17 +96,11 @@ def format_edited_question(
     return result
 
 
-def format_table(rows: list, columns: list):
+def format_user_table(rows: list[User], columns: list, idx_offset = 0):
     full_headers = [""] + columns
 
     def extract_value(row, field):
-        if hasattr(row, "_mapping"):
-            if field in row._mapping:
-                val = row._mapping[field]
-            else:
-                val = ""
-        else:
-            val = getattr(row, field, "")
+        val = getattr(row, field, "")
 
         if isinstance(val, Enum):
             return val.value
@@ -115,17 +111,14 @@ def format_table(rows: list, columns: list):
         return str(val)
 
     table = []
-    for idx, row in enumerate(rows, start=1):
-        row_values = [str(idx)]
+    for idx, row in enumerate(rows, 1):
+        row_values = [str(idx+idx_offset)]
         for col in columns:
             row_values.append(extract_value(row, col))
         table.append(row_values)
 
     col_count = len(full_headers)
-    widths = [0] * col_count
-
-    for i, h in enumerate(full_headers):
-        widths[i] = max(widths[i], len(str(h)))
+    widths = [len(str(h)) for h in full_headers]
 
     for row in table:
         for i, cell in enumerate(row):
@@ -139,3 +132,31 @@ def format_table(rows: list, columns: list):
     rows_lines = [fmt_row(r) for r in table]
 
     return "\n".join([header_line, separator] + rows_lines)
+
+def format_question_table(rows: list[Question], columns: list, idx_offset = 0):
+    def extract_value(row, field):
+        val = getattr(row, field, "")
+
+        if isinstance(val, Enum):
+            return val.value
+
+        if val is None:
+            return ""
+
+        return str(val)
+
+    table = []
+    for idx, row in enumerate(rows, 1):
+        row_values = [str(idx+idx_offset)]
+        for col in columns:
+            row_values.append(extract_value(row, col))
+        table.append(row_values)
+
+    def fmt_row(row):
+        delimiter = f"--- Question #{row[0]} ---\n"
+        card = "\n".join(f"{col}: {row[i+1]}" for i, col in enumerate(columns))
+        return delimiter + card
+    
+    rows_lines = [fmt_row(r) for r in table]
+
+    return "\n\n".join(rows_lines)

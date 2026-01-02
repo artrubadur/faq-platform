@@ -4,7 +4,7 @@ from aiogram.types import InlineKeyboardMarkup, Message
 
 import app.dialogs.markups.question as qmu
 import app.dialogs.markups.user as umu
-import app.dialogs.rows.base as brows
+import app.dialogs.rows.common as brows
 import app.dialogs.rows.settings as srows
 from app.core.constants.emojis import EmojiMenu
 from app.dialogs.actions import action_wrapper

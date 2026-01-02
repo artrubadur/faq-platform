@@ -7,9 +7,9 @@ from sqlalchemy.exc import IntegrityError
 
 from app.core.constants.dirs import USERS_CREATE
 from app.dialogs import SendAction
-from app.dialogs.rows.base import ConfirmCallback
+from app.dialogs.rows.common import ConfirmCallback
 from app.dialogs.rows.user import IdentityCallback, RoleCallback, UsernameCallback
-from app.dialogs.send.base import send_invalid
+from app.dialogs.send.common import send_invalid
 from app.dialogs.send.user import (
     send_confirm_creation,
     send_enter_identity,

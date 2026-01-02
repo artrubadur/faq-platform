@@ -7,8 +7,8 @@ from aiogram.types import CallbackQuery, Message
 from app.core.constants.dirs import QUESTIONS_CREATE
 from app.core.exceptions import SimilarityError
 from app.dialogs.actions import SendAction
-from app.dialogs.rows.base import ConfirmCallback
-from app.dialogs.send.base import send_invalid
+from app.dialogs.rows.common import ConfirmCallback
+from app.dialogs.send.common import send_invalid
 from app.dialogs.send.question import (
     send_confirm_creation,
     send_enter_answer_text,

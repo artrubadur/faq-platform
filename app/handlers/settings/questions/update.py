@@ -7,7 +7,7 @@ from sqlalchemy.exc import NoResultFound
 
 from app.core.constants.dirs import QUESTIONS_UPDATE
 from app.dialogs import SendAction
-from app.dialogs.rows.base import (
+from app.dialogs.rows.common import (
     BackCallback,
     CancelCallback,
     ConfirmCallback,
@@ -15,7 +15,7 @@ from app.dialogs.rows.base import (
     SaveCallback,
 )
 from app.dialogs.rows.question import IdCallback
-from app.dialogs.send.base import send_invalid
+from app.dialogs.send.common import send_invalid
 from app.dialogs.send.question import (
     send_changes,
     send_confirm_recompute,
@@ -72,7 +72,7 @@ async def process_id_handler(
         repo = QuestionsRepository(session)
         service = QuestionsService(repo)
         try:
-            question = await service.read_question(input_id)
+            question = await service.get_question(input_id)
             await state.update_data(
                 tmp_input_id=input_id,
                 tmp_orig_question_text=question.question_text,
