@@ -11,7 +11,7 @@ router = Router()
 
 
 @router.message(Command("state"))
-async def cmd_state(message: Message, state: FSMContext, command: CommandObject):
+async def cmd_handler(message: Message, state: FSMContext, command: CommandObject):
     args = command.args
     if args == "clear":
         await state.set_state(None)

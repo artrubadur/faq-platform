@@ -16,7 +16,7 @@ from app.storage.engine import async_session
 router = Router()
 
 
-async def process_question_handler(
+async def process_ask_handler(
     message: Message,
     question_text: str,
     *,
@@ -37,26 +37,26 @@ async def process_question_handler(
 
 
 @router.message(Command("ask"))
-async def cmd_ask(message: Message, command: CommandObject):
+async def cmd_handler(message: Message, command: CommandObject):
     try:
         input_question_text = await process_question_text_cmd(command)
     except ValueError as e:
         await send_invalid(message, SendAction.ANSWER, str(e))
         return
 
-    await process_question_handler(
+    await process_ask_handler(
         message, input_question_text, send_action=SendAction.ANSWER
     )
 
 
 @router.message()
-async def msg_ask(message: Message):
+async def msg_handler(message: Message):
     try:
         input_question_text = await process_question_text_msg(message)
     except ValueError as e:
         await send_invalid(message, SendAction.ANSWER, str(e))
         return
 
-    await process_question_handler(
+    await process_ask_handler(
         message, input_question_text, send_action=SendAction.ANSWER
     )

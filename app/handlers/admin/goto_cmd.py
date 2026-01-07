@@ -9,7 +9,7 @@ router = Router()
 
 
 @router.message(Command("goto"))
-async def cmd_goto(message: Message, command: CommandObject):
+async def cmd_handler(message: Message, command: CommandObject):
     input_path = command.args
     if input_path is None:
         await send_invalid_path(message, SendAction.ANSWER, "The path is not set")

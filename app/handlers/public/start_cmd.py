@@ -9,6 +9,6 @@ router = Router()
 
 
 @router.message(CommandStart())
-async def cmd_start(message: Message):
+async def cmd_handler(message: Message):
     full_name = message.from_user.full_name
     await send_start(message, SendAction.REPLY_DOCUMENT, full_name)
