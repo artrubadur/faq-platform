@@ -4,7 +4,7 @@ from aiogram.types import InlineKeyboardMarkup, Message
 
 import app.dialogs.rows.common as rows
 from app.core.constants.emojis import EmojiStatus
-from app.dialogs.actions import with_message_action, with_chat_message
+from app.dialogs.actions import with_chat_message, with_message_action
 
 
 @with_message_action

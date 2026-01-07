@@ -39,7 +39,8 @@ async def errors_handler(event: ErrorEvent):
                 users = await service.get_users_by_role(Role.ADMIN)
                 for user in users:
                     await send_unhandled_exception(
-                        user.telegram_id, exception  # pyright: ignore[reportArgumentType]
+                        user.telegram_id,  # pyright: ignore[reportArgumentType]
+                        exception,
                     )
             except Exception as notification_exception:
                 print(f"Failed to notify admins: {notification_exception}")
