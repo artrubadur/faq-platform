@@ -18,7 +18,9 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     telegram_id: Mapped[int | None] = mapped_column(
-        BigInteger, unique=True, nullable=False
+        BigInteger, unique=True, nullable=False, index=True
     )
-    username: Mapped[str | None] = mapped_column(String(32), unique=True, nullable=True)
-    role: Mapped[Role] = mapped_column(String, nullable=False)
+    username: Mapped[str | None] = mapped_column(
+        String(32), unique=True, nullable=True, index=True
+    )
+    role: Mapped[Role] = mapped_column(String, nullable=False, index=True)
