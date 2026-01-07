@@ -1,5 +1,7 @@
 from enum import Enum
 
+from aiogram.types import Message
+
 from app.core.constants.emojis import EmojiStatus, EmojiSymbol
 from app.storage.models.question import Question
 from app.storage.models.user import User
@@ -161,3 +163,13 @@ def format_question_table(rows: list[Question], columns: list, idx_offset=0):
     rows_lines = [fmt_row(r) for r in table]
 
     return "\n\n".join(rows_lines)
+
+
+def format_message(message: Message):
+    return (
+        f"Datetime: {message.date.isoformat()}\n"
+        f"ID: {message.message_id}\n"
+        f"User:\n"
+        f"  ID: {message.chat.id}\n"
+        f"  Username: {message.chat.username}"
+    )

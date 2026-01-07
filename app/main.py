@@ -1,7 +1,7 @@
 import asyncio
 
 from app.bot.instance import bot, dp
-from app.bot.middleware import LastMessageMiddleware
+from app.bot.middlewares import LastMessageMiddleware
 from app.handlers import router
 from app.storage.init import init_db
 

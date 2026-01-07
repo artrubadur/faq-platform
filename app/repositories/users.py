@@ -1,10 +1,10 @@
 from enum import Enum
-from typing import cast
+from typing import Sequence, cast
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.storage.models import User
+from app.storage.models.user import Role, User
 
 
 class UserColumn(Enum):
@@ -25,33 +25,39 @@ class UsersRepository:
         await self.session.refresh(user)
         return user
 
-    async def get(self, id: int) -> User:
+    async def get_by_id(self, id: int) -> User:
         user = await self.session.execute(select(User).where(User.telegram_id == id))
         return user.scalar_one()
 
-    async def get_slice(self, offset: int, limit: int, order_by: str, ascending: bool):
+    async def get_by_role(self, role: Role) -> Sequence[User]:
+        users = await self.session.execute(select(User).where(User.role == role))
+        return users.scalars().all()
+
+    async def get_slice(
+        self, offset: int, limit: int, order_by: str, ascending: bool
+    ) -> Sequence[User]:
         col = getattr(User, order_by)
 
         order_expr = col.asc() if ascending else col.desc()
 
-        result = await self.session.execute(
+        users = await self.session.execute(
             select(User).order_by(order_expr).offset(offset).limit(limit)
         )
-        return result.scalars().all()
+        return users.scalars().all()
 
     async def get_amount(self) -> int:
-        result = await self.session.execute(select(func.count()).select_from(User))
-        return cast(int, result.scalar())
+        amount = await self.session.execute(select(func.count()).select_from(User))
+        return cast(int, amount.scalar())
 
     async def update(self, id: int, **kwargs) -> User:
-        user = await self.get(id)
+        user = await self.get_by_id(id)
         for key, value in kwargs.items():
             setattr(user, key, value)
         await self.session.commit()
         return user
 
     async def delete(self, id: int):
-        user = await self.get(id)
+        user = await self.get_by_id(id)
         await self.session.delete(user)
         await self.session.commit()
         return user

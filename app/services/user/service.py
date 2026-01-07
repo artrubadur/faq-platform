@@ -1,5 +1,5 @@
 from app.repositories import UsersRepository
-from app.storage.models import User
+from app.storage.models.user import Role, User
 
 
 class UsersService:
@@ -14,7 +14,7 @@ class UsersService:
         )
 
     async def get_user(self, id: int) -> User:
-        return await self.repository.get(id)
+        return await self.repository.get_by_id(id)
 
     async def get_user_amount(self) -> int:
         return await self.repository.get_amount()
@@ -24,6 +24,10 @@ class UsersService:
     ) -> list[User]:
         offset = (page - 1) * page_size
         users = await self.repository.get_slice(offset, page_size, order_by, ascending)
+        return list(users)
+
+    async def get_users_by_role(self, role: Role) -> list[User]:
+        users = await self.repository.get_by_role(role)
         return list(users)
 
     async def delete_user(self, id: int) -> User:
