@@ -1,7 +1,6 @@
 from enum import Enum
 
 from sqlalchemy import BigInteger, String
-from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.storage.base import Base
@@ -14,9 +13,6 @@ class Role(str, Enum):
     ADMIN = "admin"
 
 
-role_enum = ENUM(*Role, name="role_enum")
-
-
 class User(Base):
     __tablename__ = "users"
 
@@ -25,4 +21,4 @@ class User(Base):
     username: Mapped[str | None] = mapped_column(
         String(32), unique=True, nullable=False
     )
-    role: Mapped[str] = mapped_column(role_enum, nullable=False)
+    role: Mapped[Role] = mapped_column(String, nullable=False)
