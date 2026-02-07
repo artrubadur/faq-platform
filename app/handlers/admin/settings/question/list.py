@@ -11,7 +11,7 @@ from app.dialogs.rows.common import (
     PaginPageCallback,
     PaginSizeCallback,
 )
-from app.dialogs.send.admin.question import send_pagination
+from app.dialogs.send.admin.question import send_empty_pagination, send_pagination
 from app.dialogs.send.common import send_invalid
 from app.repositories.questions import QuestionsRepository
 from app.services.common.process import process_page_msg
@@ -53,7 +53,10 @@ async def process(
 
         max_page = (amount + page_size - 1) // page_size
         page = min(max_page, page)
-
+        if page == 0:
+            await send_empty_pagination(message, send_action)
+            return
+        
         users = await service.get_paginated_questions(page, page_size, order, ascending)
         sent_message = await send_pagination(
             message,

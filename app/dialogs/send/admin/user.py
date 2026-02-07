@@ -300,3 +300,11 @@ async def send_pagination(
     text = f"{EmojiAction.LIST} User list: {page}/{max_page}\n```\n{table}\n```"
 
     return await send(text=text, reply_markup=reply_markup, parse_mode="Markdown")
+
+
+@with_message_action
+async def send_empty_pagination(
+    send: Callable[..., Awaitable[Message]],
+) -> Message:
+    return await send(text="No users found in the system", reply_markup=mu.back)
+
