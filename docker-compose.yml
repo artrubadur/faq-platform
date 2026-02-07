@@ -1,0 +1,28 @@
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  bot:
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
