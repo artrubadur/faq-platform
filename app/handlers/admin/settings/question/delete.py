@@ -3,6 +3,7 @@ from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
+from loguru import logger
 from sqlalchemy.exc import NoResultFound
 
 from app.core.constants.dirs import QUESTIONS_DELETE
@@ -119,14 +120,16 @@ async def question_delete_cb_confirm_handler(
         service = QuestionsService(repo)
         try:
             question = await service.delete_question(input_id)
-            await send_successfully_deleted(
-                callback.message,
-                SendAction.EDIT,
-                question.id,
-                question.question_text,
-                question.answer_text,
-            )
         except NoResultFound:
             await send_not_found(callback.message, SendAction.EDIT, input_id)
+
+    logger.debug("Question deleted", id=question.id)
+    await send_successfully_deleted(
+        callback.message,
+        SendAction.EDIT,
+        question.id,
+        question.question_text,
+        question.answer_text,
+    )
 
     await state.set_state(None)

@@ -2,6 +2,7 @@
 from aiogram import Router
 from aiogram.filters import Command, CommandObject
 from aiogram.types import Message
+from loguru import logger
 
 from app.dialogs import SendAction
 from app.dialogs.send.public.ask import send_invalid, send_similar
@@ -30,17 +31,21 @@ async def process_ask_handler(
         popular_questions = await service.get_most_popular_questions(
             8 - len(similar_questions), similar_questions
         )
-        suggestion = similar_questions + popular_questions
 
-        if len(similar_questions) == 0:
-            await send_invalid(
-                message,
-                send_action,
-                "It seems that we failed to understand the question",
-                popular_questions,
-            )
-            return
-        await send_similar(message, send_action, suggestion)
+    suggestion = similar_questions + popular_questions
+
+    if len(similar_questions) == 0:
+        logger.debug("Failed to answer user", tg_id=message.from_user.id)
+        await send_invalid(
+            message,
+            send_action,
+            "It seems that we failed to understand the question",
+            popular_questions,
+        )
+        return
+
+    logger.debug("Answered user", tg_id=message.from_user.id, text=question_text)
+    await send_similar(message, send_action, suggestion)
 
 
 @router.message(Command("ask"))

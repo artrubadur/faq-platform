@@ -1,6 +1,8 @@
 from aiogram import Router
 from aiogram.filters import CommandStart
 from aiogram.types import Message
+from loguru import logger
+from sqlalchemy.exc import IntegrityError
 
 from app.dialogs.actions import SendAction
 from app.dialogs.send.public.start import send_start
@@ -16,18 +18,27 @@ router = Router()
 
 @router.message(CommandStart())
 async def cmd_handler(message: Message):
-    name = message.from_user.full_name
 
     async with async_session() as session:
         questions_repo = QuestionsRepository(session)
         questions_service = QuestionsService(questions_repo)
-        try:
-            questions = await questions_service.get_most_popular_questions(7)
-            await send_start(message, SendAction.ANSWER, name, questions)
-        except Exception:
-            await send_start(message, SendAction.ANSWER, name)
+    try:
+        questions = await questions_service.get_most_popular_questions(7)
+    except Exception:
+        logger.error("Failed to fetch popular questions")
+        questions = []
 
-        user = message.from_user
+    name = message.from_user.full_name
+    await send_start(message, SendAction.ANSWER, name, questions)
+
+    async with async_session() as session:
         users_repo = UsersRepository(session)
         users_service = UsersService(users_repo)
-        await users_service.create_user(user.id, user.username, Role.USER)
+        try:
+            tg_user = message.from_user
+            db_user = await users_service.create_user(
+                tg_user.id, tg_user.username, Role.USER
+            )
+            logger.debug("Newbie created", id=db_user.id, tg_id=db_user.telegram_id)
+        except IntegrityError:
+            pass

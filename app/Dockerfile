@@ -8,5 +8,6 @@ RUN poetry config virtualenvs.create false \
   && poetry install --without=dev
 
 COPY ./app ./app
+COPY ./config ./config
 
 CMD ["python", "-m", "app.main"]

@@ -1,3 +1,5 @@
+from app.core.exceptions import YandexAPIError
+
 from .sdk_instance import sdk
 
 
@@ -7,8 +9,13 @@ class EmbeddingService:
         self.model = self.sdk.models.text_embeddings("query")
 
     async def compute(self, text: str) -> tuple[float, ...]:
-        response = await self.model.run(text)
-        return response.embedding
+        try:
+            response = await self.model.run(text)
+            return response.embedding
+        except Exception:
+            raise YandexAPIError(
+                "Failed to compute vector representation of question",
+            )
 
 
 embedding_service = EmbeddingService()

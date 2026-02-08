@@ -3,6 +3,7 @@ from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
+from loguru import logger
 from sqlalchemy.exc import IntegrityError, NoResultFound
 
 from app.core.constants.dirs import USERS_UPDATE
@@ -295,6 +296,7 @@ async def user_update_cb_save_handler(callback: CallbackQuery, state: FSMContext
         service = UsersService(repo)
         try:
             user = await service.update_user(id, edited_username, edited_role)
+            logger.debug("User updated", id=user.id)
             await send_successfully_updated(
                 callback.message,
                 SendAction.EDIT,
@@ -306,5 +308,7 @@ async def user_update_cb_save_handler(callback: CallbackQuery, state: FSMContext
             await send_not_found(callback.message, SendAction.EDIT, id, username)
         except IntegrityError:
             await send_failed_update(
-                callback.message, SendAction.EDIT, "Username already claimed."
+                callback.message,
+                SendAction.EDIT,
+                "The username or ID is already calimed.",
             )

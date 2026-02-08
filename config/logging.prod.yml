@@ -1,0 +1,15 @@
+handlers:
+  - sink: "ext://sys.stdout"
+    level: "INFO"
+    colorize: true
+    format: "<green>{time:YYYY-MM-DD HH:mm:ss}</green> [<level>{level}</level>] <cyan>{name}</cyan>: {message} | Extra: {extra}"
+
+  - sink: "app.jsonl"
+    level: "INFO"
+    rotation: "10 MB"
+    retention: 5
+    json: true 
+
+activation:
+  - ["aiogram.event", "WARNING"]
+  - ["aiogram.dispatcher", "INFO"]

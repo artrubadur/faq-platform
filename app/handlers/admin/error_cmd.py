@@ -7,5 +7,5 @@ router = Router()
 
 @router.message(Command("error"))
 async def cmd_handler(message: Message, command: CommandObject):
-    text = command.args or "Fake exception"
-    raise RuntimeError(text)
+    text = command.args or "Simulated exception"
+    raise Exception(text)

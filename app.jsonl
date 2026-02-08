@@ -1,0 +1,305 @@
+{"time": "2026-02-08T16:24:22.478990+03:00", "level": "INFO", "message": "Database initialized", "name": "app.storage.init"}
+{"time": "2026-02-08T16:24:22.479994+03:00", "level": "INFO", "message": "Bot is starting", "name": "__main__"}
+{"time": "2026-02-08T16:24:22.480996+03:00", "level": "INFO", "message": "Start polling", "name": "logging"}
+{"time": "2026-02-08T16:24:22.693413+03:00", "level": "INFO", "message": "Run polling for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:29:52.715738+03:00", "level": "INFO", "message": "Polling stopped", "name": "logging"}
+{"time": "2026-02-08T16:29:52.719766+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected", "name": "logging"}
+{"time": "2026-02-08T16:29:52.755504+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:29:53.015382+03:00", "level": "INFO", "message": "Polling stopped for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:29:53.016533+03:00", "level": "INFO", "message": "Bot stopped by user", "name": "__main__"}
+{"time": "2026-02-08T16:30:14.969388+03:00", "level": "INFO", "message": "Database initialized", "name": "app.storage.init"}
+{"time": "2026-02-08T16:30:14.969961+03:00", "level": "INFO", "message": "Bot is starting", "name": "__main__"}
+{"time": "2026-02-08T16:30:14.969961+03:00", "level": "INFO", "message": "Start polling", "name": "logging"}
+{"time": "2026-02-08T16:30:15.264331+03:00", "level": "INFO", "message": "Run polling for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:30:18.618523+03:00", "level": "ERROR", "message": "Unexcepted error `telegram_id=%s, username=%s, message_id=%s`", "name": "app.handlers.public.errors"}
+{"time": "2026-02-08T16:30:19.670976+03:00", "level": "INFO", "message": "Update id=17510226 is handled. Duration 1046 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T16:31:09.516597+03:00", "level": "INFO", "message": "Polling stopped", "name": "logging"}
+{"time": "2026-02-08T16:31:09.516597+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected", "name": "logging"}
+{"time": "2026-02-08T16:31:09.520124+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:31:09.770604+03:00", "level": "INFO", "message": "Polling stopped for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:31:09.771606+03:00", "level": "INFO", "message": "Bot stopped by user", "name": "__main__"}
+{"time": "2026-02-08T16:31:32.507541+03:00", "level": "INFO", "message": "Database initialized", "name": "app.storage.init"}
+{"time": "2026-02-08T16:31:32.507541+03:00", "level": "INFO", "message": "Bot is starting", "name": "__main__"}
+{"time": "2026-02-08T16:31:32.508541+03:00", "level": "INFO", "message": "Start polling", "name": "logging"}
+{"time": "2026-02-08T16:31:32.733612+03:00", "level": "INFO", "message": "Run polling for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:31:36.672558+03:00", "level": "ERROR", "message": "Unexcepted error `telegram_id=%s, username=%s, message_id=%s`", "name": "app.handlers.public.errors"}
+{"time": "2026-02-08T16:31:37.154305+03:00", "level": "INFO", "message": "Update id=17510227 is handled. Duration 483 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T16:32:50.733787+03:00", "level": "INFO", "message": "Polling stopped", "name": "logging"}
+{"time": "2026-02-08T16:32:50.734986+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected", "name": "logging"}
+{"time": "2026-02-08T16:32:50.735987+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:32:51.000616+03:00", "level": "INFO", "message": "Polling stopped for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:32:51.002627+03:00", "level": "INFO", "message": "Bot stopped by user", "name": "__main__"}
+{"time": "2026-02-08T16:32:54.816354+03:00", "level": "INFO", "message": "Database initialized", "name": "app.storage.init"}
+{"time": "2026-02-08T16:32:54.817358+03:00", "level": "INFO", "message": "Bot is starting", "name": "__main__"}
+{"time": "2026-02-08T16:32:54.818356+03:00", "level": "INFO", "message": "Start polling", "name": "logging"}
+{"time": "2026-02-08T16:32:55.051687+03:00", "level": "INFO", "message": "Run polling for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:32:55.890808+03:00", "level": "ERROR", "message": "Unexcepted error `telegram_id=%s, username=%s, message_id=%s`", "name": "app.handlers.public.errors"}
+{"time": "2026-02-08T16:32:56.367846+03:00", "level": "INFO", "message": "Update id=17510228 is handled. Duration 483 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T16:33:44.959719+03:00", "level": "INFO", "message": "Polling stopped", "name": "logging"}
+{"time": "2026-02-08T16:33:44.959719+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected", "name": "logging"}
+{"time": "2026-02-08T16:33:44.959719+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:33:45.209864+03:00", "level": "INFO", "message": "Polling stopped for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:33:45.209864+03:00", "level": "INFO", "message": "Bot stopped by user", "name": "__main__"}
+{"time": "2026-02-08T16:34:11.111659+03:00", "level": "INFO", "message": "Database initialized", "name": "app.storage.init"}
+{"time": "2026-02-08T16:34:11.112657+03:00", "level": "INFO", "message": "Bot is starting", "name": "__main__"}
+{"time": "2026-02-08T16:34:11.113657+03:00", "level": "INFO", "message": "Start polling", "name": "logging"}
+{"time": "2026-02-08T16:34:11.732242+03:00", "level": "INFO", "message": "Run polling for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:34:15.674450+03:00", "level": "ERROR", "message": "Unexcepted error `telegram_id=%s, username=%s, message_id=%s`", "name": "app.handlers.public.errors"}
+{"time": "2026-02-08T16:34:16.004009+03:00", "level": "INFO", "message": "Update id=17510229 is handled. Duration 344 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T16:35:46.024352+03:00", "level": "INFO", "message": "Polling stopped", "name": "logging"}
+{"time": "2026-02-08T16:35:46.025353+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected", "name": "logging"}
+{"time": "2026-02-08T16:35:46.026353+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:35:46.283753+03:00", "level": "INFO", "message": "Polling stopped for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:35:46.285758+03:00", "level": "INFO", "message": "Bot stopped by user", "name": "__main__"}
+{"time": "2026-02-08T16:35:49.997651+03:00", "level": "INFO", "message": "Database initialized", "name": "app.storage.init"}
+{"time": "2026-02-08T16:35:49.998650+03:00", "level": "INFO", "message": "Bot is starting", "name": "__main__"}
+{"time": "2026-02-08T16:35:49.998650+03:00", "level": "INFO", "message": "Start polling", "name": "logging"}
+{"time": "2026-02-08T16:35:50.280387+03:00", "level": "INFO", "message": "Run polling for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:36:01.930497+03:00", "level": "ERROR", "message": "Unexcepted error `telegram_id=%s, username=%s, message_id=%s`", "name": "app.handlers.public.errors"}
+{"time": "2026-02-08T16:36:02.333310+03:00", "level": "INFO", "message": "Update id=17510230 is handled. Duration 405 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T16:36:16.150570+03:00", "level": "INFO", "message": "Polling stopped", "name": "logging"}
+{"time": "2026-02-08T16:36:16.151570+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected", "name": "logging"}
+{"time": "2026-02-08T16:36:16.152570+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:36:16.336144+03:00", "level": "INFO", "message": "Polling stopped for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:36:16.337143+03:00", "level": "INFO", "message": "Bot stopped by user", "name": "__main__"}
+{"time": "2026-02-08T16:36:20.055593+03:00", "level": "INFO", "message": "Database initialized", "name": "app.storage.init"}
+{"time": "2026-02-08T16:36:20.057593+03:00", "level": "INFO", "message": "Bot is starting", "name": "__main__"}
+{"time": "2026-02-08T16:36:20.059593+03:00", "level": "INFO", "message": "Start polling", "name": "logging"}
+{"time": "2026-02-08T16:36:20.288769+03:00", "level": "INFO", "message": "Run polling for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:36:24.535070+03:00", "level": "INFO", "message": "Update id=17510231 is handled. Duration 453 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T16:37:28.476556+03:00", "level": "INFO", "message": "Polling stopped", "name": "logging"}
+{"time": "2026-02-08T16:37:28.477557+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected", "name": "logging"}
+{"time": "2026-02-08T16:37:28.478556+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:37:28.608878+03:00", "level": "INFO", "message": "Polling stopped for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:37:28.610878+03:00", "level": "INFO", "message": "Bot stopped by user", "name": "__main__"}
+{"time": "2026-02-08T16:37:33.406856+03:00", "level": "INFO", "message": "Database initialized", "name": "app.storage.init"}
+{"time": "2026-02-08T16:37:33.406856+03:00", "level": "INFO", "message": "Bot is starting", "name": "__main__"}
+{"time": "2026-02-08T16:37:33.407856+03:00", "level": "INFO", "message": "Start polling", "name": "logging"}
+{"time": "2026-02-08T16:37:34.416750+03:00", "level": "INFO", "message": "Run polling for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:37:36.398454+03:00", "level": "INFO", "message": "Update id=17510232 is handled. Duration 421 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T16:38:11.267872+03:00", "level": "INFO", "message": "Polling stopped", "name": "logging"}
+{"time": "2026-02-08T16:38:11.268874+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected", "name": "logging"}
+{"time": "2026-02-08T16:38:11.269873+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:38:11.521560+03:00", "level": "INFO", "message": "Polling stopped for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:38:11.523561+03:00", "level": "INFO", "message": "Bot stopped by user", "name": "__main__"}
+{"time": "2026-02-08T16:38:18.241278+03:00", "level": "INFO", "message": "Database initialized", "name": "app.storage.init"}
+{"time": "2026-02-08T16:38:18.241278+03:00", "level": "INFO", "message": "Bot is starting", "name": "__main__"}
+{"time": "2026-02-08T16:38:18.241278+03:00", "level": "INFO", "message": "Start polling", "name": "logging"}
+{"time": "2026-02-08T16:38:18.475303+03:00", "level": "INFO", "message": "Run polling for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:38:21.505746+03:00", "level": "INFO", "message": "Update id=17510233 is handled. Duration 969 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T16:38:29.079146+03:00", "level": "INFO", "message": "Polling stopped", "name": "logging"}
+{"time": "2026-02-08T16:38:29.080167+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected", "name": "logging"}
+{"time": "2026-02-08T16:38:29.080804+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:38:29.289798+03:00", "level": "INFO", "message": "Polling stopped for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:38:29.289798+03:00", "level": "INFO", "message": "Bot stopped by user", "name": "__main__"}
+{"time": "2026-02-08T16:38:33.806042+03:00", "level": "INFO", "message": "Database initialized", "name": "app.storage.init"}
+{"time": "2026-02-08T16:38:33.807380+03:00", "level": "INFO", "message": "Bot is starting", "name": "__main__"}
+{"time": "2026-02-08T16:38:33.807380+03:00", "level": "INFO", "message": "Start polling", "name": "logging"}
+{"time": "2026-02-08T16:38:34.111430+03:00", "level": "INFO", "message": "Run polling for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:38:50.986734+03:00", "level": "INFO", "message": "Update id=17510234 is handled. Duration 437 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T16:57:41.662136+03:00", "level": "INFO", "message": "Polling stopped", "name": "logging"}
+{"time": "2026-02-08T16:57:41.663135+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected", "name": "logging"}
+{"time": "2026-02-08T16:57:41.664135+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:57:41.833641+03:00", "level": "INFO", "message": "Polling stopped for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:57:41.835640+03:00", "level": "INFO", "message": "Bot stopped by user", "name": "__main__"}
+{"time": "2026-02-08T16:57:46.051760+03:00", "level": "INFO", "message": "Database initialized", "name": "app.storage.init"}
+{"time": "2026-02-08T16:57:46.052761+03:00", "level": "INFO", "message": "Bot is starting", "name": "__main__"}
+{"time": "2026-02-08T16:57:46.052761+03:00", "level": "INFO", "message": "Start polling", "name": "logging"}
+{"time": "2026-02-08T16:57:46.297324+03:00", "level": "INFO", "message": "Run polling for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:57:49.674134+03:00", "level": "INFO", "message": "Update id=17510235 is handled. Duration 671 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T16:58:44.651440+03:00", "level": "INFO", "message": "Database initialized", "name": "app.storage.init"}
+{"time": "2026-02-08T16:58:44.652439+03:00", "level": "INFO", "message": "Bot is starting", "name": "__main__"}
+{"time": "2026-02-08T16:58:44.652439+03:00", "level": "INFO", "message": "Start polling", "name": "logging"}
+{"time": "2026-02-08T16:58:45.436470+03:00", "level": "INFO", "message": "Run polling for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:58:45.512015+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running", "name": "logging"}
+{"time": "2026-02-08T16:58:45.513016+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:58:46.067715+03:00", "level": "INFO", "message": "Update id=17510236 is handled. Duration 422 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T16:58:49.596474+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running", "name": "logging"}
+{"time": "2026-02-08T16:58:49.596474+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:58:50.681547+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running", "name": "logging"}
+{"time": "2026-02-08T16:58:50.682547+03:00", "level": "WARNING", "message": "Sleep for 1.074633 seconds and try again... (tryings = 1, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:58:54.836928+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running", "name": "logging"}
+{"time": "2026-02-08T16:58:54.837940+03:00", "level": "WARNING", "message": "Sleep for 1.197151 seconds and try again... (tryings = 1, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:58:56.117440+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running", "name": "logging"}
+{"time": "2026-02-08T16:58:56.118441+03:00", "level": "WARNING", "message": "Sleep for 1.490231 seconds and try again... (tryings = 2, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:59:00.691915+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running", "name": "logging"}
+{"time": "2026-02-08T16:59:00.691915+03:00", "level": "WARNING", "message": "Sleep for 1.492926 seconds and try again... (tryings = 2, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:59:02.267981+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running", "name": "logging"}
+{"time": "2026-02-08T16:59:02.268982+03:00", "level": "WARNING", "message": "Sleep for 1.737585 seconds and try again... (tryings = 3, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:59:07.086183+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running", "name": "logging"}
+{"time": "2026-02-08T16:59:07.087183+03:00", "level": "WARNING", "message": "Sleep for 1.889719 seconds and try again... (tryings = 3, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:59:07.453736+03:00", "level": "INFO", "message": "Database initialized", "name": "app.storage.init"}
+{"time": "2026-02-08T16:59:07.453736+03:00", "level": "INFO", "message": "Bot is starting", "name": "__main__"}
+{"time": "2026-02-08T16:59:07.454735+03:00", "level": "INFO", "message": "Start polling", "name": "logging"}
+{"time": "2026-02-08T16:59:07.848966+03:00", "level": "INFO", "message": "Run polling for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:59:07.928090+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running", "name": "logging"}
+{"time": "2026-02-08T16:59:07.928090+03:00", "level": "WARNING", "message": "Sleep for 2.188503 seconds and try again... (tryings = 4, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:59:09.779986+03:00", "level": "INFO", "message": "Connection established (tryings = 4, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:59:10.043078+03:00", "level": "INFO", "message": "Update id=17510237 is handled. Duration 266 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T16:59:12.059406+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running", "name": "logging"}
+{"time": "2026-02-08T16:59:12.060476+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:59:13.135081+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running", "name": "logging"}
+{"time": "2026-02-08T16:59:13.136081+03:00", "level": "WARNING", "message": "Sleep for 2.825741 seconds and try again... (tryings = 5, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:59:13.199388+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running", "name": "logging"}
+{"time": "2026-02-08T16:59:13.200385+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:59:17.293244+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running", "name": "logging"}
+{"time": "2026-02-08T16:59:17.312994+03:00", "level": "WARNING", "message": "Sleep for 1.155206 seconds and try again... (tryings = 1, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:59:19.048967+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running", "name": "logging"}
+{"time": "2026-02-08T16:59:19.049971+03:00", "level": "WARNING", "message": "Sleep for 1.482884 seconds and try again... (tryings = 1, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:59:19.195404+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running", "name": "logging"}
+{"time": "2026-02-08T16:59:19.196417+03:00", "level": "WARNING", "message": "Sleep for 3.585034 seconds and try again... (tryings = 6, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:59:20.880304+03:00", "level": "INFO", "message": "Polling stopped", "name": "logging"}
+{"time": "2026-02-08T16:59:20.880304+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected", "name": "logging"}
+{"time": "2026-02-08T16:59:20.881305+03:00", "level": "WARNING", "message": "Sleep for 1.569259 seconds and try again... (tryings = 2, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:59:21.141314+03:00", "level": "INFO", "message": "Polling stopped for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:59:21.142319+03:00", "level": "INFO", "message": "Bot stopped by user", "name": "__main__"}
+{"time": "2026-02-08T16:59:22.544955+03:00", "level": "INFO", "message": "Polling stopped", "name": "logging"}
+{"time": "2026-02-08T16:59:22.794935+03:00", "level": "INFO", "message": "Polling stopped for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:59:22.796934+03:00", "level": "INFO", "message": "Bot stopped by user", "name": "__main__"}
+{"time": "2026-02-08T16:59:28.455089+03:00", "level": "INFO", "message": "Connection established (tryings = 2, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:59:28.690507+03:00", "level": "INFO", "message": "Database initialized", "name": "app.storage.init"}
+{"time": "2026-02-08T16:59:28.690507+03:00", "level": "INFO", "message": "Bot is starting", "name": "__main__"}
+{"time": "2026-02-08T16:59:28.691508+03:00", "level": "INFO", "message": "Start polling", "name": "logging"}
+{"time": "2026-02-08T16:59:28.895756+03:00", "level": "INFO", "message": "Update id=17510238 is handled. Duration 437 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T16:59:28.930624+03:00", "level": "INFO", "message": "Run polling for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:59:29.001621+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running", "name": "logging"}
+{"time": "2026-02-08T16:59:29.002621+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:59:32.139363+03:00", "level": "INFO", "message": "Connection established (tryings = 1, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:59:32.383517+03:00", "level": "INFO", "message": "Update id=17510239 is handled. Duration 250 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T16:59:33.088413+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running", "name": "logging"}
+{"time": "2026-02-08T16:59:33.089413+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:59:34.168970+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running", "name": "logging"}
+{"time": "2026-02-08T16:59:34.169973+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:59:35.965618+03:00", "level": "INFO", "message": "Polling stopped", "name": "logging"}
+{"time": "2026-02-08T16:59:35.966619+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected", "name": "logging"}
+{"time": "2026-02-08T16:59:35.967618+03:00", "level": "WARNING", "message": "Sleep for 1.319813 seconds and try again... (tryings = 1, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:59:36.129255+03:00", "level": "INFO", "message": "Polling stopped for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:59:36.130256+03:00", "level": "INFO", "message": "Bot stopped by user", "name": "__main__"}
+{"time": "2026-02-08T16:59:38.252298+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running", "name": "logging"}
+{"time": "2026-02-08T16:59:38.253311+03:00", "level": "WARNING", "message": "Sleep for 1.311117 seconds and try again... (tryings = 1, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T16:59:38.598021+03:00", "level": "INFO", "message": "Polling stopped", "name": "logging"}
+{"time": "2026-02-08T16:59:38.798733+03:00", "level": "INFO", "message": "Polling stopped for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:59:38.799733+03:00", "level": "INFO", "message": "Bot stopped by user", "name": "__main__"}
+{"time": "2026-02-08T16:59:42.656497+03:00", "level": "INFO", "message": "Database initialized", "name": "app.storage.init"}
+{"time": "2026-02-08T16:59:42.657498+03:00", "level": "INFO", "message": "Bot is starting", "name": "__main__"}
+{"time": "2026-02-08T16:59:42.657498+03:00", "level": "INFO", "message": "Start polling", "name": "logging"}
+{"time": "2026-02-08T16:59:42.896474+03:00", "level": "INFO", "message": "Run polling for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T16:59:44.165385+03:00", "level": "ERROR", "message": "Unexcepted error `telegram_id=%s, username=%s, message_id=%s`", "name": "app.handlers.public.errors"}
+{"time": "2026-02-08T16:59:44.961119+03:00", "level": "INFO", "message": "Update id=17510240 is handled. Duration 796 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T17:00:29.206928+03:00", "level": "INFO", "message": "Polling stopped", "name": "logging"}
+{"time": "2026-02-08T17:00:29.207927+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected", "name": "logging"}
+{"time": "2026-02-08T17:00:29.207927+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T17:00:29.401084+03:00", "level": "INFO", "message": "Polling stopped for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T17:00:29.402083+03:00", "level": "INFO", "message": "Bot stopped by user", "name": "__main__"}
+{"time": "2026-02-08T17:00:33.448884+03:00", "level": "INFO", "message": "Database initialized", "name": "app.storage.init"}
+{"time": "2026-02-08T17:00:33.448884+03:00", "level": "INFO", "message": "Bot is starting", "name": "__main__"}
+{"time": "2026-02-08T17:00:33.449885+03:00", "level": "INFO", "message": "Start polling", "name": "logging"}
+{"time": "2026-02-08T17:00:34.560440+03:00", "level": "INFO", "message": "Run polling for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T17:00:35.086897+03:00", "level": "ERROR", "message": "Unexcepted error `telegram_id=%s, username=%s, message_id=%s`", "name": "app.handlers.public.errors"}
+{"time": "2026-02-08T17:00:35.555639+03:00", "level": "INFO", "message": "Update id=17510241 is handled. Duration 469 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T17:01:01.960601+03:00", "level": "INFO", "message": "Polling stopped", "name": "logging"}
+{"time": "2026-02-08T17:01:01.962327+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected", "name": "logging"}
+{"time": "2026-02-08T17:01:01.962327+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T17:01:02.224453+03:00", "level": "INFO", "message": "Polling stopped for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T17:01:02.225459+03:00", "level": "INFO", "message": "Bot stopped by user", "name": "__main__"}
+{"time": "2026-02-08T17:01:06.401035+03:00", "level": "INFO", "message": "Database initialized", "name": "app.storage.init"}
+{"time": "2026-02-08T17:01:06.401035+03:00", "level": "INFO", "message": "Bot is starting", "name": "__main__"}
+{"time": "2026-02-08T17:01:06.402034+03:00", "level": "INFO", "message": "Start polling", "name": "logging"}
+{"time": "2026-02-08T17:01:06.648452+03:00", "level": "INFO", "message": "Run polling for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T17:01:07.306668+03:00", "level": "ERROR", "message": "Unexcepted error `telegram_id=%s, username=%s, message_id=%s`", "name": "app.handlers.public.errors"}
+{"time": "2026-02-08T17:01:07.709109+03:00", "level": "INFO", "message": "Update id=17510242 is handled. Duration 405 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T17:02:47.649541+03:00", "level": "INFO", "message": "Polling stopped", "name": "logging"}
+{"time": "2026-02-08T17:02:47.650535+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected", "name": "logging"}
+{"time": "2026-02-08T17:02:47.650535+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T17:02:47.904023+03:00", "level": "INFO", "message": "Polling stopped for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T17:02:47.905196+03:00", "level": "INFO", "message": "Bot stopped by user", "name": "__main__"}
+{"time": "2026-02-08T17:02:51.809331+03:00", "level": "INFO", "message": "Database initialized", "name": "app.storage.init"}
+{"time": "2026-02-08T17:02:51.809331+03:00", "level": "INFO", "message": "Bot is starting", "name": "__main__"}
+{"time": "2026-02-08T17:02:51.810331+03:00", "level": "INFO", "message": "Start polling", "name": "logging"}
+{"time": "2026-02-08T17:02:52.550367+03:00", "level": "INFO", "message": "Run polling for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T17:02:54.450914+03:00", "level": "ERROR", "message": "Unexcepted error `telegram_id=%s, username=%s, message_id=%s`", "name": "app.handlers.public.errors", "error": "Traceback (most recent call last):\n  File \"E:\\prjcts\\faq_bot\\.venv\\Lib\\site-packages\\aiogram\\dispatcher\\middlewares\\error.py\", line 27, in __call__\n    return await handler(event, data)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\prjcts\\faq_bot\\.venv\\Lib\\site-packages\\aiogram\\dispatcher\\middlewares\\user_context.py\", line 58, in __call__\n    return await handler(event, data)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\prjcts\\faq_bot\\.venv\\Lib\\site-packages\\aiogram\\fsm\\middleware.py\", line 43, in __call__\n    return await handler(event, data)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\prjcts\\faq_bot\\.venv\\Lib\\site-packages\\aiogram\\dispatcher\\event\\telegram.py\", line 126, in trigger\n    return await wrapped_inner(event, kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\prjcts\\faq_bot\\.venv\\Lib\\site-packages\\aiogram\\dispatcher\\event\\handler.py\", line 71, in call\n    return await wrapped()\n           ^^^^^^^^^^^^^^^\n  File \"E:\\prjcts\\faq_bot\\.venv\\Lib\\site-packages\\aiogram\\dispatcher\\dispatcher.py\", line 283, in _listen_update\n    return await self.propagate_event(update_type=update_type, event=event, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\prjcts\\faq_bot\\.venv\\Lib\\site-packages\\aiogram\\dispatcher\\router.py\", line 161, in propagate_event\n    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\prjcts\\faq_bot\\.venv\\Lib\\site-packages\\aiogram\\dispatcher\\router.py\", line 153, in _wrapped\n    return await self._propagate_event(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\prjcts\\faq_bot\\.venv\\Lib\\site-packages\\aiogram\\dispatcher\\router.py\", line 189, in _propagate_event\n    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\prjcts\\faq_bot\\.venv\\Lib\\site-packages\\aiogram\\dispatcher\\router.py\", line 161, in propagate_event\n    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\prjcts\\faq_bot\\.venv\\Lib\\site-packages\\aiogram\\dispatcher\\router.py\", line 153, in _wrapped\n    return await self._propagate_event(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\prjcts\\faq_bot\\.venv\\Lib\\site-packages\\aiogram\\dispatcher\\router.py\", line 189, in _propagate_event\n    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\prjcts\\faq_bot\\.venv\\Lib\\site-packages\\aiogram\\dispatcher\\router.py\", line 161, in propagate_event\n    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\prjcts\\faq_bot\\.venv\\Lib\\site-packages\\aiogram\\dispatcher\\router.py\", line 153, in _wrapped\n    return await self._propagate_event(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\prjcts\\faq_bot\\.venv\\Lib\\site-packages\\aiogram\\dispatcher\\router.py\", line 189, in _propagate_event\n    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\prjcts\\faq_bot\\.venv\\Lib\\site-packages\\aiogram\\dispatcher\\router.py\", line 161, in propagate_event\n    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\prjcts\\faq_bot\\.venv\\Lib\\site-packages\\aiogram\\dispatcher\\router.py\", line 153, in _wrapped\n    return await self._propagate_event(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\prjcts\\faq_bot\\.venv\\Lib\\site-packages\\aiogram\\dispatcher\\router.py\", line 181, in _propagate_event\n    response = await observer.trigger(event, **kwargs)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\prjcts\\faq_bot\\.venv\\Lib\\site-packages\\aiogram\\dispatcher\\event\\telegram.py\", line 126, in trigger\n    return await wrapped_inner(event, kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\prjcts\\faq_bot\\app\\bot\\middlewares\\last_message.py\", line 16, in __call__\n    return await handler(event, data)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\prjcts\\faq_bot\\app\\bot\\middlewares\\log_handler.py\", line 23, in __call__\n    result = await handler(event, data)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\prjcts\\faq_bot\\.venv\\Lib\\site-packages\\aiogram\\dispatcher\\event\\handler.py\", line 71, in call\n    return await wrapped()\n           ^^^^^^^^^^^^^^^\n  File \"E:\\prjcts\\faq_bot\\app\\handlers\\admin\\error_cmd.py\", line 11, in cmd_handler\n    raise Exception(text)\nException: Simulated exception\n"}
+{"time": "2026-02-08T17:02:55.249589+03:00", "level": "INFO", "message": "Update id=17510243 is handled. Duration 796 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T17:04:44.332880+03:00", "level": "INFO", "message": "Polling stopped", "name": "logging"}
+{"time": "2026-02-08T17:04:44.332880+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected", "name": "logging"}
+{"time": "2026-02-08T17:04:44.332880+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T17:04:44.589498+03:00", "level": "INFO", "message": "Polling stopped for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T17:04:44.589498+03:00", "level": "INFO", "message": "Bot stopped by user", "name": "__main__"}
+{"time": "2026-02-08T17:05:00.274690+03:00", "level": "DEBUG", "message": "Database vector extension created", "name": "app.storage.init"}
+{"time": "2026-02-08T17:05:00.279726+03:00", "level": "DEBUG", "message": "Database tables created", "name": "app.storage.init"}
+{"time": "2026-02-08T17:05:00.279726+03:00", "level": "INFO", "message": "Database initialized", "name": "app.storage.init"}
+{"time": "2026-02-08T17:05:00.279726+03:00", "level": "INFO", "message": "Bot is starting", "name": "__main__"}
+{"time": "2026-02-08T17:05:00.284835+03:00", "level": "INFO", "message": "Start polling", "name": "logging"}
+{"time": "2026-02-08T17:05:00.499395+03:00", "level": "INFO", "message": "Run polling for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T17:05:24.417295+03:00", "level": "DEBUG", "message": "Start handler [app.handlers.public.ask_cmd.msg_handler] for user: 5457527695", "name": "logging"}
+{"time": "2026-02-08T17:05:24.417295+03:00", "level": "DEBUG", "message": "[_cygrpc] Loaded running loop: id(loop)=3094089555296", "name": "logging"}
+{"time": "2026-02-08T17:05:24.418296+03:00", "level": "DEBUG", "message": "Using AsyncIOEngine.POLLER as I/O engine", "name": "logging"}
+{"time": "2026-02-08T17:05:24.420295+03:00", "level": "DEBUG", "message": "[_cygrpc] Loaded running loop: id(loop)=3094089555296", "name": "logging"}
+{"time": "2026-02-08T17:05:24.427294+03:00", "level": "DEBUG", "message": "[_cygrpc] Loaded running loop: id(loop)=3094089555296", "name": "logging"}
+{"time": "2026-02-08T17:05:24.673616+03:00", "level": "DEBUG", "message": "[_cygrpc] Loaded running loop: id(loop)=3094089555296", "name": "logging"}
+{"time": "2026-02-08T17:05:24.673616+03:00", "level": "DEBUG", "message": "[_cygrpc] Loaded running loop: id(loop)=3094089555296", "name": "logging"}
+{"time": "2026-02-08T17:05:24.674635+03:00", "level": "DEBUG", "message": "[_cygrpc] Loaded running loop: id(loop)=3094089555296", "name": "logging"}
+{"time": "2026-02-08T17:05:24.899476+03:00", "level": "DEBUG", "message": "Failed to answer user `telegram_id=%s`", "name": "app.handlers.public.ask_cmd"}
+{"time": "2026-02-08T17:05:25.979489+03:00", "level": "DEBUG", "message": "Handler [app.handlers.public.ask_cmd.msg_handler] finished successfully", "name": "logging"}
+{"time": "2026-02-08T17:05:25.979489+03:00", "level": "INFO", "message": "Update id=17510244 is handled. Duration 1562 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T17:05:32.436488+03:00", "level": "DEBUG", "message": "Start handler [app.handlers.admin.settings.root.cmd_handler] for user: 5457527695", "name": "logging"}
+{"time": "2026-02-08T17:05:32.553439+03:00", "level": "DEBUG", "message": "Handler [app.handlers.admin.settings.root.cmd_handler] finished successfully", "name": "logging"}
+{"time": "2026-02-08T17:05:32.553439+03:00", "level": "INFO", "message": "Update id=17510245 is handled. Duration 125 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T17:05:35.761160+03:00", "level": "DEBUG", "message": "Start handler [app.handlers.admin.settings.question.root.question_cb_handler] for user: 5457527695", "name": "logging"}
+{"time": "2026-02-08T17:05:36.668169+03:00", "level": "DEBUG", "message": "Handler [app.handlers.admin.settings.question.root.question_cb_handler] finished successfully", "name": "logging"}
+{"time": "2026-02-08T17:05:36.669168+03:00", "level": "INFO", "message": "Update id=17510246 is handled. Duration 905 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T17:05:36.835412+03:00", "level": "DEBUG", "message": "Start handler [app.handlers.admin.settings.question.list.question_list_cb_handler] for user: 5457527695", "name": "logging"}
+{"time": "2026-02-08T17:05:37.013225+03:00", "level": "DEBUG", "message": "No questions found", "name": "app.handlers.admin.settings.question.list"}
+{"time": "2026-02-08T17:05:37.117413+03:00", "level": "DEBUG", "message": "Handler [app.handlers.admin.settings.question.list.question_list_cb_handler] finished successfully", "name": "logging"}
+{"time": "2026-02-08T17:05:37.117413+03:00", "level": "INFO", "message": "Update id=17510247 is handled. Duration 281 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T17:05:43.563608+03:00", "level": "DEBUG", "message": "Start handler [app.handlers.admin.settings.question.root.question_back_cb_handler] for user: 5457527695", "name": "logging"}
+{"time": "2026-02-08T17:05:45.019745+03:00", "level": "DEBUG", "message": "Handler [app.handlers.admin.settings.question.root.question_back_cb_handler] finished successfully", "name": "logging"}
+{"time": "2026-02-08T17:05:45.019745+03:00", "level": "INFO", "message": "Update id=17510248 is handled. Duration 1467 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T17:07:58.309668+03:00", "level": "INFO", "message": "Polling stopped", "name": "logging"}
+{"time": "2026-02-08T17:07:58.309668+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected", "name": "logging"}
+{"time": "2026-02-08T17:07:58.309668+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T17:07:58.568995+03:00", "level": "INFO", "message": "Polling stopped for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T17:07:58.569517+03:00", "level": "INFO", "message": "Bot stopped by user", "name": "__main__"}
+{"time": "2026-02-08T17:08:05.652382+03:00", "level": "DEBUG", "message": "Database vector extension created", "name": "app.storage.init"}
+{"time": "2026-02-08T17:08:05.659575+03:00", "level": "DEBUG", "message": "Database tables created", "name": "app.storage.init"}
+{"time": "2026-02-08T17:08:05.660575+03:00", "level": "INFO", "message": "Database initialized", "name": "app.storage.init"}
+{"time": "2026-02-08T17:08:05.660575+03:00", "level": "INFO", "message": "Bot is starting", "name": "__main__"}
+{"time": "2026-02-08T17:08:05.661575+03:00", "level": "INFO", "message": "Start polling", "name": "logging"}
+{"time": "2026-02-08T17:08:05.939273+03:00", "level": "INFO", "message": "Run polling for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T17:08:13.561434+03:00", "level": "DEBUG", "message": "Start handler [%s] for user: %s", "name": "app.bot.middlewares.log_handler"}
+{"time": "2026-02-08T17:08:13.562434+03:00", "level": "DEBUG", "message": "[_cygrpc] Loaded running loop: id(loop)=2145132719536", "name": "logging"}
+{"time": "2026-02-08T17:08:13.562434+03:00", "level": "DEBUG", "message": "Using AsyncIOEngine.POLLER as I/O engine", "name": "logging"}
+{"time": "2026-02-08T17:08:13.564434+03:00", "level": "DEBUG", "message": "[_cygrpc] Loaded running loop: id(loop)=2145132719536", "name": "logging"}
+{"time": "2026-02-08T17:08:13.572433+03:00", "level": "DEBUG", "message": "[_cygrpc] Loaded running loop: id(loop)=2145132719536", "name": "logging"}
+{"time": "2026-02-08T17:08:13.732387+03:00", "level": "DEBUG", "message": "[_cygrpc] Loaded running loop: id(loop)=2145132719536", "name": "logging"}
+{"time": "2026-02-08T17:08:13.732387+03:00", "level": "DEBUG", "message": "[_cygrpc] Loaded running loop: id(loop)=2145132719536", "name": "logging"}
+{"time": "2026-02-08T17:08:13.733387+03:00", "level": "DEBUG", "message": "[_cygrpc] Loaded running loop: id(loop)=2145132719536", "name": "logging"}
+{"time": "2026-02-08T17:08:13.929508+03:00", "level": "DEBUG", "message": "Failed to answer user `telegram_id=%s`", "name": "app.handlers.public.ask_cmd"}
+{"time": "2026-02-08T17:08:15.223090+03:00", "level": "DEBUG", "message": "Handler [%s] finished successfully", "name": "app.bot.middlewares.log_handler"}
+{"time": "2026-02-08T17:08:15.224091+03:00", "level": "INFO", "message": "Update id=17510249 is handled. Duration 1671 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T17:10:02.367241+03:00", "level": "INFO", "message": "Polling stopped", "name": "logging"}
+{"time": "2026-02-08T17:10:02.368094+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected", "name": "logging"}
+{"time": "2026-02-08T17:10:02.369095+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T17:10:02.619642+03:00", "level": "INFO", "message": "Polling stopped for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T17:10:02.619642+03:00", "level": "INFO", "message": "Bot stopped by user", "name": "__main__"}
+{"time": "2026-02-08T17:10:11.392112+03:00", "level": "DEBUG", "message": "Database vector extension created", "name": "app.storage.init"}
+{"time": "2026-02-08T17:10:11.411985+03:00", "level": "DEBUG", "message": "Database tables created", "name": "app.storage.init"}
+{"time": "2026-02-08T17:10:11.412984+03:00", "level": "INFO", "message": "Database initialized", "name": "app.storage.init"}
+{"time": "2026-02-08T17:10:11.412984+03:00", "level": "INFO", "message": "Bot is starting", "name": "__main__"}
+{"time": "2026-02-08T17:10:11.413984+03:00", "level": "INFO", "message": "Start polling", "name": "logging"}
+{"time": "2026-02-08T17:10:11.665620+03:00", "level": "INFO", "message": "Run polling for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T17:10:13.973277+03:00", "level": "DEBUG", "message": "Start handler [%s] for user: %s", "name": "app.bot.middlewares.log_handler"}
+{"time": "2026-02-08T17:10:13.974279+03:00", "level": "DEBUG", "message": "[_cygrpc] Loaded running loop: id(loop)=2274841832880", "name": "logging"}
+{"time": "2026-02-08T17:10:13.974279+03:00", "level": "DEBUG", "message": "Using AsyncIOEngine.POLLER as I/O engine", "name": "logging"}
+{"time": "2026-02-08T17:10:13.976278+03:00", "level": "DEBUG", "message": "[_cygrpc] Loaded running loop: id(loop)=2274841832880", "name": "logging"}
+{"time": "2026-02-08T17:10:13.983278+03:00", "level": "DEBUG", "message": "[_cygrpc] Loaded running loop: id(loop)=2274841832880", "name": "logging"}
+{"time": "2026-02-08T17:10:14.124212+03:00", "level": "DEBUG", "message": "[_cygrpc] Loaded running loop: id(loop)=2274841832880", "name": "logging"}
+{"time": "2026-02-08T17:10:14.125210+03:00", "level": "DEBUG", "message": "[_cygrpc] Loaded running loop: id(loop)=2274841832880", "name": "logging"}
+{"time": "2026-02-08T17:10:14.126210+03:00", "level": "DEBUG", "message": "[_cygrpc] Loaded running loop: id(loop)=2274841832880", "name": "logging"}
+{"time": "2026-02-08T17:10:14.371362+03:00", "level": "DEBUG", "message": "Failed to answer user `telegram_id=%s`", "name": "app.handlers.public.ask_cmd"}
+{"time": "2026-02-08T17:10:14.624337+03:00", "level": "DEBUG", "message": "Handler [%s] finished successfully", "name": "app.bot.middlewares.log_handler"}
+{"time": "2026-02-08T17:10:14.624337+03:00", "level": "INFO", "message": "Update id=17510250 is handled. Duration 641 ms by bot id=8443575393", "name": "logging"}
+{"time": "2026-02-08T17:10:30.849413+03:00", "level": "INFO", "message": "Polling stopped", "name": "logging"}
+{"time": "2026-02-08T17:10:30.849413+03:00", "level": "ERROR", "message": "Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected", "name": "logging"}
+{"time": "2026-02-08T17:10:30.849413+03:00", "level": "WARNING", "message": "Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8443575393)", "name": "logging"}
+{"time": "2026-02-08T17:10:31.105217+03:00", "level": "INFO", "message": "Polling stopped for bot @fincubes_dev_bot id=8443575393 - 'FinCubes Support'", "name": "logging"}
+{"time": "2026-02-08T17:10:31.106217+03:00", "level": "INFO", "message": "Bot stopped by user", "name": "__main__"}

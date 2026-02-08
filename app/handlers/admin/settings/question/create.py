@@ -3,6 +3,7 @@ from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
+from loguru import logger
 
 from app.core.constants.dirs import QUESTIONS_CREATE
 from app.core.exceptions import SimilarityError
@@ -150,10 +151,12 @@ async def question_create_cb_similar_confirm_handler(
         question = await service.create_question(
             input_question_text, input_answer_text, False
         )
-        await send_successfully_created(
-            callback.message,
-            SendAction.EDIT,
-            question.id,
-            question.question_text,
-            question.answer_text,
-        )
+
+    logger.debug("Question created", id=question.id)
+    await send_successfully_created(
+        callback.message,
+        SendAction.EDIT,
+        question.id,
+        question.question_text,
+        question.answer_text,
+    )

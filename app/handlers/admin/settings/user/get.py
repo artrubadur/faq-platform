@@ -3,6 +3,7 @@ from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
+from loguru import logger
 from sqlalchemy.exc import NoResultFound
 
 from app.core.constants.dirs import USERS_GET
@@ -72,6 +73,7 @@ async def process_identity_handler(
             await state.update_data(
                 glb_found_user_id=user.telegram_id, glb_found_username=user.username
             )
+            logger.debug("User obtained", id=user.id)
             await send_successfully_found(
                 message,
                 send_action,

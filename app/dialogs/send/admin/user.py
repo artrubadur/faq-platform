@@ -307,4 +307,3 @@ async def send_empty_pagination(
     send: Callable[..., Awaitable[Message]],
 ) -> Message:
     return await send(text="No users found in the system", reply_markup=mu.back)
-

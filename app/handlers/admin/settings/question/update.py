@@ -3,6 +3,7 @@ from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
+from loguru import logger
 from sqlalchemy.exc import NoResultFound
 
 from app.core.constants.dirs import QUESTIONS_UPDATE
@@ -334,6 +335,7 @@ async def question_update_cb_save_handler(callback: CallbackQuery, state: FSMCon
                 edited_rating,
                 recompute_embedding,
             )
+            logger.debug("Question updated", id=question.id)
             await send_successfully_updated(
                 callback.message,
                 SendAction.EDIT,

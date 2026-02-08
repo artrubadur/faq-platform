@@ -11,9 +11,9 @@ from app.storage.models import Question
 async def send_start(
     send: Callable[..., Awaitable[Message]],
     name: str,
-    questions: list[Question] | None = None,
+    questions: list[Question] = [],
 ) -> Message:
-    if questions is not None or isinstance(questions, list) and len(questions) == 0:
+    if len(questions) == 0 or isinstance(questions, list) and len(questions) == 0:
         builder = ReplyKeyboardBuilder()
         for question in questions:
             builder.button(text=question.question_text)
@@ -23,6 +23,9 @@ async def send_start(
         reply_markup = ReplyKeyboardRemove()
 
     return await send(
-        text=f"Hello, {name}. I will help you find the answer — just send a question or choose one of the most popular ones below!",
+        text=(
+            f"Hello, {name}! I will help you find the answer — just send a question"
+            f"{" or choose one of the most popular ones below" if len(questions) == 0 else ""}!"
+        ),
         reply_markup=reply_markup,
     )

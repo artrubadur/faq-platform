@@ -3,6 +3,7 @@ from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
+from loguru import logger
 
 from app.core.constants.dirs import USERS_LIST
 from app.dialogs.actions import SendAction
@@ -54,10 +55,12 @@ async def process(
         max_page = (amount + page_size - 1) // page_size
         page = min(max_page, page)
         if page == 0:
+            logger.debug("No users found")
             await send_empty_pagination(message, send_action)
             return
 
         users = await service.get_paginated_users(page, page_size, order, ascending)
+        logger.debug("Users obtained", len=len(users))
         sent_message = await send_pagination(
             message,
             send_action,

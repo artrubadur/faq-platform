@@ -3,6 +3,7 @@ from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
+from loguru import logger
 from sqlalchemy.exc import IntegrityError
 
 from app.core.constants.dirs import USERS_CREATE
@@ -270,6 +271,7 @@ async def user_create_cb_confirm_handler(callback: CallbackQuery, state: FSMCont
         service = UsersService(repo)
         try:
             user = await service.create_user(input_id, input_username, input_role)
+            logger.debug("User created", id=user.id)
             await send_successfully_created(
                 callback.message,
                 SendAction.EDIT,

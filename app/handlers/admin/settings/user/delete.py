@@ -3,6 +3,7 @@ from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
+from loguru import logger
 from sqlalchemy.exc import NoResultFound
 
 from app.core.constants.dirs import USERS_DELETE
@@ -130,6 +131,7 @@ async def user_delete_cb_confirm_handler(callback: CallbackQuery, state: FSMCont
         service = UsersService(repo)
         try:
             user = await service.delete_user(input_id)
+            logger.debug("User deleted", id=user.id)
             await send_successfully_deleted(
                 callback.message,
                 SendAction.EDIT,

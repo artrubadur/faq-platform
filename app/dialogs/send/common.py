@@ -22,7 +22,7 @@ async def send_invalid(
 @with_message_action
 async def send_unexcepted_error(send: Callable[..., Awaitable[Message]]) -> Message:
     return await send(
-        text=f"{EmojiStatus.FAILED} Unexcepted error! We are already fixing it. Try to retry later"
+        text=f"{EmojiStatus.FAILED} Unexcepted internal error! We are already fixing it. Try to retry"
     )
 
 
@@ -31,6 +31,6 @@ async def send_unhandled_exception(
     send: Callable[..., Awaitable[Message]], exception: Exception
 ) -> Message:
     return await send(
-        text=f"{EmojiStatus.FAILED} Unhandled error: `{exception}`. Check the logs",
+        text=f"{EmojiStatus.FAILED} Unhandled error: `{exception}`\nCheck the logs",
         parse_mode="Markdown",
     )
