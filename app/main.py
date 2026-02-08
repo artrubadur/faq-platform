@@ -1,4 +1,5 @@
 import asyncio
+import signal
 from pathlib import Path
 
 from loguru import logger
@@ -8,12 +9,18 @@ from app.bot.middlewares import LastMessageMiddleware, LogHandlerMiddleware
 from app.core.config import config
 from app.core.logging.setup import setup_logging
 from app.handlers import router
-from app.storage.init import init_db
+from app.storage.core import close_db, init_db
 
 CONFIG_DIR = Path.cwd() / "config"
 
 
-async def main():
+async def ignore_signals():
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        signal.signal(sig, signal.SIG_IGN)
+    await asyncio.Event().wait()
+
+
+async def startup():
     setup_logging(CONFIG_DIR / f"logging.{config.env}.yml", config.tg_log_cooldown)
     await init_db()
 
@@ -30,8 +37,14 @@ async def main():
     await dp.start_polling(bot)
 
 
+@dp.shutdown()
+async def shutdown():
+    logger.info("Bot stopped by user")
+    await close_db()
+
+
 if __name__ == "__main__":
     try:
-        asyncio.run(main())
+        asyncio.run(startup())
     except KeyboardInterrupt:
-        logger.info("Bot stopped by user")
+        pass

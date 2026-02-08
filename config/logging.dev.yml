@@ -1,6 +1,6 @@
 handlers:
   - sink: "ext://sys.stdout"
-    level: "DEBUG"
+    level: "INFO"
     colorize: true
     format: "<green>{time:YYYY-MM-DD HH:mm:ss}</green> [<level>{level}</level>] <cyan>{name}</cyan>: {message} | Extra: {extra}"
 
@@ -11,7 +11,7 @@ handlers:
     json: true 
 
   - sink: telegram
-    level: "INFO"
+    level: "WARNING"
 
 activation:
   - ["aiogram.event", "INFO"]

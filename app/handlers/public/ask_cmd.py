@@ -5,14 +5,14 @@ from aiogram.types import Message
 from loguru import logger
 
 from app.dialogs import SendAction
-from app.dialogs.send.public.ask import send_invalid, send_similar
+from app.dialogs.send.public.ask import send_failed, send_similar
 from app.repositories.questions import QuestionsRepository
 from app.services.question.process import (
     process_question_text_cmd,
     process_question_text_msg,
 )
 from app.services.question.service import QuestionsService
-from app.storage.engine import async_session
+from app.storage.core import async_session
 
 router = Router()
 
@@ -36,7 +36,7 @@ async def process_ask_handler(
 
     if len(similar_questions) == 0:
         logger.debug("Failed to answer user", tg_id=message.from_user.id)
-        await send_invalid(
+        await send_failed(
             message,
             send_action,
             "It seems that we failed to understand the question",
@@ -53,7 +53,7 @@ async def cmd_handler(message: Message, command: CommandObject):
     try:
         input_question_text = await process_question_text_cmd(command)
     except ValueError as e:
-        await send_invalid(message, SendAction.ANSWER, str(e))
+        await send_failed(message, SendAction.ANSWER, str(e))
         return
 
     await process_ask_handler(
@@ -66,7 +66,7 @@ async def msg_handler(message: Message):
     try:
         input_question_text = await process_question_text_msg(message)
     except ValueError as e:
-        await send_invalid(message, SendAction.ANSWER, str(e))
+        await send_failed(message, SendAction.ANSWER, str(e))
         return
 
     await process_ask_handler(

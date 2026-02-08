@@ -34,7 +34,7 @@ from app.services.user.process import (
     process_role_msg,
     process_username_msg,
 )
-from app.storage.engine import async_session
+from app.storage.core import async_session
 from app.utils.history.last_message import LastMessage
 
 router = Router()

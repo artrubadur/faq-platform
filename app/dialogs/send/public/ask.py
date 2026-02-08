@@ -24,7 +24,7 @@ async def send_similar(
 
 
 @with_message_action
-async def send_invalid(
+async def send_failed(
     send: Callable[..., Awaitable[Message]],
     exception: str,
     fallback_questions: list[Question] = [],
@@ -36,6 +36,6 @@ async def send_invalid(
     reply_markup = builder.as_markup(resize_keyboard=True)
 
     return await send(
-        text=f"{exception}. Try to reformulate it and ask it again",
+        text=f"{exception}. Try to reformulate it and ask again",
         reply_markup=reply_markup,
     )

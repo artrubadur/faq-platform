@@ -23,7 +23,7 @@ from app.services.question.process import (
     process_question_text_msg,
 )
 from app.services.question.service import QuestionsService
-from app.storage.engine import async_session
+from app.storage.core import async_session
 from app.utils.history.last_message import LastMessage
 
 router = Router()

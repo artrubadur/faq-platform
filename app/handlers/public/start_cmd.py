@@ -10,7 +10,7 @@ from app.repositories import QuestionsRepository
 from app.repositories.users import UsersRepository
 from app.services.question.service import QuestionsService
 from app.services.user.service import UsersService
-from app.storage.engine import async_session
+from app.storage.core import async_session
 from app.storage.models.user import Role
 
 router = Router()

@@ -2,15 +2,18 @@ from app.core.exceptions import SimilarityError
 from app.repositories import QuestionsRepository
 from app.services.question.embedding import EmbeddingService, embedding_service
 from app.storage.models import Question
+from app.core.config import config
 
 
 class QuestionsService:
     def __init__(
         self,
         repository: QuestionsRepository,
+        max_distance: float | None = None,
         new_embedding_service: EmbeddingService | None = None,
     ):
         self.repository = repository
+        self.max_distance = max_distance or (1 - config.qn_sim_threshold)
         self.embedding_service = new_embedding_service or embedding_service
 
     async def create_question(
@@ -20,7 +23,7 @@ class QuestionsService:
 
         if check_similarity:
             row = await self.repository.get_similar(
-                embedding=embedding, limit=1, max_distance=0.2
+                embedding=embedding, limit=1, max_distance=self.max_distance
             )
             if len(row) > 0:
                 similar, distance = row[0]

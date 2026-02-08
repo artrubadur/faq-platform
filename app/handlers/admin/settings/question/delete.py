@@ -20,7 +20,7 @@ from app.dialogs.send.common import send_invalid
 from app.repositories.questions import QuestionsRepository
 from app.services.question.process import process_id_msg
 from app.services.question.service import QuestionsService
-from app.storage.engine import async_session
+from app.storage.core import async_session
 from app.utils.history.last_message import LastMessage
 
 router = Router()
