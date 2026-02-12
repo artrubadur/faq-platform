@@ -1,3 +1,6 @@
+cached_limit: 5
+repeat_limit: 2
+
 handlers:
   - sink: "ext://sys.stdout"
     level: "INFO"
@@ -5,14 +8,16 @@ handlers:
     format: "<green>{time:YYYY-MM-DD HH:mm:ss}</green> [<level>{level}</level>] <cyan>{name}</cyan>: {message} | Extra: {extra}"
 
   - sink: "log/app.jsonl"
-    level: "CRITICAL"
-    rotation: "10 MB"
-    retention: 5
     json: true 
+    level: "CRITICAL"
+    rotation: "1 MB"
+    retention: 5
 
   - sink: telegram
     level: "WARNING"
+    cooldown: 1
+
 
 activation:
-  - ["aiogram.event", "INFO"]
-  - ["aiogram.dispatcher", "INFO"]
+  - ["aiogram.event", "WARNING"]
+  - ["aiogram.dispatcher", "WARNING"]

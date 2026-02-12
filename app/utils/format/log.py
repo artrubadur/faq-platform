@@ -1,20 +1,25 @@
 import json
 import traceback
+from typing import Any
 
 
-def serialize_json(record):
+def serialize_json(record: dict[str, Any]) -> str:
     payload = {
-        "time": record["time"].isoformat(),
+        "time": int(record["time"].timestamp()),
         "level": record["level"].name,
         "message": record["message"],
         "name": record["name"],
     }
     exception = record["exception"]
     if exception:
-        payload["error"] = "".join(
+        payload["exception"] = "".join(
             traceback.format_exception(
                 exception.type, exception.value, exception.traceback
             )
         )
+
+    repeat = record.get("_repeat", None)
+    if repeat:
+        payload["repeat"] = repeat
 
     return f"{{{json.dumps(payload, ensure_ascii=False)}}}\n"

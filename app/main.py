@@ -21,7 +21,7 @@ async def ignore_signals():
 
 
 async def startup():
-    setup_logging(CONFIG_DIR / f"logging.{config.env}.yml", config.tg_log_cooldown)
+    setup_logging(CONFIG_DIR / f"logging.{config.env}.yml")
     await init_db()
 
     last_message_mw = LastMessageMiddleware(bot)

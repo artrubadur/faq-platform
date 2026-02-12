@@ -6,7 +6,6 @@ class Config(BaseSettings):
 
     env: str
 
-    tg_log_cooldown: int
     tg_bot_token: str
 
     db_name: str

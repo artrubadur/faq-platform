@@ -12,7 +12,9 @@ class LogEntry:
     name: str
     message: str
     level: Any
-    exception: Any
+    exception: Exception | None
+    repeat: int | None
+    repeat_limit: int
 
 
 class TelegramThrottler:
@@ -33,12 +35,22 @@ class TelegramThrottler:
                     entry.message,
                     entry.level,
                     entry.exception,
+                    entry.repeat,
+                    entry.repeat_limit,
                 )
                 await asyncio.sleep(self.cooldown)
             finally:
                 queue.task_done()
 
-    def add_log(self, name: str, message: str, level: Any, exception: Any):
+    def add_log(
+        self,
+        name: str,
+        message: str,
+        level: Any,
+        exception: Exception | None,
+        repeat: int | None,
+        repeat_limit: int,
+    ):
         try:
             loop = asyncio.get_running_loop()
         except RuntimeError:
@@ -48,4 +60,6 @@ class TelegramThrottler:
             self.queues[name] = asyncio.Queue()
             self.workers[name] = loop.create_task(self._worker(name))
 
-        self.queues[name].put_nowait(LogEntry(name, message, level, exception))
+        self.queues[name].put_nowait(
+            LogEntry(name, message, level, exception, repeat, repeat_limit)
+        )
