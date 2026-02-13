@@ -37,14 +37,15 @@ class QuestionCreation(StatesGroup):
 
 
 @router.callback_query(F.data == DIR)
-async def question_create_cb_handler(callback: CallbackQuery, state: FSMContext):
+async def question_create_cb_handler(callback: CallbackQuery, last_message: LastMessage, state: FSMContext):
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    await send_enter_question_text(
+    sent_message = await send_enter_question_text(
         callback.message,
         SendAction.EDIT,
     )
+    await last_message.set(sent_message, state)
 
     await state.set_state(QuestionCreation.waiting_for_question_text)
 
