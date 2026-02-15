@@ -1918,6 +1918,22 @@ toml = ["tomli (>=2.0.1)"]
 yaml = ["pyyaml (>=6.0.1)"]
 
 [[package]]
+name = "pydantic-settings-yaml"
+version = "0.2.0"
+description = "Yaml support for Pydantic settings"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "pydantic_settings_yaml-0.2.0-py2.py3-none-any.whl", hash = "sha256:e5e3a4866d124cc03bff5cca968455ce658f0382a8287c4b14e5fe91a2d6e2ef"},
+    {file = "pydantic_settings_yaml-0.2.0.tar.gz", hash = "sha256:ee3c679ecd04ae045de100458387ff92bb54b435807ca8ac0726c141f63b1c8d"},
+]
+
+[package.dependencies]
+pydantic-settings = ">=2.0,<3.0"
+pyYAML = "*"
+
+[[package]]
 name = "pyjwt"
 version = "2.10.1"
 description = "JSON Web Token implementation in Python"
@@ -2625,4 +2641,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<4.0"
-content-hash = "358d4ecd42bd4d20a1a2f144bf2b5be63513c9d2d066a628b94d2495477b8f51"
+content-hash = "9895da67d5901bfa9da93ab518b2ef83ab5b69c5f6169181573370522d53b7c2"

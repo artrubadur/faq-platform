@@ -8,6 +8,7 @@ router = Router()
 
 router.include_router(admin_router)
 router.include_router(common_router)
+# Should be last
 router.include_router(public_router)
 
 __all__ = ["router"]

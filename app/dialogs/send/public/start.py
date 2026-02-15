@@ -5,12 +5,14 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 from app.dialogs.actions import with_message_action
 from app.storage.models import Question
+from app.utils.format.output import format_response
 
 
 @with_message_action
 async def send_start(
     send: Callable[..., Awaitable[Message]],
-    name: str,
+    message: Message,
+    text: str,
     questions: list[Question] = [],
 ) -> Message:
     if len(questions) == 0 or isinstance(questions, list) and len(questions) == 0:
@@ -23,9 +25,6 @@ async def send_start(
         reply_markup = ReplyKeyboardRemove()
 
     return await send(
-        text=(
-            f"Hello, {name}! I will help you find the answer — just send a question"
-            f"{" or choose one of the most popular ones below" if len(questions) == 0 else ""}!"
-        ),
+        text=format_response(text, message),
         reply_markup=reply_markup,
     )

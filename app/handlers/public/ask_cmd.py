@@ -3,6 +3,7 @@ from aiogram.filters import Command, CommandObject
 from aiogram.types import Message
 from loguru import logger
 
+from app.core.responses import responses
 from app.dialogs import SendAction
 from app.dialogs.send.public.ask import send_failed, send_similar
 from app.repositories.questions import QuestionsRepository
@@ -37,8 +38,9 @@ async def process_ask_handler(
         logger.debug("Failed to answer user", tg_id=message.from_user.id)
         await send_failed(
             message,
-            send_action,
-            "It seems that we failed to understand the question",
+            SendAction.ANSWER,
+            message,
+            responses.exceptions.search.empty_result,
             popular_questions,
         )
         return
@@ -52,7 +54,7 @@ async def cmd_handler(message: Message, command: CommandObject):
     try:
         input_question_text = await process_question_text_cmd(command)
     except ValueError as e:
-        await send_failed(message, SendAction.ANSWER, str(e))
+        await send_failed(message, SendAction.ANSWER, message, str(e))
         return
 
     await process_ask_handler(
@@ -65,7 +67,7 @@ async def msg_handler(message: Message):
     try:
         input_question_text = await process_question_text_msg(message)
     except ValueError as e:
-        await send_failed(message, SendAction.ANSWER, str(e))
+        await send_failed(message, SendAction.ANSWER, message, str(e))
         return
 
     await process_ask_handler(

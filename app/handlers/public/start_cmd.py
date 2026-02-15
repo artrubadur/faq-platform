@@ -4,6 +4,7 @@ from aiogram.types import Message
 from loguru import logger
 from sqlalchemy.exc import IntegrityError
 
+from app.core.responses import responses
 from app.dialogs.actions import SendAction
 from app.dialogs.send.public.start import send_start
 from app.repositories import QuestionsRepository
@@ -18,7 +19,6 @@ router = Router()
 
 @router.message(CommandStart())
 async def cmd_handler(message: Message):
-
     async with async_session() as session:
         questions_repo = QuestionsRepository(session)
         questions_service = QuestionsService(questions_repo)
@@ -28,8 +28,9 @@ async def cmd_handler(message: Message):
         logger.error("Failed to fetch popular questions")
         questions = []
 
-    name = message.from_user.full_name
-    await send_start(message, SendAction.ANSWER, name, questions)
+    await send_start(
+        message, SendAction.ANSWER, message, responses.start_template, questions
+    )
 
     async with async_session() as session:
         users_repo = UsersRepository(session)

@@ -3,8 +3,10 @@ from typing import Awaitable, Callable
 from aiogram.types import Message
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
+from app.core.responses import responses
 from app.dialogs.actions import with_message_action
 from app.storage.models.question import Question
+from app.utils.format.output import format_response
 
 
 @with_message_action
@@ -26,6 +28,7 @@ async def send_similar(
 @with_message_action
 async def send_failed(
     send: Callable[..., Awaitable[Message]],
+    message: Message,
     exception: str,
     fallback_questions: list[Question] = [],
 ) -> Message:
@@ -36,6 +39,6 @@ async def send_failed(
     reply_markup = builder.as_markup(resize_keyboard=True)
 
     return await send(
-        text=f"{exception}. Try to reformulate it and ask again",
+        text=format_response(responses.failed_template, message, exception=exception),
         reply_markup=reply_markup,
     )
