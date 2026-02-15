@@ -9,7 +9,6 @@ from app.storage.base import Base
 class Role(str, Enum):
     BANNED = "banned"
     USER = "user"
-    RESPONDER = "responder"
     ADMIN = "admin"
 
 
