@@ -15,12 +15,16 @@ async def errors_handler(event: ErrorEvent):
     update = event.update
     message = update.message
 
-    logger.exception(
-        "Unexcepted error",
-        tg_id=message.chat.id,
-        username=message.chat.username,
-        msg_id=message.message_id,
+    extra = (
+        {}
+        if message is None
+        else {
+            "tg_id": message.chat.id,
+            "username": message.chat.username,
+            "msg_id": message.message_id,
+        }
     )
+    logger.exception("Unexcepted error", extra)
 
     should_notify = (
         isinstance(exception, AppError)
