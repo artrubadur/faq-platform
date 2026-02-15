@@ -13,5 +13,16 @@ async def send_state(
     str_data = dumps(data, indent=2)
 
     return await send(
-        text=f"Stored data:\n{str_data}",
+        text=f"```json\n{str_data}```",
+        parse_mode="MarkDown",
+    )
+
+
+@with_message_action
+async def send_invalid_argument(
+    send: Callable[..., Awaitable[Message]], text: str
+) -> Message:
+    return await send(
+        text=f"Invalid argument: {text}",
+        parse_mode="MarkDown",
     )

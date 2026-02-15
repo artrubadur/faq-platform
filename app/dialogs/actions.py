@@ -12,6 +12,7 @@ P = ParamSpec("P")
 class SendAction(str, Enum):
     ANSWER = "answer"
     EDIT = "edit"
+    REPLY = "reply"
 
 
 async def send_via_action(message: Message, action: SendAction, **kwargs) -> Message:
@@ -20,6 +21,8 @@ async def send_via_action(message: Message, action: SendAction, **kwargs) -> Mes
             return await message.edit_text(
                 **kwargs
             )  # pyright: ignore[reportReturnType]
+        case SendAction.REPLY:
+            return await message.reply(**kwargs)
         case _:
             return await message.answer(**kwargs)
 
