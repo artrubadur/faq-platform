@@ -1,4 +1,3 @@
-# pyright: reportArgumentType=false
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -60,8 +59,9 @@ async def user_update_cb_handler(
     found_username = data.get("glb_found_username", None)
 
     sent_message = await send_enter_identity(
-        callback.message,
+        callback.message,  # pyright: ignore[reportArgumentType]
         SendAction.EDIT,
+        PARENT_DIR,
         DIR,
         found_user_id,
         found_username,
@@ -133,7 +133,11 @@ async def user_update_cb_identity_handler(
     input_username = callback_data.username
 
     await process_identity_handler(
-        callback.message, state, input_id, input_username, send_action=SendAction.EDIT
+        callback.message,  # pyright: ignore[reportArgumentType]
+        state,
+        input_id,
+        input_username,
+        send_action=SendAction.EDIT,
     )
 
 
@@ -166,7 +170,11 @@ async def user_update_confirm_cb_fields_handler(
     callback: CallbackQuery, state: FSMContext
 ):
     await callback.answer()
-    await process_fields_handler(callback.message, state, send_action=SendAction.EDIT)
+    await process_fields_handler(
+        callback.message,  # pyright: ignore[reportArgumentType]
+        state,
+        send_action=SendAction.EDIT,
+    )
 
 
 @router.callback_query(CancelCallback.filter(F.dir == DIR))
@@ -174,7 +182,11 @@ async def user_update_cancel_cb_fields_handler(
     callback: CallbackQuery, state: FSMContext
 ):
     await callback.answer()
-    await process_fields_handler(callback.message, state, send_action=SendAction.EDIT)
+    await process_fields_handler(
+        callback.message,  # pyright: ignore[reportArgumentType]
+        state,
+        send_action=SendAction.EDIT,
+    )
 
 
 @router.callback_query(BackCallback.filter(F.dir == DIR))
@@ -182,7 +194,11 @@ async def user_update_back_cb_fields_handler(
     callback: CallbackQuery, state: FSMContext
 ):
     await callback.answer()
-    await process_fields_handler(callback.message, state, send_action=SendAction.EDIT)
+    await process_fields_handler(
+        callback.message,  # pyright: ignore[reportArgumentType]
+        state,
+        send_action=SendAction.EDIT,
+    )
 
 
 @router.callback_query(EditCallback.filter((F.dir == DIR) & (F.field == "username")))
@@ -196,7 +212,10 @@ async def user_update_cb_edit_username_handler(
     found_username = data.get("glb_found_username", None)
 
     sent_message = await send_edit_username(
-        callback.message, SendAction.EDIT, DIR, found_username
+        callback.message,  # pyright: ignore[reportArgumentType]
+        SendAction.EDIT,
+        DIR,
+        found_username,
     )
     await last_message.set(sent_message, state)
 
@@ -231,7 +250,11 @@ async def user_update_cb_edited_username_handler(
     input_username = callback_data.username
     await state.update_data(tmp_edited_username=input_username)
 
-    await process_fields_handler(callback.message, state, send_action=SendAction.EDIT)
+    await process_fields_handler(
+        callback.message,  # pyright: ignore[reportArgumentType]
+        state,
+        send_action=SendAction.EDIT,
+    )
 
 
 @router.callback_query(EditCallback.filter((F.dir == DIR) & (F.field == "role")))
@@ -241,7 +264,9 @@ async def user_update_msg_edit_role_handler(
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    sent_message = await send_edit_role(callback.message, SendAction.EDIT, DIR)
+    sent_message = await send_edit_role(
+        callback.message, SendAction.EDIT, DIR  # pyright: ignore[reportArgumentType]
+    )
     await last_message.set(sent_message, state)
 
     await state.set_state(UserUpdate.waiting_for_role)
@@ -275,7 +300,11 @@ async def user_update_cb_edited_role_handler(
     input_role = callback_data.role
     await state.update_data(tmp_edited_role=input_role)
 
-    await process_fields_handler(callback.message, state, send_action=SendAction.EDIT)
+    await process_fields_handler(
+        callback.message,  # pyright: ignore[reportArgumentType]
+        state,
+        send_action=SendAction.EDIT,
+    )
 
 
 @router.callback_query(SaveCallback.filter(F.dir == DIR))
@@ -298,17 +327,22 @@ async def user_update_cb_save_handler(callback: CallbackQuery, state: FSMContext
             user = await service.update_user(id, edited_username, edited_role)
             logger.debug("User updated", id=user.id)
             await send_successfully_updated(
-                callback.message,
+                callback.message,  # pyright: ignore[reportArgumentType]
                 SendAction.EDIT,
                 user.telegram_id,
                 user.username,
                 user.role,
             )
         except NoResultFound:
-            await send_not_found(callback.message, SendAction.EDIT, id, username)
+            await send_not_found(
+                callback.message,  # pyright: ignore[reportArgumentType]
+                SendAction.EDIT,
+                id,
+                username,
+            )
         except IntegrityError:
             await send_failed_update(
-                callback.message,
+                callback.message,  # pyright: ignore[reportArgumentType]
                 SendAction.EDIT,
                 "The username or ID is already calimed.",
             )

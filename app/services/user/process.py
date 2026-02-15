@@ -1,4 +1,3 @@
-# pyright: reportArgumentType=false
 from aiogram.types import Message
 
 from app.services.user.validate import validate_id, validate_role, validate_username
@@ -8,6 +7,8 @@ from app.utils.format.input import format_input
 async def process_identity_msg(message: Message):
     if message.contact:
         input_id, input_username = message.contact.user_id, None
+        if input_id is None:
+            raise ValueError("The account is hidden or the user is not registered")
     elif message.forward_from:
         input_id, input_username = (
             message.forward_from.id,
@@ -29,7 +30,7 @@ async def process_username_msg(message: Message):
     if input_username is None:
         raise ValueError("Invalid message type")
 
-    formatted_username = format_input(input_username, True)
+    formatted_username = format_input(input_username)
     valid_username = validate_username(formatted_username)
     return valid_username
 

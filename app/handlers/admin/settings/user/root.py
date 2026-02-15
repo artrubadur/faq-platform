@@ -1,4 +1,3 @@
-# pyright: reportArgumentType=false
 from aiogram import Bot, Dispatcher, F, Router
 from aiogram.types import CallbackQuery
 
@@ -17,7 +16,9 @@ DIR = USERS[1]
 @router.callback_query(F.data == DIR)
 async def user_cb_handler(callback: CallbackQuery):
     await callback.answer()
-    await send_users_menu(callback.message, SendAction.EDIT)
+    await send_users_menu(
+        callback.message, SendAction.EDIT  # pyright: ignore[reportArgumentType]
+    )
 
 
 @router.callback_query(BackCallback.filter(F.dir == DIR))
@@ -29,7 +30,9 @@ async def user_back_cb_handler(
 
     await clear_context(callback.from_user.id, bot, dispatcher)
 
-    await send_users_menu(callback.message, SendAction.ANSWER)
+    await send_users_menu(
+        callback.message, SendAction.ANSWER  # pyright: ignore[reportArgumentType]
+    )
 
 
 @router.callback_query(CancelCallback.filter(F.dir == DIR))
@@ -45,4 +48,6 @@ async def user_cancel_cb_handler(
 
     await clear_context(callback.from_user.id, bot, dispatcher)
 
-    await send_users_menu(callback.message, SendAction.ANSWER)
+    await send_users_menu(
+        callback.message, SendAction.ANSWER  # pyright: ignore[reportArgumentType]
+    )

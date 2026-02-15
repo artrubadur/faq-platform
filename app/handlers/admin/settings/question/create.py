@@ -1,4 +1,3 @@
-# pyright: reportArgumentType=false
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -42,8 +41,9 @@ async def question_create_cb_handler(callback: CallbackQuery, last_message: Last
     await callback.message.edit_reply_markup(reply_markup=None)
 
     sent_message = await send_enter_question_text(
-        callback.message,
+        callback.message, # pyright: ignore[reportArgumentType]
         SendAction.EDIT,
+        PARENT_DIR
     )
     await last_message.set(sent_message, state)
 
@@ -67,7 +67,8 @@ async def question_create_msg_question_text_handler(
 
     await state.update_data(tmp_input_question_text=input_question_text)
 
-    await send_enter_answer_text(message, SendAction.ANSWER)
+    sent_message = await send_enter_answer_text(message, SendAction.ANSWER, PARENT_DIR)
+    await last_message.set(sent_message, state)
 
     await state.set_state(QuestionCreation.waiting_for_answer_text)
 
@@ -119,7 +120,7 @@ async def question_create_cb_create_confirm_handler(
             )
             await state.set_data(data)
             await send_successfully_created(
-                callback.message,
+                callback.message, # pyright: ignore[reportArgumentType]
                 SendAction.EDIT,
                 qustion.id,
                 qustion.question_text,
@@ -127,7 +128,7 @@ async def question_create_cb_create_confirm_handler(
             )
         except SimilarityError as e:
             await send_found_similar(
-                callback.message,
+                callback.message, # pyright: ignore[reportArgumentType]
                 SendAction.EDIT,
                 e.question.id,
                 e.question.question_text,
@@ -155,7 +156,7 @@ async def question_create_cb_similar_confirm_handler(
 
     logger.debug("Question created", id=question.id)
     await send_successfully_created(
-        callback.message,
+        callback.message, # pyright: ignore[reportArgumentType]
         SendAction.EDIT,
         question.id,
         question.question_text,

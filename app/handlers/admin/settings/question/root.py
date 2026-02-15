@@ -1,4 +1,3 @@
-# pyright: reportArgumentType=false
 from aiogram import Bot, Dispatcher, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
@@ -18,7 +17,9 @@ DIR = QUESTIONS[1]
 @router.callback_query(F.data == DIR)
 async def question_cb_handler(callback: CallbackQuery):
     await callback.answer()
-    await send_questions_menu(callback.message, SendAction.EDIT)
+    await send_questions_menu(
+        callback.message, SendAction.EDIT  # pyright: ignore[reportArgumentType]
+    )
 
 
 @router.callback_query(BackCallback.filter(F.dir == DIR))
@@ -30,7 +31,9 @@ async def question_back_cb_handler(
 
     await clear_context(callback.from_user.id, bot, dispatcher)
 
-    await send_questions_menu(callback.message, SendAction.ANSWER)
+    await send_questions_menu(
+        callback.message, SendAction.ANSWER  # pyright: ignore[reportArgumentType]
+    )
 
 
 @router.callback_query(CancelCallback.filter(F.dir == DIR))
@@ -46,4 +49,6 @@ async def question_cancel_cb_handler(
 
     await clear_context(callback.from_user.id, bot, dispatcher)
 
-    await send_questions_menu(callback.message, SendAction.ANSWER)
+    await send_questions_menu(
+        callback.message, SendAction.ANSWER  # pyright: ignore[reportArgumentType]
+    )

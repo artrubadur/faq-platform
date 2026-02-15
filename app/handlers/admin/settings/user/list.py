@@ -1,4 +1,3 @@
-# pyright: reportArgumentType=false
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -85,7 +84,12 @@ async def user_list_cb_handler(
         tmp_order="id", tmp_ascending=True, tmp_page=1, tmp_page_size=5
     )
 
-    await process(callback.message, last_message, state, send_action=SendAction.EDIT)
+    await process(
+        callback.message,  # pyright: ignore[reportArgumentType]
+        last_message,
+        state,
+        send_action=SendAction.EDIT,
+    )
 
     await state.set_state(UserListing.waiting_for_page)
 
@@ -123,7 +127,12 @@ async def user_list_cb_page_handler(
     page = max(1, data.get("tmp_page", 1) + callback_data.page)
     await state.update_data(tmp_page=page)
 
-    await process(callback.message, last_message, state, send_action=SendAction.EDIT)
+    await process(
+        callback.message,  # pyright: ignore[reportArgumentType]
+        last_message,
+        state,
+        send_action=SendAction.EDIT,
+    )
 
 
 @router.callback_query(PaginSizeCallback.filter(F.dir == DIR))
@@ -137,7 +146,12 @@ async def user_list_cb_size_handler(
 
     await state.update_data(tmp_page_size=callback_data.size)
 
-    await process(callback.message, last_message, state, send_action=SendAction.EDIT)
+    await process(
+        callback.message,  # pyright: ignore[reportArgumentType]
+        last_message,
+        state,
+        send_action=SendAction.EDIT,
+    )
 
 
 @router.callback_query(PaginOrderCallback.filter(F.dir == DIR))
@@ -156,4 +170,9 @@ async def user_list_cb_order_handler(
     else:
         await state.update_data(tmp_order=new_order)
 
-    await process(callback.message, last_message, state, send_action=SendAction.EDIT)
+    await process(
+        callback.message,  # pyright: ignore[reportArgumentType]
+        last_message,
+        state,
+        send_action=SendAction.EDIT,
+    )

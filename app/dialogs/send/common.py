@@ -9,9 +9,9 @@ from app.dialogs.actions import with_chat_message, with_message_action
 
 @with_message_action
 async def send_invalid(
-    send: Callable[..., Awaitable[Message]], dir: str, text: str | None
+    send: Callable[..., Awaitable[Message]], cancel_dir: str, text: str | None
 ) -> Message:
-    reply_markup = InlineKeyboardMarkup(inline_keyboard=rows.back_row(dir))
+    reply_markup = InlineKeyboardMarkup(inline_keyboard=rows.back_row(cancel_dir))
 
     return await send(
         text=f"{EmojiStatus.WARNING} {text}. Retry or back",

@@ -1,4 +1,3 @@
-# pyright: reportArgumentType=false
 from aiogram.filters import CommandObject
 from aiogram.types import Message
 

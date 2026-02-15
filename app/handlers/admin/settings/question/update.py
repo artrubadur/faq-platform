@@ -1,4 +1,3 @@
-# pyright: reportArgumentType=false
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -62,7 +61,11 @@ async def question_update_cb_handler(
     found_question_id: int | None = data.get("glb_found_question_id", None)
 
     sent_message = await send_enter_id(
-        callback.message, SendAction.EDIT, DIR, found_question_id
+        callback.message,  # pyright: ignore[reportArgumentType]
+        SendAction.EDIT,
+        DIR,
+        PARENT_DIR,
+        found_question_id,
     )
     await last_message.set(sent_message, state)
 
@@ -124,7 +127,10 @@ async def question_update_cb_id_handler(
     input_id = callback_data.id
 
     await process_id_handler(
-        callback.message, state, input_id, send_action=SendAction.EDIT
+        callback.message,  # pyright: ignore[reportArgumentType]
+        state,
+        input_id,
+        send_action=SendAction.EDIT,
     )
 
 
@@ -132,7 +138,7 @@ async def process_fields_handler(
     message: Message, state: FSMContext, *, send_action: SendAction
 ):
     data = await state.get_data()
-    id: str = data["tmp_input_id"]
+    id: int = data["tmp_input_id"]
     question_text: str = data["tmp_orig_question_text"]
     answer_text: str = data["tmp_orig_answer_text"]
     rating: float = data["tmp_orig_rating"]
@@ -162,7 +168,11 @@ async def question_update_confirm_cb_fields_handler(
     callback: CallbackQuery, state: FSMContext
 ):
     await callback.answer()
-    await process_fields_handler(callback.message, state, send_action=SendAction.EDIT)
+    await process_fields_handler(
+        callback.message,  # pyright: ignore[reportArgumentType]
+        state,
+        send_action=SendAction.EDIT,
+    )
 
 
 @router.callback_query(CancelCallback.filter(F.dir == PARENT_DIR))
@@ -170,7 +180,11 @@ async def question_update_cancel_cb_fields_handler(
     callback: CallbackQuery, state: FSMContext
 ):
     await callback.answer()
-    await process_fields_handler(callback.message, state, send_action=SendAction.EDIT)
+    await process_fields_handler(
+        callback.message,  # pyright: ignore[reportArgumentType]
+        state,
+        send_action=SendAction.EDIT,
+    )
 
 
 @router.callback_query(BackCallback.filter(F.dir == DIR))
@@ -178,7 +192,11 @@ async def question_update_back_cb_fields_handler(
     callback: CallbackQuery, state: FSMContext
 ):
     await callback.answer()
-    await process_fields_handler(callback.message, state, send_action=SendAction.EDIT)
+    await process_fields_handler(
+        callback.message,  # pyright: ignore[reportArgumentType]
+        state,
+        send_action=SendAction.EDIT,
+    )
 
 
 @router.callback_query(
@@ -190,7 +208,9 @@ async def question_update_cb_edit_question_text_handler(
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    sent_message = await send_edit_question_text(callback.message, SendAction.EDIT)
+    sent_message = await send_edit_question_text(
+        callback.message, SendAction.EDIT, DIR  # pyright: ignore[reportArgumentType]
+    )
     await last_message.set(sent_message, state)
 
     await state.set_state(QuestionUpdate.waiting_for_question_text)
@@ -225,7 +245,11 @@ async def question_update_cb_confirm_recompute_handler(
 
     await state.update_data(tmp_recompute_embedding=True)
 
-    await process_fields_handler(callback.message, state, send_action=SendAction.EDIT)
+    await process_fields_handler(
+        callback.message,  # pyright: ignore[reportArgumentType]
+        state,
+        send_action=SendAction.EDIT,
+    )
 
 
 @router.callback_query(CancelCallback.filter(F.dir == DIR))
@@ -237,7 +261,11 @@ async def question_update_cb_cancel_recompute_handler(
 
     await state.update_data(tmp_recompute_embedding=False)
 
-    await process_fields_handler(callback.message, state, send_action=SendAction.EDIT)
+    await process_fields_handler(
+        callback.message,  # pyright: ignore[reportArgumentType]
+        state,
+        send_action=SendAction.EDIT,
+    )
 
 
 @router.callback_query(EditCallback.filter((F.dir == DIR) & (F.field == "answer_text")))
@@ -247,7 +275,9 @@ async def question_update_cb_edit_answer_text_handler(
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    sent_message = await send_edit_answer_text(callback.message, SendAction.EDIT)
+    sent_message = await send_edit_answer_text(
+        callback.message, SendAction.EDIT, DIR  # pyright: ignore[reportArgumentType]
+    )
     await last_message.set(sent_message, state)
 
     await state.set_state(QuestionUpdate.waiting_for_answer_text)
@@ -280,7 +310,9 @@ async def question_update_cb_edit_rating_handler(
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    sent_message = await send_edit_rating(callback.message, SendAction.EDIT)
+    sent_message = await send_edit_rating(
+        callback.message, SendAction.EDIT, DIR  # pyright: ignore[reportArgumentType]
+    )
     await last_message.set(sent_message, state)
 
     await state.set_state(QuestionUpdate.waiting_for_rating)
@@ -312,7 +344,7 @@ async def question_update_cb_save_handler(callback: CallbackQuery, state: FSMCon
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    id: str = data.pop("tmp_input_id")
+    id: int = data.pop("tmp_input_id")
     question_text: str = data.pop("tmp_orig_question_text")
     answer_text: str = data.pop("tmp_orig_answer_text")
     rating: float = data.pop("tmp_orig_rating")
@@ -337,11 +369,16 @@ async def question_update_cb_save_handler(callback: CallbackQuery, state: FSMCon
             )
             logger.debug("Question updated", id=question.id)
             await send_successfully_updated(
-                callback.message,
+                callback.message,  # pyright: ignore[reportArgumentType]
                 SendAction.EDIT,
                 question.id,
                 question.question_text,
                 question.answer_text,
+                question.rating
             )
         except NoResultFound:
-            await send_not_found(callback.message, SendAction.EDIT, id)
+            await send_not_found(
+                callback.message,  # pyright: ignore[reportArgumentType]
+                SendAction.EDIT,
+                id,
+            )

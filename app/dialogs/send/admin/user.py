@@ -21,6 +21,7 @@ from app.utils.format.output import (
 @with_message_action
 async def send_enter_identity(
     send: Callable[..., Awaitable[Message]],
+    cancel_dir: str,
     dir: str,
     found_user_id: int | None = None,
     found_username: str | None = None,
@@ -31,7 +32,7 @@ async def send_enter_identity(
         inline_keyboard=urows.identity_rows(
             dir, found_user_id, found_username, sender_id, sender_username
         )
-        + urows.cancel_row
+        + brows.cancel_row(cancel_dir)
     )
     return await send(
         text=f"{EmojiAction.ENTER} Enter a telegram id, share contact or forward a message",
@@ -42,6 +43,7 @@ async def send_enter_identity(
 @with_message_action
 async def send_enter_username(
     send: Callable[..., Awaitable[Message]],
+    cancel_dir: str,
     dir: str,
     found_username: str | None = None,
     sender_username: str | None = None,
@@ -50,7 +52,7 @@ async def send_enter_username(
         inline_keyboard=urows.username_rows(
             dir, found_username, sender_username, empty=True
         )
-        + urows.cancel_row
+        + brows.cancel_row(cancel_dir)
     )
     return await send(
         text=f"{EmojiAction.ENTER} Enter a username",
@@ -60,10 +62,10 @@ async def send_enter_username(
 
 @with_message_action
 async def send_select_role(
-    send: Callable[..., Awaitable[Message]], dir: str
+    send: Callable[..., Awaitable[Message]], cancel_dir: str, dir: str
 ) -> Message:
     reply_markup = InlineKeyboardMarkup(
-        inline_keyboard=urows.role_rows(dir) + urows.cancel_row
+        inline_keyboard=urows.role_rows(dir) + brows.cancel_row(cancel_dir)
     )
     return await send(
         text=f"{EmojiAction.SELECT} Select a role:",
@@ -226,7 +228,7 @@ async def send_edit_username(
 ) -> Message:
     reply_markup = InlineKeyboardMarkup(
         inline_keyboard=urows.username_rows(dir, found_username, empty=True)
-        + brows.cancel_row("settings.users.update")
+        + brows.cancel_row(dir)
     )
 
     return await send(
@@ -241,7 +243,7 @@ async def send_edit_role(
     dir: str,
 ) -> Message:
     reply_markup = InlineKeyboardMarkup(
-        inline_keyboard=urows.role_rows(dir) + brows.cancel_row("settings.users.update")
+        inline_keyboard=urows.role_rows(dir) + brows.cancel_row(dir)
     )
 
     return await send(

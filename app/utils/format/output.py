@@ -58,7 +58,7 @@ def format_question(
     id: int | None = None,
     question_text: str | None = None,
     answer_text: str | None = None,
-    rating: str | None = None,
+    rating: str | float | None = None,
 ) -> str:
     result = ""
 

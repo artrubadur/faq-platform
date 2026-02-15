@@ -1,4 +1,3 @@
-# pyright: reportArgumentType=false
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -43,7 +42,11 @@ async def question_get_cb_handler(
     found_question_id: int | None = data.get("glb_found_question_id", None)
 
     sent_message = await send_enter_id(
-        callback.message, SendAction.EDIT, DIR, found_question_id
+        callback.message,  # pyright: ignore[reportArgumentType]
+        SendAction.EDIT,
+        DIR,
+        PARENT_DIR,
+        found_question_id,
     )
     await last_message.set(sent_message, state)
 
@@ -100,7 +103,10 @@ async def question_delete_cb_identity_handler(
     input_id = callback_data.id
 
     await process_id_handler(
-        callback.message, state, input_id, send_action=SendAction.EDIT
+        callback.message,  # pyright: ignore[reportArgumentType]
+        state,
+        input_id,
+        send_action=SendAction.EDIT,
     )
 
 
@@ -121,11 +127,15 @@ async def question_delete_cb_confirm_handler(
         try:
             question = await service.delete_question(input_id)
         except NoResultFound:
-            await send_not_found(callback.message, SendAction.EDIT, input_id)
+            await send_not_found(
+                callback.message,  # pyright: ignore[reportArgumentType]
+                SendAction.EDIT,
+                input_id,
+            )
 
     logger.debug("Question deleted", id=question.id)
     await send_successfully_deleted(
-        callback.message,
+        callback.message,  # pyright: ignore[reportArgumentType]
         SendAction.EDIT,
         question.id,
         question.question_text,

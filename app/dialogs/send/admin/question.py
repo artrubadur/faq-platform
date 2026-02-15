@@ -21,11 +21,12 @@ from app.utils.format.output import (
 @with_message_action
 async def send_enter_id(
     send: Callable[..., Awaitable[Message]],
+    cancel_dir: str,
     dir: str,
     found_question_id: int | None = None,
 ) -> Message:
     reply_markup = InlineKeyboardMarkup(
-        inline_keyboard=qrows.id_row(dir, found_question_id) + qrows.cancel_row
+        inline_keyboard=qrows.id_row(dir, found_question_id) + brows.cancel_row(cancel_dir)
     )
     return await send(
         text=f"{EmojiAction.ENTER} Enter the question id", reply_markup=reply_markup
@@ -35,8 +36,9 @@ async def send_enter_id(
 @with_message_action
 async def send_enter_question_text(
     send: Callable[..., Awaitable[Message]],
+    cancel_dir: str,
 ) -> Message:
-    reply_markup = InlineKeyboardMarkup(inline_keyboard=qrows.cancel_row)
+    reply_markup = InlineKeyboardMarkup(inline_keyboard=brows.cancel_row(cancel_dir))
     return await send(
         text=f"{EmojiAction.ENTER} Enter the question text", reply_markup=reply_markup
     )
@@ -44,9 +46,9 @@ async def send_enter_question_text(
 
 @with_message_action
 async def send_enter_answer_text(
-    send: Callable[..., Awaitable[Message]],
+    send: Callable[..., Awaitable[Message]], cancel_dir: str,
 ) -> Message:
-    reply_markup = InlineKeyboardMarkup(inline_keyboard=qrows.cancel_row)
+    reply_markup = InlineKeyboardMarkup(inline_keyboard=brows.cancel_row(cancel_dir))
     return await send(
         text=f"{EmojiAction.ENTER} Enter the answer text", reply_markup=reply_markup
     )
@@ -228,9 +230,10 @@ async def send_changes(
 @with_message_action
 async def send_edit_question_text(
     send: Callable[..., Awaitable[Message]],
+    dir: str
 ) -> Message:
     reply_markup = InlineKeyboardMarkup(
-        inline_keyboard=brows.cancel_row("settings.questions.update")
+        inline_keyboard=brows.cancel_row(dir)
     )
 
     return await send(
@@ -242,9 +245,10 @@ async def send_edit_question_text(
 @with_message_action
 async def send_edit_answer_text(
     send: Callable[..., Awaitable[Message]],
+    dir: str
 ) -> Message:
     reply_markup = InlineKeyboardMarkup(
-        inline_keyboard=brows.cancel_row("settings.questions.update")
+        inline_keyboard=brows.cancel_row(dir)
     )
 
     return await send(
@@ -256,9 +260,10 @@ async def send_edit_answer_text(
 @with_message_action
 async def send_edit_rating(
     send: Callable[..., Awaitable[Message]],
+    dir: str
 ) -> Message:
     reply_markup = InlineKeyboardMarkup(
-        inline_keyboard=brows.cancel_row("settings.questions.update")
+        inline_keyboard=brows.cancel_row(dir)
     )
 
     return await send(
@@ -284,11 +289,12 @@ async def send_successfully_updated(
     id: int,
     question_text: str,
     answer_text: str,
+    rating: float
 ) -> Message:
     return await send(
         text=(
             f"{EmojiStatus.SUCCESSFUL} The question has been successfully updated:\n"
-            f"{format_question(id, question_text, answer_text)}"
+            f"{format_question(id, question_text, answer_text, rating)}"
         ),
         parse_mode="HTML",
         reply_markup=mu.back,

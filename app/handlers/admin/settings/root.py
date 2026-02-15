@@ -1,4 +1,3 @@
-# pyright: reportArgumentType=false
 from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message
@@ -23,4 +22,6 @@ async def cb_back_handler(callback: CallbackQuery):
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    await send_settings_menu(callback.message, SendAction.EDIT)
+    await send_settings_menu(
+        callback.message, SendAction.EDIT  # pyright: ignore[reportArgumentType]
+    )

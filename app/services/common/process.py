@@ -1,4 +1,3 @@
-# pyright: reportArgumentType=false
 from aiogram.types import Message
 
 from app.services.common.validate import validate_page
