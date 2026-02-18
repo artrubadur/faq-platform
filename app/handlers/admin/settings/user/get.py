@@ -70,22 +70,23 @@ async def process_identity_handler(
         service = UsersService(repo)
         try:
             user = await service.get_user(input_id)
-            await state.update_data(
-                glb_found_user_id=user.telegram_id, glb_found_username=user.username
-            )
-            logger.debug("User obtained", id=user.id)
-            await send_successfully_found(
-                message,
-                send_action,
-                user.telegram_id,
-                user.username,
-                user.role,
-            )
         except NoResultFound:
             await state.update_data(
                 glb_found_user_id=input_id, glb_found_username=input_username
             )
             await send_partially_found(message, send_action, input_id, input_username)
+
+    await state.update_data(
+        glb_found_user_id=user.telegram_id, glb_found_username=user.username
+    )
+    logger.debug("User obtained", id=user.id)
+    await send_successfully_found(
+        message,
+        send_action,
+        user.telegram_id,
+        user.username,
+        user.role,
+    )
 
     await state.set_state(None)
 

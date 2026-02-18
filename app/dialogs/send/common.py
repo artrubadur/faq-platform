@@ -3,26 +3,31 @@ from typing import Any, Awaitable, Callable
 from aiogram.types import InlineKeyboardMarkup, Message
 
 import app.dialogs.rows.common as rows
-from app.core.constants.emojis import EmojiAction, EmojiStatus
+from app.core.messages import messages
 from app.dialogs.actions import with_chat_message, with_message_action
+from app.utils.format.output import format_response
 
 
 @with_message_action
-async def send_invalid(
-    send: Callable[..., Awaitable[Message]], cancel_dir: str, text: str | None
+async def send_unexcepted_error(
+    send: Callable[..., Awaitable[Message]], message: Message
 ) -> Message:
-    reply_markup = InlineKeyboardMarkup(inline_keyboard=rows.back_row(cancel_dir))
-
     return await send(
-        text=f"{EmojiStatus.WARNING} {text}. Retry or back",
-        reply_markup=reply_markup,
+        text=format_response(messages.responses.public.error, message),
+        parse_mode=messages.parse_mode,
     )
 
 
 @with_message_action
-async def send_unexcepted_error(send: Callable[..., Awaitable[Message]]) -> Message:
+async def send_invalid(
+    send: Callable[..., Awaitable[Message]], cancel_dir: str, exception: str | None
+) -> Message:
+    reply_markup = InlineKeyboardMarkup(inline_keyboard=rows.back_row(cancel_dir))
+
     return await send(
-        text=f"{EmojiStatus.FAILED} Unexcepted internal error! We are already fixing it. Try to retry"
+        text=messages.responses.admin.invalid.format(exception=exception),
+        parse_mode=messages.parse_mode,
+        reply_markup=reply_markup,
     )
 
 
@@ -49,7 +54,7 @@ async def send_log(
             f"{repeat_str}"
             f"Log: `{message}`\n"
             f"{error_str}"
-            f"{EmojiAction.GET} Check the logs for more"
+            f"Check the logs for more"
         ),
-        parse_mode="Markdown",
+        parse_mode="MarkDown",
     )

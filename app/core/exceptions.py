@@ -23,3 +23,8 @@ class SimilarityError(AppError):
 class YandexAPIError(AppError):
     def __init__(self, message: str, should_notify: bool = True):
         super().__init__(message, should_notify)
+
+
+class ConfigError(Exception):
+    def __init__(self, *args: object):
+        super().__init__(*args)

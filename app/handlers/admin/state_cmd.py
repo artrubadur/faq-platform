@@ -4,8 +4,9 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from loguru import logger
 
+from app.core.messages import messages
 from app.dialogs.actions import SendAction
-from app.dialogs.send.admin.state import send_invalid_argument, send_state
+from app.dialogs.send.admin.misc import send_invalid_argument, send_json
 from app.utils.state import clear_context, clear_temp_data, get_data, update_data
 
 router = Router()
@@ -26,14 +27,14 @@ async def cmd_handler(
 
         data = await state.get_data()
         logger.debug("State obtained", id=target_id)
-        return await send_state(message, SendAction.ANSWER, data)
+        return await send_json(message, SendAction.ANSWER, data)
 
     if args[0].isdigit():
         target_id = int(args[0])
 
         data = await get_data(target_id, bot, dispatcher)
         logger.debug("State obtained", id=target_id)
-        return await send_state(message, SendAction.ANSWER, data)
+        return await send_json(message, SendAction.ANSWER, data)
     else:
         action = args[0].lower()
 
@@ -47,7 +48,7 @@ async def cmd_handler(
 
             data = await get_data(target_id, bot, dispatcher)
             logger.debug("State obtained", id=target_id)
-            await send_state(message, SendAction.ANSWER, data)
+            await send_json(message, SendAction.ANSWER, data)
 
         case "clear":
             target_id = message.from_user.id
@@ -64,12 +65,12 @@ async def cmd_handler(
                 case "-all":
                     data = await clear_context(target_id, bot, dispatcher)
                     logger.debug("State is cleared", id=target_id)
-                    await send_state(message, SendAction.ANSWER, data)
+                    await send_json(message, SendAction.ANSWER, data)
 
                 case "-tmp":
                     data = await clear_temp_data(target_id, bot, dispatcher)
                     logger.debug("Temporary state is cleared", id=target_id)
-                    await send_state(message, SendAction.ANSWER, data)
+                    await send_json(message, SendAction.ANSWER, data)
 
         case "update":
             target_id = message.from_user.id
@@ -82,7 +83,7 @@ async def cmd_handler(
                 return await send_invalid_argument(
                     message,
                     SendAction.REPLY,
-                    "Pass changes with the `key=value` format",
+                    messages.exceptions.misc.invalid_changes,
                 )
 
             changes = {}
@@ -92,7 +93,7 @@ async def cmd_handler(
                     return await send_invalid_argument(
                         message,
                         SendAction.REPLY,
-                        f"`{kv_pair_str}`. Use the `key=value` format",
+                        messages.exceptions.misc.invalid_changes,
                     )
 
                 key, value = kv_pair
@@ -100,7 +101,11 @@ async def cmd_handler(
 
             logger.debug("State updated", id=target_id, changes=changes)
             data = await update_data(target_id, bot, dispatcher, **changes)
-            await send_state(message, SendAction.ANSWER, data)
+            await send_json(message, SendAction.ANSWER, data)
 
         case _:
-            await send_invalid_argument(message, SendAction.REPLY, f"`{action}`")
+            await send_invalid_argument(
+                message,
+                SendAction.REPLY,
+                messages.exceptions.misc.invalid_argument.format(conent=action),
+            )

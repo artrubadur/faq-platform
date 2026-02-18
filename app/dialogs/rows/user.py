@@ -3,7 +3,7 @@ from aiogram.types import InlineKeyboardButton
 
 import app.dialogs.rows.common as rows
 from app.core.constants.dirs import USERS
-from app.core.constants.emojis import EmojiAction
+from app.core.messages import messages
 from app.storage.models.user import Role
 
 cancel_row = rows.cancel_row(USERS[1])
@@ -30,7 +30,13 @@ def identity_rows(
         rows.append(
             [
                 InlineKeyboardButton(
-                    text=f"Found ({f"@{found_username}" if found_username is not None else found_user_id})",
+                    text=messages.button.user.found.format(
+                        identity=(
+                            f"@{found_username}"
+                            if found_username is not None
+                            else found_user_id
+                        )
+                    ),
                     callback_data=callback_data,
                 )
             ]
@@ -42,7 +48,13 @@ def identity_rows(
         rows.append(
             [
                 InlineKeyboardButton(
-                    text=f"Me ({f"@{sender_username}" if sender_username is not None else sender_id})",
+                    text=messages.button.user.you.format(
+                        identity=(
+                            f"@{sender_username}"
+                            if sender_username is not None
+                            else sender_id
+                        )
+                    ),
                     callback_data=callback_data,
                 )
             ]
@@ -67,7 +79,8 @@ def username_rows(
         rows.append(
             [
                 InlineKeyboardButton(
-                    text=f"Found ({found_username})", callback_data=callback_data
+                    text=messages.button.user.found.format(identity=found_username),
+                    callback_data=callback_data,
                 )
             ]
         )
@@ -76,7 +89,8 @@ def username_rows(
         rows.append(
             [
                 InlineKeyboardButton(
-                    text=f"Me ({sender_username})", callback_data=callback_data
+                    text=messages.button.user.you.format(identity=sender_username),
+                    callback_data=callback_data,
                 )
             ]
         )
@@ -85,7 +99,7 @@ def username_rows(
         rows.append(
             [
                 InlineKeyboardButton(
-                    text=f"{EmojiAction.EMPTY} Empty", callback_data=callback_data
+                    text=messages.button.common.empty, callback_data=callback_data
                 )
             ]
         )

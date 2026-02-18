@@ -1,8 +1,8 @@
+from app.core.config import config
 from app.core.exceptions import SimilarityError
 from app.repositories import QuestionsRepository
 from app.services.question.embedding import EmbeddingService, embedding_service
 from app.storage.models import Question
-from app.core.config import config
 
 
 class QuestionsService:

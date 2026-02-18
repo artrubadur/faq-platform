@@ -1,0 +1,44 @@
+emoji:
+  menu:
+    settings: "⚙"
+    user: "👤"
+    question: "📚"
+    
+  nav:
+    back: "◀️"
+    cancel: "✖️"
+    close: "✖️"
+    right: "▶️"
+    left: "◀️"
+    down: "🔽"
+    up: "🔼"
+    
+  action:
+    create: "➕"
+    get: "🔍"
+    update: "🔧"
+    delete: "🗑️"
+    list: "🗂"
+
+    confirm: "✅"
+    reject: "❌"
+
+    save: "💾"
+    discard: "🚫"
+    
+    enter: "📝"
+    select: "⏩"
+    empty: "🧹"
+    
+  status:
+    failed: "❌"
+    warning: "⚠"
+    successful: "✅"
+    
+  symbol:
+    change: "➡️"
+    index: "#️⃣"
+    rating: "🚀"
+    question: "🔍"
+    answer: "💡"
+    embedding: "🧬"

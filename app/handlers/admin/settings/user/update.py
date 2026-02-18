@@ -16,13 +16,13 @@ from app.dialogs.rows.common import (
 )
 from app.dialogs.rows.user import IdentityCallback, RoleCallback, UsernameCallback
 from app.dialogs.send.admin.user import (
+    send_already_exists,
     send_changes,
     send_confirm_update,
-    send_edit_role,
-    send_edit_username,
     send_enter_identity,
-    send_failed_update,
+    send_enter_username,
     send_not_found,
+    send_select_role,
     send_successfully_updated,
 )
 from app.dialogs.send.common import send_invalid
@@ -84,21 +84,21 @@ async def process_identity_handler(
         service = UsersService(repo)
         try:
             user = await service.get_user(input_id)
-            await state.update_data(
-                tmp_orig_id=user.telegram_id,
-                tmp_orig_username=user.username,
-                tmp_orig_role=user.role,
-            )
-            await send_confirm_update(
-                message,
-                send_action,
-                user.telegram_id,
-                user.username,
-                user.role,
-            )
         except NoResultFound:
             await send_not_found(message, send_action, input_id, input_username)
 
+    await state.update_data(
+        tmp_orig_id=user.telegram_id,
+        tmp_orig_username=user.username,
+        tmp_orig_role=user.role,
+    )
+    await send_confirm_update(
+        message,
+        send_action,
+        user.telegram_id,
+        user.username,
+        user.role,
+    )
     await state.set_state(None)
 
 
@@ -211,9 +211,10 @@ async def user_update_cb_edit_username_handler(
     data = await state.get_data()
     found_username = data.get("glb_found_username", None)
 
-    sent_message = await send_edit_username(
+    sent_message = await send_enter_username(
         callback.message,  # pyright: ignore[reportArgumentType]
         SendAction.EDIT,
+        DIR,
         DIR,
         found_username,
     )
@@ -264,8 +265,11 @@ async def user_update_msg_edit_role_handler(
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    sent_message = await send_edit_role(
-        callback.message, SendAction.EDIT, DIR  # pyright: ignore[reportArgumentType]
+    sent_message = await send_select_role(
+        callback.message,
+        SendAction.EDIT,
+        DIR,
+        DIR,  # pyright: ignore[reportArgumentType]
     )
     await last_message.set(sent_message, state)
 
@@ -341,8 +345,9 @@ async def user_update_cb_save_handler(callback: CallbackQuery, state: FSMContext
                 username,
             )
         except IntegrityError:
-            await send_failed_update(
+            await send_already_exists(
                 callback.message,  # pyright: ignore[reportArgumentType]
                 SendAction.EDIT,
-                "The username or ID is already calimed.",
+                user.telegram_id,
+                user.username,
             )

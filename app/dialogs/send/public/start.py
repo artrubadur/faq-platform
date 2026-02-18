@@ -3,6 +3,7 @@ from typing import Awaitable, Callable
 from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
+from app.core.messages import messages
 from app.dialogs.actions import with_message_action
 from app.storage.models import Question
 from app.utils.format.output import format_response
@@ -12,7 +13,6 @@ from app.utils.format.output import format_response
 async def send_start(
     send: Callable[..., Awaitable[Message]],
     message: Message,
-    text: str,
     questions: list[Question] = [],
 ) -> Message:
     if len(questions) == 0 or isinstance(questions, list) and len(questions) == 0:
@@ -25,6 +25,7 @@ async def send_start(
         reply_markup = ReplyKeyboardRemove()
 
     return await send(
-        text=format_response(text, message),
+        text=format_response(messages.responses.public.start, message),
+        parse_mode=messages.parse_mode,
         reply_markup=reply_markup,
     )

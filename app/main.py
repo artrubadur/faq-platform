@@ -6,6 +6,7 @@ from loguru import logger
 
 from app.bot.instance import bot, dp
 from app.bot.middlewares import LastMessageMiddleware, LogHandlerMiddleware
+from app.core import commands_status, constants_status, messages_status
 from app.core.config import config
 from app.core.logging.setup import setup_logging
 from app.handlers import router
@@ -23,6 +24,10 @@ async def ignore_signals():
 async def startup():
     setup_logging(CONFIG_DIR / f"logging.{config.env}.yml")
     await init_db()
+
+    logger.info(messages_status)
+    logger.info(constants_status)
+    logger.info(commands_status)
 
     last_message_mw = LastMessageMiddleware(bot)
     dp.message.middleware(last_message_mw)

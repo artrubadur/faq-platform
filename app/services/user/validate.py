@@ -1,5 +1,6 @@
 import re
 
+from app.core.messages import messages
 from app.storage.models.user import Role
 
 
@@ -10,7 +11,7 @@ def validate_id(id: str | int) -> int:
     if id.isdigit():
         return int(id)
 
-    raise ValueError("ID is incorrect")
+    raise ValueError(messages.validation.user.id_invalid)
 
 
 def validate_username(username: str | None) -> str | None:
@@ -19,14 +20,14 @@ def validate_username(username: str | None) -> str | None:
 
     res_val = username.removeprefix("@")
 
-    if len(username) < 4:
-        raise ValueError("The username is too short")
+    if len(username) <= 4:
+        raise ValueError(messages.validation.user.username_short)
 
     if len(username) > 32:
-        raise ValueError("The username is too long")
+        raise ValueError(messages.validation.user.username_long)
 
     if not bool(re.match(r"^[a-zA-Z0-9_]+$", username)):
-        raise ValueError("The username has unexcepted symbols")
+        raise ValueError(messages.validation.user.username_unexcepted_symbols)
 
     return res_val
 
@@ -35,6 +36,6 @@ def validate_role(role: str) -> str:
     res_val = role.lower()
 
     if res_val not in Role:
-        raise ValueError("An unexpected role")
+        raise ValueError(messages.validation.user.role_unexcepted)
 
     return res_val

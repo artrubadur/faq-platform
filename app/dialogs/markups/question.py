@@ -8,6 +8,7 @@ from app.core.constants.dirs import (
     QUESTIONS_LIST,
     QUESTIONS_UPDATE,
 )
+from app.core.messages import messages
 
 main = InlineKeyboardMarkup(
     inline_keyboard=rows.crud_rows(QUESTIONS[1])
@@ -46,9 +47,9 @@ field_save_update = InlineKeyboardMarkup(
         QUESTIONS_UPDATE[1],
         QUESTIONS[1],
         [
-            rows.FieldButton("Question Text", "question_text"),
-            rows.FieldButton("Answer Text", "answer_text"),
-            rows.FieldButton("Rating", "rating"),
+            rows.FieldButton(messages.button.question.question_text, "question_text"),
+            rows.FieldButton(messages.button.question.answer_text, "answer_text"),
+            rows.FieldButton(messages.button.question.rating, "rating"),
         ],
     )
 )

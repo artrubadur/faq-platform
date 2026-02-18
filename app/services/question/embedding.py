@@ -1,4 +1,5 @@
 from app.core.exceptions import YandexAPIError
+from app.core.messages import messages
 
 from .sdk_instance import sdk
 
@@ -13,9 +14,7 @@ class EmbeddingService:
             response = await self.model.run(text)
             return response.embedding
         except Exception:
-            raise YandexAPIError(
-                "Failed to compute vector representation of question",
-            )
+            raise YandexAPIError(messages.exceptions.question.embedding_failed)
 
 
 embedding_service = EmbeddingService()

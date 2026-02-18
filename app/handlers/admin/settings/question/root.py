@@ -1,9 +1,9 @@
+import locale
+
 from aiogram import Bot, Dispatcher, F, Router
-from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
 from app.core.constants.dirs import QUESTIONS
-from app.core.constants.emojis import EmojiNav
 from app.dialogs import SendAction
 from app.dialogs.rows.common import BackCallback, CancelCallback
 from app.dialogs.send.admin.settings import send_questions_menu
@@ -43,7 +43,7 @@ async def question_cancel_cb_handler(
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
     await callback.message.edit_text(
-        f"{callback.message.html_text}\n{EmojiNav.CANCEL} CANCELED {EmojiNav.CANCEL}",
+        locale.format.canceled.format(old=callback.message.html_text),
         parse_mode="HTML",
     )
 

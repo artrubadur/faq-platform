@@ -5,12 +5,13 @@ from aiogram.types import InlineKeyboardMarkup, Message
 import app.dialogs.markups.question as mu
 import app.dialogs.rows.common as brows
 import app.dialogs.rows.question as qrows
-from app.core.constants.emojis import EmojiAction, EmojiStatus
+from app.core.messages import messages
 from app.dialogs.actions import with_message_action
 from app.repositories.questions import QuestionColumn
 from app.storage.models.question import Question
 from app.utils.format.output import (
     format_edited_question,
+    format_exception,
     format_id,
     format_question,
     format_question_table,
@@ -26,10 +27,13 @@ async def send_enter_id(
     found_question_id: int | None = None,
 ) -> Message:
     reply_markup = InlineKeyboardMarkup(
-        inline_keyboard=qrows.id_row(dir, found_question_id) + brows.cancel_row(cancel_dir)
+        inline_keyboard=qrows.id_row(dir, found_question_id)
+        + brows.cancel_row(cancel_dir)
     )
     return await send(
-        text=f"{EmojiAction.ENTER} Enter the question id", reply_markup=reply_markup
+        text=messages.responses.admin.question.enter.id,
+        parse_mode=messages.parse_mode,
+        reply_markup=reply_markup,
     )
 
 
@@ -40,17 +44,35 @@ async def send_enter_question_text(
 ) -> Message:
     reply_markup = InlineKeyboardMarkup(inline_keyboard=brows.cancel_row(cancel_dir))
     return await send(
-        text=f"{EmojiAction.ENTER} Enter the question text", reply_markup=reply_markup
+        text=messages.responses.admin.question.enter.question_text,
+        parse_mode=messages.parse_mode,
+        reply_markup=reply_markup,
     )
 
 
 @with_message_action
 async def send_enter_answer_text(
-    send: Callable[..., Awaitable[Message]], cancel_dir: str,
+    send: Callable[..., Awaitable[Message]],
+    cancel_dir: str,
 ) -> Message:
     reply_markup = InlineKeyboardMarkup(inline_keyboard=brows.cancel_row(cancel_dir))
     return await send(
-        text=f"{EmojiAction.ENTER} Enter the answer text", reply_markup=reply_markup
+        text=messages.responses.admin.question.enter.answer_text,
+        parse_mode=messages.parse_mode,
+        reply_markup=reply_markup,
+    )
+
+
+@with_message_action
+async def send_enter_rating(
+    send: Callable[..., Awaitable[Message]], dir: str
+) -> Message:
+    reply_markup = InlineKeyboardMarkup(inline_keyboard=brows.cancel_row(dir))
+
+    return await send(
+        text=messages.responses.admin.question.enter.rating,
+        parse_mode=messages.parse_mode,
+        reply_markup=reply_markup,
     )
 
 
@@ -62,14 +84,12 @@ async def send_confirm_creation(
     answer_text: str,
 ) -> Message:
     return await send(
-        text=(
-            f"{EmojiAction.SELECT} Confirm creation?\n"
-            f"{format_question(
-                    question_text=question_text,
-                    answer_text=answer_text
-                )}"
+        text=messages.responses.admin.question.creation.confirm.format(
+            question=format_question(
+                question_text=question_text, answer_text=answer_text
+            )
         ),
-        parse_mode="HTML",
+        parse_mode=messages.parse_mode,
         reply_markup=mu.confirm_creation,
     )
 
@@ -82,11 +102,10 @@ async def send_successfully_created(
     answer_text: str,
 ) -> Message:
     return await send(
-        text=(
-            f"{EmojiStatus.SUCCESSFUL} Question has been successfully created:\n"
-            f"{format_question(id, question_text, answer_text)}"
+        text=messages.responses.admin.question.creation.successful.format(
+            question=format_question(id, question_text, answer_text)
         ),
-        parse_mode="HTML",
+        parse_mode=messages.parse_mode,
         reply_markup=mu.back,
     )
 
@@ -98,24 +117,12 @@ async def send_found_similar(
     question_text: str,
 ) -> Message:
     return await send(
-        text=(
-            f"{EmojiStatus.WARNING} A similar question already exists:\n"
-            f"{format_question(id, question_text)}\n"
-            f"{EmojiAction.SELECT} Confirm creation?"
+        text=messages.exceptions.question.similar.format(
+            question=format_question(id, question_text)
         ),
-        parse_mode="HTML",
+        parse_mode=messages.parse_mode,
         reply_markup=mu.confirm_similar,
     )
-
-
-# async def send_failed_creation(
-#     send: Callable[..., Awaitable[Message]],
-#     exception="Unexcepted error.",
-# ) -> Message:
-#     return await send(
-#         text=format_exception_output(f"Failed to create the question: {exception}"),
-#         reply_markup=mu.back,
-#     )
 
 
 # Finding
@@ -127,11 +134,10 @@ async def send_successfully_found(
     answer_text: str,
 ) -> Message:
     return await send(
-        text=(
-            f"{EmojiStatus.SUCCESSFUL} The question has been successfully found:\n"
-            f"{format_question(id, question_text, answer_text)}"
+        text=messages.responses.admin.question.finding.successful.format(
+            question=format_question(id, question_text, answer_text)
         ),
-        parse_mode="HTML",
+        parse_mode=messages.parse_mode,
         reply_markup=mu.back,
     )
 
@@ -139,8 +145,10 @@ async def send_successfully_found(
 @with_message_action
 async def send_not_found(send: Callable[..., Awaitable[Message]], id: int) -> Message:
     return await send(
-        text=f"{EmojiStatus.FAILED} Question {format_id(id)} not found",
-        parse_mode="HTML",
+        text=format_exception(
+            messages.exceptions.question.not_found.format(id=format_id(id))
+        ),
+        parse_mode=messages.parse_mode,
         reply_markup=mu.back,
     )
 
@@ -154,11 +162,10 @@ async def send_confirm_deletion(
     answer_text: str,
 ) -> Message:
     return await send(
-        text=(
-            f"{EmojiAction.SELECT} Confirm deletion?\n"
-            f"{format_question(id, question_text, answer_text)}"
+        text=messages.responses.admin.question.deletion.confirm.format(
+            question=format_question(id, question_text, answer_text)
         ),
-        parse_mode="HTML",
+        parse_mode=messages.parse_mode,
         reply_markup=mu.confirm_deletion,
     )
 
@@ -171,11 +178,10 @@ async def send_successfully_deleted(
     answer_text: str,
 ) -> Message:
     return await send(
-        text=(
-            f"{EmojiStatus.SUCCESSFUL} Next question has been successfully deleted:\n"
-            f"{format_question(id, question_text, answer_text)}"
+        text=messages.responses.admin.question.deletion.successful.format(
+            question=format_question(id, question_text, answer_text)
         ),
-        parse_mode="HTML",
+        parse_mode=messages.parse_mode,
         reply_markup=mu.back,
     )
 
@@ -189,11 +195,10 @@ async def send_confirm_update(
     answer_text: str,
 ) -> Message:
     return await send(
-        text=(
-            f"{EmojiAction.SELECT} Update this question?\n"
-            f"{format_question(id, question_text, answer_text)}"
+        text=messages.responses.admin.question.update.confirm.format(
+            question=format_question(id, question_text, answer_text)
         ),
-        parse_mode="HTML",
+        parse_mode=messages.parse_mode,
         reply_markup=mu.confirm_update,
     )
 
@@ -221,54 +226,11 @@ async def send_changes(
         recompute_embedding,
     )
     return await send(
-        text=f"{changes_text}{EmojiAction.SELECT} Select the field to edit:",
-        parse_mode="HTML",
+        text=messages.responses.admin.question.update.select_field.format(
+            question=changes_text
+        ),
+        parse_mode=messages.parse_mode,
         reply_markup=mu.field_save_update,
-    )
-
-
-@with_message_action
-async def send_edit_question_text(
-    send: Callable[..., Awaitable[Message]],
-    dir: str
-) -> Message:
-    reply_markup = InlineKeyboardMarkup(
-        inline_keyboard=brows.cancel_row(dir)
-    )
-
-    return await send(
-        text=f"{EmojiAction.ENTER} Enter the question text",
-        reply_markup=reply_markup,
-    )
-
-
-@with_message_action
-async def send_edit_answer_text(
-    send: Callable[..., Awaitable[Message]],
-    dir: str
-) -> Message:
-    reply_markup = InlineKeyboardMarkup(
-        inline_keyboard=brows.cancel_row(dir)
-    )
-
-    return await send(
-        text=f"{EmojiAction.ENTER} Enter the answer text",
-        reply_markup=reply_markup,
-    )
-
-
-@with_message_action
-async def send_edit_rating(
-    send: Callable[..., Awaitable[Message]],
-    dir: str
-) -> Message:
-    reply_markup = InlineKeyboardMarkup(
-        inline_keyboard=brows.cancel_row(dir)
-    )
-
-    return await send(
-        text=f"{EmojiAction.ENTER} Enter the rating",
-        reply_markup=reply_markup,
     )
 
 
@@ -277,8 +239,8 @@ async def send_confirm_recompute(
     send: Callable[..., Awaitable[Message]],
 ) -> Message:
     return await send(
-        text=f"{EmojiAction.SELECT} Recompute embedding?",
-        parse_mode="HTML",
+        text=messages.responses.admin.question.update.confirm_recompute,
+        parse_mode=messages.parse_mode,
         reply_markup=mu.confirm_recompute,
     )
 
@@ -289,27 +251,15 @@ async def send_successfully_updated(
     id: int,
     question_text: str,
     answer_text: str,
-    rating: float
+    rating: float,
 ) -> Message:
     return await send(
-        text=(
-            f"{EmojiStatus.SUCCESSFUL} The question has been successfully updated:\n"
-            f"{format_question(id, question_text, answer_text, rating)}"
+        text=messages.responses.admin.question.update.successful.format(
+            question=format_question(id, question_text, answer_text, rating)
         ),
-        parse_mode="HTML",
+        parse_mode=messages.parse_mode,
         reply_markup=mu.back,
     )
-
-
-# @action_wrapper
-# async def send_failed_update(
-#     send: Callable[..., Awaitable[Message]],
-#     exception="Unexcepted error.",
-# ) -> Message:
-#     return await send(
-#         text=format_exception(f"Failed to update the question: {exception}"),
-#         reply_markup=mu.back,
-#     )
 
 
 @with_message_action
@@ -334,8 +284,9 @@ async def send_pagination(
     )
 
     table = format_question_table(questions, columns, index_offset)
-    text = f"{EmojiAction.LIST} List: {page}/{max_page}\n```\n{table}\n```"
-
+    text = messages.responses.admin.question.listing.successful.format(
+        page=page, max_page=max_page, content=table
+    )
     return await send(text=text, reply_markup=reply_markup, parse_mode="Markdown")
 
 
@@ -344,6 +295,7 @@ async def send_empty_pagination(
     send: Callable[..., Awaitable[Message]],
 ) -> Message:
     return await send(
-        text=f"{EmojiAction.LIST} No questions found in the system",
+        text=messages.responses.admin.question.listing.not_found,
+        parse_mode=messages.parse_mode,
         reply_markup=mu.back,
     )

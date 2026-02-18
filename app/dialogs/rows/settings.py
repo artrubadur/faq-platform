@@ -1,19 +1,20 @@
 from aiogram.types import InlineKeyboardButton
 
-from app.core.constants.emojis import EmojiMenu
+from app.core.constants.dirs import QUESTIONS, USERS
+from app.core.messages import messages
 
 
 def section_rows():
     return [
         [
             InlineKeyboardButton(
-                text=f"{EmojiMenu.USERS} Users", callback_data="settings.users"
+                text=messages.button.settings.user, callback_data=USERS[1]
             ),
         ],
         [
             InlineKeyboardButton(
-                text=f"{EmojiMenu.QUESTIONS} Questions",
-                callback_data="settings.questions",
+                text=messages.button.settings.question,
+                callback_data=QUESTIONS[1],
             ),
         ],
     ]

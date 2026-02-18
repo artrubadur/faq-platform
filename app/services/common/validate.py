@@ -1,9 +1,12 @@
+from app.core.messages import messages
+
+
 def validate_page(page: str):
     if not page.isdigit():
-        raise ValueError("Page is invalid")
+        raise ValueError(messages.validation.common.page_invalid)
     int_page = int(page)
 
     if int_page < 1:
-        raise ValueError("Page cannot be less than one")
+        raise ValueError(messages.validation.common.page_negative)
 
     return int_page

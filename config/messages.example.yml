@@ -1,0 +1,241 @@
+parse_mode: html # / markdown / None
+
+
+responses: # -(app.dialog.send)
+  public:
+    start: > # < message
+      Hello, {first_name}! I will help you find the answer — just send a question
+      or choose one of the most popular ones below!
+    failed: "{exception}. Try to reformulate it and ask again" # < message, exception
+    error: > # < message
+      {emoji.status.failed} Unexcepted internal error!
+      We are already fixing it. Try to retry
+
+  admin:
+    invalid: "{emoji.status.warning} {exception}. Retry or back"
+    user:
+      enter:
+        identity: "{emoji.action.enter} Enter the telegram id, share contact or forward a message"
+        username: "{emoji.action.enter} Enter a username"
+        role: "{emoji.action.select} Select a role:"
+      creation: 
+        confirm: | # < user (fmt)
+          {emoji.action.select} Confirm creation?
+          {user}
+        successful: | # < user (fmt)
+          {emoji.status.successful} User has been successfully created:
+          {user}
+      finding:
+        successful: | # < user (fmt)
+          {emoji.status.successful} The user has been successfully found in the database:
+          {user}
+        partially_found: | # < user (fmt)
+          {emoji.status.warning} The user has been partially found but missing in the database:
+          {user}
+      update:
+        confirm: | # < user (fmt)
+          {emoji.action.select} Update this user?
+          {user}
+        select_field: | # < user (edit fmt)
+          {user}
+          {emoji.action.select} Select the field to edit:
+        successful: | # < user (fmt)
+          {emoji.status.successful} The user has been successfully updated:
+          {user}
+      deletion:
+        confirm: | # < user (fmt)
+          {emoji.action.select} Confirm deletion?
+          {user}
+        successful: | # < user (fmt)
+          {emoji.status.successful} Next user has been successfully deleted:
+          {user}
+      listing:
+          successful: | # < content (table)
+            {emoji.action.list} User list: {page}/{max_page}
+            <pre>{content}</pre>
+          not_found: "{emoji.action.list} No users found in the system"
+
+    question:
+      enter:
+        id: "{emoji.action.enter} Enter the question id"
+        question_text: "{emoji.action.enter} Enter a question text"
+        answer_text: "{emoji.action.enter} Enter a answer text"
+        rating: "{emoji.action.enter} Enter a rating"
+      creation:
+        confirm: | # < question (fmt)
+          {emoji.action.select} Confirm creation?
+          {question}
+        successful: | # < question (fmt)
+          {emoji.status.successful} Question has been successfully created:
+          {question}
+        similar: | # < question (fmt)
+          {emoji.status.warning} A similar question already exists:
+          {question}
+          {emoji.action.select} Confirm creation?
+      finding:
+        successful: | # < question (fmt)
+          {emoji.status.successful} The question has been successfully found:
+          {question}
+      update:
+        confirm: | # < question (fmt)
+          {emoji.action.select} Update this question?
+          {question}
+        select_field: | # < question (edit fmt)
+          {question}
+          {emoji.action.select} Select the field to edit:
+        confirm_recompute: "{emoji.action.select} Recompute embedding?"
+        successful: | # < question (fmt)
+          {emoji.status.successful} The question has been successfully updated:
+          {question}
+      deletion:
+        confirm: | # < question (fmt)
+          {emoji.action.select} Confirm deletion?
+          {question}
+        successful: | # < question (fmt)
+          {emoji.status.successful} Next question has been successfully deleted:
+          {question}
+      listing:
+        successful: | # < content (table)
+          {emoji.action.list} Question list: {page}/{max_page}
+          <pre>{content}</pre>
+        not_found: "{emoji.action.list} No questions found in the system"
+
+    settings:
+      main: "{emoji.menu.settings} Settings"
+      user: "{emoji.menu.user} User"
+      question: "{emoji.menu.question} Question"
+
+    misc:
+      goto:
+        go: "Go!"
+        confirm: "{emoji.action.select} Go to <code>{content}</code>?" # < content (path)
+      state:
+        serialization: '<pre><code class="json">{content}</code></pre>' # < content (state)
+        argument: "<code>{content}</code>" # < content (argument)
+
+exceptions: # -(app.handlers)
+  search: # // as failed
+    not_found: "It seems that we failed to understand the question" # < message
+
+  user: # // as invalid
+    not_found: "{emoji.status.failed} User {identity} not found" # < identity (fmt)
+    already_exists: "A user with the ID {id} or the username {username} already exists" # < id (fmt), username (fmt)
+
+  question: # // as invalid
+    not_found: "{emoji.status.failed} Question {id} not found" # < id (fmt)
+    embedding_failed: "Failed to compute vector representation of question"
+
+  misc:
+    invalid_path: "Failed to go: The path is not set"
+    invalid_changes: "Pass changes with the <code>key=value</code> format" # < exception
+    invalid_argument: "Invalid argument: {exception}" # < exception 
+
+process: # -(app.services.*.process)
+  common:
+    page_invalid: "Message type is invalid"
+
+  user:
+    contact_invalid: "The account is hidden or the user is not registered"
+    identity_invalid: "Please send a simple text message with ID, contact or forward the message"
+    username_invalid: "Please send a simple text message with the username"
+    role_invalid: "Please send a simple text message with the role or choose one from the list"
+
+  question:
+    id_invalid: "Please send a simple text message with ID"
+    msg_question_text_invalid: "Please send a simple text message with the question" # + -(app.handlers.public)
+    cmd_question_text_invalid: "Please specify the question text after the command" # -(app.handlers.public)
+    answer_text_invalid: "Please send a simple text message with the answer to the question"
+    rating_invalid: "Please send a simple text message with the rating"
+
+validation: # -(app.services.*.validation)
+  common:
+    page_invalid: "Page is invalid"
+    page_negative: "Page cannot be negative"
+
+  user:
+    id_invalid: "ID is invalid"
+    username_short: "The username is too short"
+    username_long: "The username is too long"
+    username_unexcepted_symbols: "The username has unexcepted symbols"
+    role_unexcepted: "An unexpected role"
+    
+  question:
+    id_invalid: "ID is invalid"
+    question_text_long: "The question text is too long" # + -(app.handlers.public)
+    answer_text_long: "The answer text is too long"
+    rating_incorrect: "Rating is incorrect"
+
+format:  # -(app.utils.format)
+  field:
+    id: "<code>{id}</code>" # < id
+    exception: "{emoji.status.failed} {exception}" # < exception (fb)
+    question_text: "{question_text}" # < question_text
+    answer_text: "{answer_text}" # < answer_text
+    rating: "{rating}" # < rating
+    username: "<code>@{username}</code>" # < username (fb)
+    user_link: "<a href='tg://user?id={id}'>@{username}</a>" # < id, username (fb)
+    user_role: "<b>{user_role}</b>" # < role
+
+  fallback: # Fallback message data -(app.utils.format)
+    first_name: "N/A" # > message, format
+    last_name: "" # > message, format
+    username: "" # > message, format
+    exception: "" # > format
+    
+  user:
+      id: "ID: {id}" # < id (fmt)
+      username: "Username {username}" # < username (fmt)
+      user_link: "Link {user_link}" # < user_link (fmt)
+      user_role: "Role {user_role}" # < user_role
+      
+  question:
+    id: "{emoji.symbol.index} {id} Question:" # < id (fmt)
+    question_text: "{emoji.symbol.question} Text: {question_text}" # < question_text (fmt)
+    answer_text: "{emoji.symbol.answer} Answer: {answer_text}" # < answer_text (fmt)
+    rating: "{emoji.symbol.rating} Rating: {rating}" # < rating (fmt)
+    recomputed: "{emoji.symbol.embedding} Embedding will be recomputed" 
+    not_recomputed: "{emoji.symbol.embedding} Embedding will NOT be recomputed"
+
+  edit:
+    unedited: "{old}" # old
+    edited: "{old} {emoji.symbol.change} {new}" # old, new
+
+  canceled: |
+      {old}
+      {emoji.nav.cancel} CANCELED {emoji.nav.cancel}
+
+button: # -(app.dialogs.markups / rows)
+  question: 
+    question_text: "Question Text"
+    answer_text: "Answer Text"
+    rating: "Rating"
+    found: "Found ({id})" # < id
+
+  user:
+    username: "Username"
+    role: "Role"
+    found: "Found ({identity})" # < identity (username/id)
+    you: "You ({identity})" # < identity (username/id)
+
+  settings:
+    user: "{emoji.menu.user} Users"
+    question: "{emoji.menu.question} Questions"
+
+  common:
+    close: "{emoji.nav.close} Close"
+    back: "{emoji.nav.back} Back"
+    cancel: "{emoji.nav.cancel} Cancel"
+    create: "{emoji.action.create} Create"
+    get: "{emoji.action.get} Get"
+    update: "{emoji.action.update} Update"
+    delete: "{emoji.action.delete} Delete"
+    list: "{emoji.action.list} List"
+    confirm: "{emoji.action.confirm}"
+    reject: "{emoji.action.reject}"
+    save: "{emoji.action.save}"
+    discard: "{emoji.action.discard}"
+    previous: "{emoji.nav.left} Previous"
+    next: "Next {emoji.nav.right}"
+    ascending: "{emoji.nav.up}"
+    descending: "{emoji.nav.down}"
+    empty: "{emoji.action.empty} Empty"

@@ -3,6 +3,7 @@ from aiogram.types import InlineKeyboardButton
 
 import app.dialogs.rows.common as rows
 from app.core.constants.dirs import QUESTIONS
+from app.core.messages import messages
 
 cancel_row = rows.cancel_row(QUESTIONS[1])
 
@@ -22,7 +23,7 @@ def id_row(
         rows.append(
             [
                 InlineKeyboardButton(
-                    text=f"Found ({found_question_id})",
+                    text=messages.button.question.found.format(id=found_question_id),
                     callback_data=callback_data,
                 )
             ]

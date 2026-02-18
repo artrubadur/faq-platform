@@ -2,41 +2,78 @@ from enum import Enum
 
 from aiogram.types import Message
 
-from app.core.constants.emojis import EmojiStatus, EmojiSymbol
+from app.core.messages import messages
 from app.storage.models.question import Question
 from app.storage.models.user import User
 
 
+def format_response(text: str, message: Message, **kwargs):
+    return text.format(
+        id=message.from_user.id,
+        first_name=message.from_user.first_name or messages.format.fallback.first_name,
+        last_name=message.from_user.last_name or messages.format.fallback.last_name,
+        username=message.from_user.username or messages.format.fallback.username,
+        full_name=message.from_user.full_name,
+        date=message.date.strftime("%d.%m.%Y %H:%M"),
+        **kwargs,
+    )
+
+
 def format_exception(exception: str | None = None):
-    return f"{EmojiStatus.FAILED} {exception or ""}."
+    return messages.format.field.exception.format(
+        exception=exception or messages.format.fallback.exception
+    )
 
 
 def format_id(id: int):
-    return f"<code>{id}</code>"
-
-
-def format_user_link(id: int, username: str | None):
-    return f"<a href='tg://user?id={id}'>@{username or "N/A"}</a>"
+    return messages.format.field.id.format(id=id)
 
 
 def format_username(username: str | None):
-    return f"<code>{username or "N/A"}</code>"
+    return messages.format.field.username.format(
+        id=id, username=username or messages.format.fallback.username
+    )
+
+
+def format_user_link(id: int, username: str | None):
+    return messages.format.field.user_link.format(
+        id=id, username=username or messages.format.fallback.username
+    )
 
 
 def format_user_role(role: str):
-    return f"<b>{role.upper()}</b>"
+    return messages.format.field.user_role.format(user_role=role)
+
+
+def format_question_text(question_text: str):
+    return messages.format.field.question_text.format(question_text=question_text)
+
+
+def format_answer_text(answer_text: str):
+    return messages.format.field.answer_text.format(answer_text=answer_text)
+
+
+def format_rating(rating: float | str):
+    return messages.format.field.rating.format(rating=rating)
 
 
 def format_user(id: int, username: str | None = None, role: str | None = None) -> str:
-    result = f"Link: {format_user_link(id, username)}\nID: {format_id(id)}\n"
+    result = [
+        messages.format.user.id.format(id=format_id(id)),
+        messages.format.user.user_link.format(user_link=format_user_link(id, username)),
+    ]
 
     if username is not None:
-        result += f"Username: {format_username(username)}\n"
+        result.append(
+            messages.format.user.username.format(username=format_username(username))
+        )
 
     if role is not None:
-        result += f"Role: {format_user_role(role)}\n"
+        result.append(
+            messages.format.user.user_role.format(user_role=format_user_role(role))
+        )
 
-    return result
+    return "\n".join(result)
 
 
 def format_edited_user(
@@ -49,11 +86,42 @@ def format_edited_user(
     is_username_changed = username != edited_username
     is_role_changed = role != edited_role
 
-    return format_user(
-        id,
-        f"{format_username(username)}{f" {EmojiSymbol.CHANGE} {format_username(edited_username)}"if is_username_changed else ""}",
-        f"{format_user_role(role)}{f" {EmojiSymbol.CHANGE} {format_user_role(edited_role)}"if is_role_changed else ""}",
-    )
+    result = [format_id(id)]
+
+    result += [
+        (
+            messages.format.edit.edited.format(
+                old=format_user_link(id, username),
+                new=format_user_link(id, edited_username),
+            )
+            if is_username_changed
+            else messages.format.edit.unedited.format(
+                old=format_user_link(id, username)
+            )
+        )
+    ]
+
+    result += [
+        (
+            messages.format.edit.edited.format(
+                old=format_username(username), new=format_username(edited_username)
+            )
+            if is_username_changed
+            else messages.format.edit.unedited.format(old=format_username(username))
+        )
+    ]
+
+    result += [
+        (
+            messages.format.edit.edited.format(
+                old=format_user_role(role), new=format_user_role(edited_role)
+            )
+            if is_role_changed
+            else messages.format.edit.unedited.format(old=format_user_role(role))
+        )
+    ]
+
+    return "\n".join(result)
 
 
 def format_question(
@@ -62,21 +130,31 @@ def format_question(
     answer_text: str | None = None,
     rating: str | float | None = None,
 ) -> str:
-    result = ""
+    result = []
 
     if id is not None:
-        result += f"{EmojiSymbol.INDEX}{format_id(id)} Question:\n"
+        result.append(messages.format.question.id.format(id=format_id(id)))
 
     if question_text is not None:
-        result += f"{EmojiSymbol.QUESTION} Text:\n {question_text}\n"
+        result.append(
+            messages.format.question.question_text.format(
+                question_text=format_question_text(question_text)
+            )
+        )
 
     if answer_text is not None:
-        result += f"{EmojiSymbol.ANSWER} Answer:\n {answer_text}\n"
+        result.append(
+            messages.format.question.answer_text.format(
+                answer_text=format_answer_text(answer_text)
+            )
+        )
 
     if rating is not None:
-        result += f"{EmojiSymbol.RATING} Rating: {rating}\n"
+        result.append(
+            messages.format.question.rating.format(rating=format_rating(rating))
+        )
 
-    return result
+    return "\n".join(result)
 
 
 def format_edited_question(
@@ -93,17 +171,43 @@ def format_edited_question(
     is_answer_text_changed = answer_text != edited_answer_text
     is_rating_changed = rating != edited_rating
 
-    result = format_question(
-        id,
-        f"{question_text}{f" {EmojiSymbol.CHANGE}\n{edited_question_text}"if is_question_text_changed else ""}",
-        f"{answer_text}{f" {EmojiSymbol.CHANGE}\n{edited_answer_text}" if is_answer_text_changed else ""}",
-        f"{rating}{f" {EmojiSymbol.CHANGE} {edited_rating}" if is_rating_changed else ""}",
+    result = [format_id(id)]
+
+    result.append(
+        messages.format.edit.edited.format(
+            old=format_question_text(question_text),
+            new=format_question_text(edited_question_text),
+        )
+        if is_question_text_changed
+        else messages.format.edit.unedited.format(
+            old=format_question_text(question_text)
+        )
     )
 
-    status = "<b>NOT</b> " if not recompute_embedding else ""
-    result += f"{EmojiSymbol.EMBEDDING} Embedding will {status}be recomputed\n"
+    result.append(
+        messages.format.edit.edited.format(
+            old=format_answer_text(answer_text),
+            new=format_answer_text(edited_answer_text),
+        )
+        if is_answer_text_changed
+        else messages.format.edit.unedited.format(old=format_answer_text(answer_text))
+    )
 
-    return result
+    result.append(
+        messages.format.edit.edited.format(
+            old=format_rating(rating), new=format_rating(edited_rating)
+        )
+        if is_rating_changed
+        else messages.format.edit.unedited.format(old=format_rating(rating))
+    )
+
+    result.append(
+        messages.format.question.recomputed
+        if recompute_embedding
+        else messages.format.question.not_recomputed
+    )
+
+    return "\n".join(result)
 
 
 def format_user_table(rows: list[User], columns: list, idx_offset=0):
@@ -164,22 +268,10 @@ def format_question_table(rows: list[Question], columns: list, idx_offset=0):
         table.append(row_values)
 
     def fmt_row(row):
-        delimiter = f"--- Question #{row[0]} ---\n"
+        delimiter = f"----- #{row[0]} -----\n"
         card = "\n".join(f"{col}: {row[i+1]}" for i, col in enumerate(columns))
         return delimiter + card
 
     rows_lines = [fmt_row(r) for r in table]
 
     return "\n\n".join(rows_lines)
-
-
-def format_response(text: str, message: Message, **kwargs):
-    return text.format(
-        user_id=message.from_user.id,
-        first_name=message.from_user.first_name or "",
-        last_name=message.from_user.last_name or "",
-        username=message.from_user.username or "",
-        full_name=message.from_user.full_name,
-        date=message.date.strftime("%d.%m.%Y %H:%M"),
-        **kwargs,
-    )

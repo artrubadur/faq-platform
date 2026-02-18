@@ -41,38 +41,41 @@ async def process(
     page: int = data["tmp_page"]
     page_size: int = data["tmp_page_size"]
 
+    if "tmp_amount" not in data:
+        async with async_session() as session:
+            repo = QuestionsRepository(session)
+            service = QuestionsService(repo)
+            amount = await service.get_questions_amount()
+        await state.update_data(tmp_amount=amount)
+    else:
+        amount = data["tmp_amount"]
+
+    max_page = (amount + page_size - 1) // page_size
+    page = min(max_page, page)
+    if page == 0:
+        logger.debug("No questions found")
+        await send_empty_pagination(message, send_action)
+        return
+
     async with async_session() as session:
         repo = QuestionsRepository(session)
         service = QuestionsService(repo)
-
-        if "tmp_amount" not in data:
-            amount = await service.get_questions_amount()
-            await state.update_data(tmp_amount=amount)
-        else:
-            amount = data["tmp_amount"]
-
-        max_page = (amount + page_size - 1) // page_size
-        page = min(max_page, page)
-        if page == 0:
-            logger.debug("No questions found")
-            await send_empty_pagination(message, send_action)
-            return
-
         questions = await service.get_paginated_questions(
             page, page_size, order, ascending
         )
-        logger.debug("Questions obtained", len=len(questions))
-        sent_message = await send_pagination(
-            message,
-            send_action,
-            questions,
-            order,
-            ascending,
-            page,
-            max_page,
-            page_size,
-        )
-        await last_message.set(sent_message, state)
+
+    logger.debug("Questions obtained", len=len(questions))
+    sent_message = await send_pagination(
+        message,
+        send_action,
+        questions,
+        order,
+        ascending,
+        page,
+        max_page,
+        page_size,
+    )
+    await last_message.set(sent_message, state)
 
 
 @router.callback_query(F.data == DIR)

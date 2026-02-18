@@ -1,0 +1,23 @@
+responses:
+  public:
+    start: >
+      Hi {first_name}! 👋 I’m here to help you find answers. 
+      Feel free to ask me anything, pick a popular question below, 
+      or use /help to get in touch with our team!
+    failed: "{exception}. Maybe try rephrasing it a bit?"
+    error: >
+      ❌ Oops! Something went wrong on our end. 
+      We're already looking into it. Please try again in a moment.
+
+exceptions:
+  search:
+    not_found: "I couldn't quite find an answer for that"
+
+process:
+  question:
+    msg_question_text_invalid: "Could you please send your question as a plain text message?"
+    cmd_question_text_invalid: "Please add your question right after the command"
+
+validation:
+  question:
+    question_text_long: "That's a long one! Could you try making the question a bit shorter?"

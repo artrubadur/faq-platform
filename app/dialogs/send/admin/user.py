@@ -5,15 +5,17 @@ from aiogram.types import InlineKeyboardMarkup, Message
 import app.dialogs.markups.user as mu
 import app.dialogs.rows.common as brows
 import app.dialogs.rows.user as urows
-from app.core.constants.emojis import EmojiAction, EmojiStatus
+from app.core.messages import messages
 from app.dialogs.actions import with_message_action
 from app.repositories.users import UserColumn
 from app.storage.models.user import User
 from app.utils.format.output import (
     format_edited_user,
     format_exception,
+    format_id,
     format_user,
     format_user_table,
+    format_username,
 )
 
 
@@ -35,7 +37,8 @@ async def send_enter_identity(
         + brows.cancel_row(cancel_dir)
     )
     return await send(
-        text=f"{EmojiAction.ENTER} Enter a telegram id, share contact or forward a message",
+        text=messages.responses.admin.user.enter.identity,
+        prase_mode=messages.parse_mode,
         reply_markup=reply_markup,
     )
 
@@ -55,7 +58,8 @@ async def send_enter_username(
         + brows.cancel_row(cancel_dir)
     )
     return await send(
-        text=f"{EmojiAction.ENTER} Enter a username",
+        text=messages.responses.admin.user.enter.username,
+        prase_mode=messages.parse_mode,
         reply_markup=reply_markup,
     )
 
@@ -68,7 +72,8 @@ async def send_select_role(
         inline_keyboard=urows.role_rows(dir) + brows.cancel_row(cancel_dir)
     )
     return await send(
-        text=f"{EmojiAction.SELECT} Select a role:",
+        text=messages.responses.admin.user.enter.role,
+        prase_mode=messages.parse_mode,
         reply_markup=reply_markup,
     )
 
@@ -82,8 +87,10 @@ async def send_confirm_creation(
     role: str,
 ) -> Message:
     return await send(
-        text=f"{EmojiAction.SELECT} Confirm creation?\n{format_user(id=id, username=username, role=role)}",
-        parse_mode="HTML",
+        text=messages.responses.admin.user.creation.confirm.format(
+            user=format_user(id=id, username=username, role=role)
+        ),
+        prase_mode=messages.parse_mode,
         reply_markup=mu.confirm_creation,
     )
 
@@ -96,19 +103,25 @@ async def send_successfully_created(
     role: str,
 ) -> Message:
     return await send(
-        text=f"{EmojiStatus.SUCCESSFUL} User has been successfully created:\n{format_user(id=id, username=username, role=role)}",
-        parse_mode="HTML",
+        text=messages.responses.admin.user.creation.successful.format(
+            user=format_user(id=id, username=username, role=role)
+        ),
+        prase_mode=messages.parse_mode,
         reply_markup=mu.back,
     )
 
 
 @with_message_action
-async def send_failed_creation(
-    send: Callable[..., Awaitable[Message]],
-    exception="Unexcepted error.",
+async def send_already_exists(
+    send: Callable[..., Awaitable[Message]], id: int, username: str | None
 ) -> Message:
     return await send(
-        text=format_exception(f"Failed to create the user: {exception}"),
+        text=format_exception(
+            messages.exceptions.user.already_exists.format(
+                id=format_id(id), username=format_username(username)
+            )
+        ),
+        prase_mode=messages.parse_mode,
         reply_markup=mu.back,
     )
 
@@ -122,11 +135,10 @@ async def send_successfully_found(
     role: str,
 ) -> Message:
     return await send(
-        text=(
-            f"{EmojiStatus.SUCCESSFUL} The user has been successfully found in the database:\n"
-            f"{format_user(id=id, username=username, role=role)}"
+        text=messages.responses.admin.user.finding.successful.format(
+            user=format_user(id=id, username=username, role=role)
         ),
-        parse_mode="HTML",
+        prase_mode=messages.parse_mode,
         reply_markup=mu.back,
     )
 
@@ -139,11 +151,10 @@ async def send_partially_found(
     role: str | None = None,
 ) -> Message:
     return await send(
-        text=(
-            f"{EmojiStatus.WARNING} The user has been partially found but missing in the database:\n"
-            f"{format_user(id=id, username=username, role=role)}"
+        text=messages.responses.admin.user.finding.partially_found.format(
+            user=format_user(id=id, username=username, role=role)
         ),
-        parse_mode="HTML",
+        prase_mode=messages.parse_mode,
         reply_markup=mu.back,
     )
 
@@ -153,8 +164,12 @@ async def send_not_found(
     send: Callable[..., Awaitable[Message]], id: int, username: str | None = None
 ) -> Message:
     return await send(
-        text=f"{EmojiStatus.FAILED} User `{username or id}` not found",
-        parse_mode="Markdown",
+        text=messages.exceptions.user.not_found.format(
+            identity=(
+                format_username(username) if username is not None else format_id(id)
+            )
+        ),
+        prase_mode=messages.parse_mode,
         reply_markup=mu.back,
     )
 
@@ -168,8 +183,10 @@ async def send_confirm_deletion(
     role: str,
 ) -> Message:
     return await send(
-        text=f"{EmojiAction.SELECT} Confirm deletion?\n{format_user(id=id, username=username, role=role)}",
-        parse_mode="HTML",
+        text=messages.responses.admin.user.deletion.confirm.format(
+            user=format_user(id=id, username=username, role=role)
+        ),
+        prase_mode=messages.parse_mode,
         reply_markup=mu.confirm_deletion,
     )
 
@@ -182,8 +199,10 @@ async def send_successfully_deleted(
     role: str,
 ) -> Message:
     return await send(
-        text=f"{EmojiStatus.SUCCESSFUL} Next user has been successfully deleted:\n{format_user(id=id, username=username, role=role)}",
-        parse_mode="HTML",
+        text=messages.responses.admin.user.deletion.successful.format(
+            user=format_user(id=id, username=username, role=role)
+        ),
+        prase_mode=messages.parse_mode,
         reply_markup=mu.back,
     )
 
@@ -197,8 +216,10 @@ async def send_confirm_update(
     role: str,
 ) -> Message:
     return await send(
-        text=f"{EmojiAction.SELECT} Update this user?\n{format_user(id=id, username=username, role=role)}",
-        parse_mode="HTML",
+        text=messages.responses.admin.user.update.confirm.format(
+            user=format_user(id=id, username=username, role=role)
+        ),
+        prase_mode=messages.parse_mode,
         reply_markup=mu.confirm_update,
     )
 
@@ -214,41 +235,11 @@ async def send_changes(
 ) -> Message:
     changes_text = format_edited_user(id, username, edited_username, role, edited_role)
     return await send(
-        text=f"{changes_text}{EmojiAction.SELECT} Select the field to edit:",
-        parse_mode="HTML",
+        text=messages.responses.admin.user.update.select_field.format(
+            user=changes_text
+        ),
+        prase_mode=messages.parse_mode,
         reply_markup=mu.field_save_update,
-    )
-
-
-@with_message_action
-async def send_edit_username(
-    send: Callable[..., Awaitable[Message]],
-    dir: str,
-    found_username: str | None = None,
-) -> Message:
-    reply_markup = InlineKeyboardMarkup(
-        inline_keyboard=urows.username_rows(dir, found_username, empty=True)
-        + brows.cancel_row(dir)
-    )
-
-    return await send(
-        text=f"{EmojiAction.ENTER} Enter the username",
-        reply_markup=reply_markup,
-    )
-
-
-@with_message_action
-async def send_edit_role(
-    send: Callable[..., Awaitable[Message]],
-    dir: str,
-) -> Message:
-    reply_markup = InlineKeyboardMarkup(
-        inline_keyboard=urows.role_rows(dir) + brows.cancel_row(dir)
-    )
-
-    return await send(
-        text=f"{EmojiAction.ENTER} Select the role:",
-        reply_markup=reply_markup,
     )
 
 
@@ -260,19 +251,10 @@ async def send_successfully_updated(
     role: str,
 ) -> Message:
     return await send(
-        text=f"{EmojiStatus.SUCCESSFUL} The user has been successfully updated:\n{format_user(id=id, username=username, role=role)}",
-        parse_mode="HTML",
-        reply_markup=mu.back,
-    )
-
-
-@with_message_action
-async def send_failed_update(
-    send: Callable[..., Awaitable[Message]],
-    exception="Unexcepted error.",
-) -> Message:
-    return await send(
-        text=format_exception(f"Failed to update the user: {exception}"),
+        text=messages.responses.admin.user.update.successful.format(
+            user=format_user(id=id, username=username, role=role)
+        ),
+        prase_mode=messages.parse_mode,
         reply_markup=mu.back,
     )
 
@@ -299,9 +281,15 @@ async def send_pagination(
     )
 
     table = format_user_table(users, columns, index_offset)
-    text = f"{EmojiAction.LIST} User list: {page}/{max_page}\n```\n{table}\n```"
+    text = messages.responses.admin.user.listing.successful.format(
+        page=page, max_page=max_page, content=table
+    )
 
-    return await send(text=text, reply_markup=reply_markup, parse_mode="Markdown")
+    return await send(
+        text=text,
+        reply_markup=reply_markup,
+        prase_mode=messages.parse_mode,
+    )
 
 
 @with_message_action
@@ -309,5 +297,7 @@ async def send_empty_pagination(
     send: Callable[..., Awaitable[Message]],
 ) -> Message:
     return await send(
-        text=f"{EmojiAction.LIST} No users found in the system", reply_markup=mu.back
+        text=messages.responses.admin.user.listing.not_found,
+        reply_markup=mu.back,
+        prase_mode=messages.parse_mode,
     )

@@ -135,14 +135,6 @@ async def user_delete_cb_confirm_handler(callback: CallbackQuery, state: FSMCont
         service = UsersService(repo)
         try:
             user = await service.delete_user(input_id)
-            logger.debug("User deleted", id=user.id)
-            await send_successfully_deleted(
-                callback.message,  # pyright: ignore[reportArgumentType]
-                SendAction.EDIT,
-                user.telegram_id,
-                user.username,
-                user.role,
-            )
         except NoResultFound:
             await send_not_found(
                 callback.message,  # pyright: ignore[reportArgumentType]
@@ -150,4 +142,12 @@ async def user_delete_cb_confirm_handler(callback: CallbackQuery, state: FSMCont
                 input_id,
             )
 
+    logger.debug("User deleted", id=user.id)
+    await send_successfully_deleted(
+        callback.message,  # pyright: ignore[reportArgumentType]
+        SendAction.EDIT,
+        user.telegram_id,
+        user.username,
+        user.role,
+    )
     await state.set_state(None)

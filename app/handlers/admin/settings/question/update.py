@@ -19,10 +19,10 @@ from app.dialogs.send.admin.question import (
     send_changes,
     send_confirm_recompute,
     send_confirm_update,
-    send_edit_answer_text,
-    send_edit_question_text,
-    send_edit_rating,
+    send_enter_answer_text,
     send_enter_id,
+    send_enter_question_text,
+    send_enter_rating,
     send_not_found,
     send_successfully_updated,
 )
@@ -80,21 +80,22 @@ async def process_id_handler(
         service = QuestionsService(repo)
         try:
             question = await service.get_question(input_id)
-            await state.update_data(
-                tmp_input_id=input_id,
-                tmp_orig_question_text=question.question_text,
-                tmp_orig_answer_text=question.answer_text,
-                tmp_orig_rating=question.rating,
-            )
-            await send_confirm_update(
-                message,
-                send_action,
-                question.id,
-                question.question_text,
-                question.answer_text,
-            )
         except NoResultFound:
             await send_not_found(message, send_action, input_id)
+
+    await state.update_data(
+        tmp_input_id=input_id,
+        tmp_orig_question_text=question.question_text,
+        tmp_orig_answer_text=question.answer_text,
+        tmp_orig_rating=question.rating,
+    )
+    await send_confirm_update(
+        message,
+        send_action,
+        question.id,
+        question.question_text,
+        question.answer_text,
+    )
 
     await state.set_state(None)
 
@@ -208,7 +209,7 @@ async def question_update_cb_edit_question_text_handler(
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    sent_message = await send_edit_question_text(
+    sent_message = await send_enter_question_text(
         callback.message, SendAction.EDIT, DIR  # pyright: ignore[reportArgumentType]
     )
     await last_message.set(sent_message, state)
@@ -275,7 +276,7 @@ async def question_update_cb_edit_answer_text_handler(
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    sent_message = await send_edit_answer_text(
+    sent_message = await send_enter_answer_text(
         callback.message, SendAction.EDIT, DIR  # pyright: ignore[reportArgumentType]
     )
     await last_message.set(sent_message, state)
@@ -310,7 +311,7 @@ async def question_update_cb_edit_rating_handler(
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    sent_message = await send_edit_rating(
+    sent_message = await send_enter_rating(
         callback.message, SendAction.EDIT, DIR  # pyright: ignore[reportArgumentType]
     )
     await last_message.set(sent_message, state)
@@ -374,7 +375,7 @@ async def question_update_cb_save_handler(callback: CallbackQuery, state: FSMCon
                 question.id,
                 question.question_text,
                 question.answer_text,
-                question.rating
+                question.rating,
             )
         except NoResultFound:
             await send_not_found(

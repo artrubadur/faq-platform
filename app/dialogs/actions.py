@@ -30,6 +30,7 @@ async def send_via_action(message: Message, action: SendAction, **kwargs) -> Mes
 def with_message_action(
     func: Callable[Concatenate[Callable, P], Awaitable[Message]],
 ) -> Callable[Concatenate[Message, SendAction, P], Awaitable[Message]]:
+
     @wraps(func)
     async def inner(message: Message, action: SendAction, *args, **kwargs):
         async def send(**data):

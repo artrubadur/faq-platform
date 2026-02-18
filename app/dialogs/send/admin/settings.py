@@ -6,7 +6,7 @@ import app.dialogs.markups.question as qmu
 import app.dialogs.markups.user as umu
 import app.dialogs.rows.common as brows
 import app.dialogs.rows.settings as srows
-from app.core.constants.emojis import EmojiMenu
+from app.core.messages import messages
 from app.dialogs.actions import with_message_action
 
 
@@ -17,7 +17,8 @@ async def send_settings_menu(send: Callable[..., Awaitable[Message]]) -> Message
     )
 
     return await send(
-        text=f"{EmojiMenu.SETTINGS} Settings",
+        text=messages.responses.admin.settings.main,
+        parse_mode=messages.parse_mode,
         reply_markup=reply_markup,
     )
 
@@ -27,7 +28,8 @@ async def send_users_menu(
     send: Callable[..., Awaitable[Message]],
 ) -> Message:
     return await send(
-        text=f"{EmojiMenu.USERS} User Management",
+        text=messages.responses.admin.settings.user,
+        parse_mode=messages.parse_mode,
         reply_markup=umu.main,
     )
 
@@ -37,6 +39,7 @@ async def send_questions_menu(
     send: Callable[..., Awaitable[Message]],
 ) -> Message:
     return await send(
-        text=f"{EmojiMenu.QUESTIONS} Question Management",
+        text=messages.responses.admin.settings.question,
+        parse_mode=messages.parse_mode,
         reply_markup=qmu.main,
     )

@@ -10,10 +10,10 @@ from app.dialogs import SendAction
 from app.dialogs.rows.common import ConfirmCallback
 from app.dialogs.rows.user import IdentityCallback, RoleCallback, UsernameCallback
 from app.dialogs.send.admin.user import (
+    send_already_exists,
     send_confirm_creation,
     send_enter_identity,
     send_enter_username,
-    send_failed_creation,
     send_select_role,
     send_successfully_created,
 )
@@ -275,17 +275,19 @@ async def user_create_cb_confirm_handler(callback: CallbackQuery, state: FSMCont
         service = UsersService(repo)
         try:
             user = await service.create_user(input_id, input_username, input_role)
-            logger.debug("User created", id=user.id)
-            await send_successfully_created(
-                callback.message,  # pyright: ignore[reportArgumentType]
-                SendAction.EDIT,
-                user.telegram_id,
-                user.username,
-                user.role,
-            )
         except IntegrityError:
-            await send_failed_creation(
+            await send_already_exists(
                 callback.message,  # pyright: ignore[reportArgumentType]
                 SendAction.EDIT,
-                "User already exists",
+                input_id,
+                input_username,
             )
+
+    logger.debug("User created", id=user.id)
+    await send_successfully_created(
+        callback.message,  # pyright: ignore[reportArgumentType]
+        SendAction.EDIT,
+        user.telegram_id,
+        user.username,
+        user.role,
+    )

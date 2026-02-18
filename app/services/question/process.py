@@ -1,6 +1,7 @@
 from aiogram.filters import CommandObject
 from aiogram.types import Message
 
+from app.core.messages import messages
 from app.services.question.validate import (
     validate_id,
     validate_question_text,
@@ -12,7 +13,7 @@ from app.utils.format.input import format_input
 async def process_id_msg(message: Message):
     input_id = message.text
     if input_id is None:
-        raise ValueError("Please send a simple text message with ID")
+        raise ValueError(messages.process.question.id_invalid)
 
     formatted_id = format_input(input_id)
     valid_id = validate_id(formatted_id)
@@ -22,7 +23,7 @@ async def process_id_msg(message: Message):
 async def process_question_text_msg(message: Message):
     input_question_text = message.text
     if input_question_text is None:
-        raise ValueError("Please send a simple text message with the question")
+        raise ValueError(messages.process.question.msg_question_text_invalid)
 
     formatted_question_text = format_input(input_question_text)
     valid_question_text = validate_question_text(formatted_question_text)
@@ -32,7 +33,7 @@ async def process_question_text_msg(message: Message):
 async def process_question_text_cmd(command: CommandObject):
     input_question_text = command.args
     if input_question_text is None:
-        raise ValueError("Please specify the question text after the command")
+        raise ValueError(messages.process.question.cmd_question_text_invalid)
 
     formatted_question_text = format_input(input_question_text)
     valid_question_text = validate_question_text(formatted_question_text)
@@ -42,9 +43,7 @@ async def process_question_text_cmd(command: CommandObject):
 async def process_answer_text_msg(message: Message):
     input_answer_text = message.html_text
     if input_answer_text is None:
-        raise ValueError(
-            "Please send a simple text message with the answer to the question"
-        )
+        raise ValueError(messages.process.question.answer_text_invalid)
 
     formatted_answer_text = format_input(input_answer_text)
     valid_answer_text = validate_question_text(formatted_answer_text)
@@ -54,7 +53,7 @@ async def process_answer_text_msg(message: Message):
 async def process_rating_msg(message: Message):
     input_rating = message.text
     if input_rating is None:
-        raise ValueError("Please send a simple text message with the rating")
+        raise ValueError(messages.process.question.rating_invalid)
 
     formatted_rating = format_input(input_rating)
     valid_rating = validate_rating(formatted_rating)

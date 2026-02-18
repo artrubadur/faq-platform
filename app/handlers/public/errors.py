@@ -33,6 +33,6 @@ async def errors_handler(event: ErrorEvent):
     )
 
     if message is not None and should_notify:
-        await send_unexcepted_error(message, SendAction.ANSWER)
+        await send_unexcepted_error(message, SendAction.ANSWER, message)
 
     return True

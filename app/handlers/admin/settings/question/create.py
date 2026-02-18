@@ -36,14 +36,16 @@ class QuestionCreation(StatesGroup):
 
 
 @router.callback_query(F.data == DIR)
-async def question_create_cb_handler(callback: CallbackQuery, last_message: LastMessage, state: FSMContext):
+async def question_create_cb_handler(
+    callback: CallbackQuery, last_message: LastMessage, state: FSMContext
+):
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
 
     sent_message = await send_enter_question_text(
-        callback.message, # pyright: ignore[reportArgumentType]
+        callback.message,  # pyright: ignore[reportArgumentType]
         SendAction.EDIT,
-        PARENT_DIR
+        PARENT_DIR,
     )
     await last_message.set(sent_message, state)
 
@@ -120,7 +122,7 @@ async def question_create_cb_create_confirm_handler(
             )
             await state.set_data(data)
             await send_successfully_created(
-                callback.message, # pyright: ignore[reportArgumentType]
+                callback.message,  # pyright: ignore[reportArgumentType]
                 SendAction.EDIT,
                 qustion.id,
                 qustion.question_text,
@@ -128,7 +130,7 @@ async def question_create_cb_create_confirm_handler(
             )
         except SimilarityError as e:
             await send_found_similar(
-                callback.message, # pyright: ignore[reportArgumentType]
+                callback.message,  # pyright: ignore[reportArgumentType]
                 SendAction.EDIT,
                 e.question.id,
                 e.question.question_text,
@@ -156,7 +158,7 @@ async def question_create_cb_similar_confirm_handler(
 
     logger.debug("Question created", id=question.id)
     await send_successfully_created(
-        callback.message, # pyright: ignore[reportArgumentType]
+        callback.message,  # pyright: ignore[reportArgumentType]
         SendAction.EDIT,
         question.id,
         question.question_text,

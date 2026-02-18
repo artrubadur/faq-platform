@@ -4,7 +4,7 @@ from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton
 
 from app.core.constants.dirs import CREATE, DELETE, GET, LIST, UPDATE
-from app.core.constants.emojis import EmojiAction, EmojiNav, EmojiStatus
+from app.core.messages import messages
 
 
 class CloseCallback(CallbackData, prefix="cls"):
@@ -15,7 +15,8 @@ def close_row():
     return [
         [
             InlineKeyboardButton(
-                text=f"{EmojiNav.CLOSE} Close", callback_data=CloseCallback().pack()
+                text=messages.button.common.close,
+                callback_data=CloseCallback().pack(),
             )
         ]
     ]
@@ -29,7 +30,8 @@ def back_row(dir: str):
     return [
         [
             InlineKeyboardButton(
-                text=f"{EmojiNav.BACK} Back", callback_data=BackCallback(dir=dir).pack()
+                text=messages.button.common.back,
+                callback_data=BackCallback(dir=dir).pack(),
             ),
         ]
     ]
@@ -43,7 +45,7 @@ def cancel_row(dir: str):
     return [
         [
             InlineKeyboardButton(
-                text=f"{EmojiNav.CANCEL} Cancel",
+                text=messages.button.common.cancel,
                 callback_data=CancelCallback(dir=dir).pack(),
             ),
         ]
@@ -59,11 +61,11 @@ def confirm_row(confirm_dir: str, cancel_dir: str, step: str = ""):
     return [
         [
             InlineKeyboardButton(
-                text=EmojiStatus.CONFIRM,
+                text=messages.button.common.confirm,
                 callback_data=ConfirmCallback(dir=confirm_dir, step=step).pack(),
             ),
             InlineKeyboardButton(
-                text=EmojiNav.REJECT,
+                text=messages.button.common.reject,
                 callback_data=CancelCallback(dir=cancel_dir).pack(),
             ),
         ]
@@ -74,14 +76,15 @@ class SaveCallback(CallbackData, prefix="sav"):
     dir: str
 
 
-def save_row(save_dir: str, cancel_dir: str, step: str = ""):
+def save_row(save_dir: str, cancel_dir: str):
     return [
         [
             InlineKeyboardButton(
-                text=EmojiAction.SAVE, callback_data=SaveCallback(dir=save_dir).pack()
+                text=messages.button.common.save,
+                callback_data=SaveCallback(dir=save_dir).pack(),
             ),
             InlineKeyboardButton(
-                text=EmojiNav.CANCEL_CHANGES,
+                text=messages.button.common.discard,
                 callback_data=CancelCallback(dir=cancel_dir).pack(),
             ),
         ]
@@ -92,18 +95,18 @@ def crud_rows(dir: str):
     return [
         [
             InlineKeyboardButton(
-                text=f"{EmojiAction.CREATE} Create", callback_data=f"{dir}.{CREATE}"
+                text=messages.button.common.create, callback_data=f"{dir}.{CREATE}"
             ),
             InlineKeyboardButton(
-                text=f"{EmojiAction.GET} Get", callback_data=f"{dir}.{GET}"
+                text=messages.button.common.get, callback_data=f"{dir}.{GET}"
             ),
         ],
         [
             InlineKeyboardButton(
-                text=f"{EmojiAction.UPDATE} Update", callback_data=f"{dir}.{UPDATE}"
+                text=messages.button.common.update, callback_data=f"{dir}.{UPDATE}"
             ),
             InlineKeyboardButton(
-                text=f"{EmojiAction.DELETE} Delete", callback_data=f"{dir}.{DELETE}"
+                text=messages.button.common.delete, callback_data=f"{dir}.{DELETE}"
             ),
         ],
     ]
@@ -113,7 +116,7 @@ def list_row(dir: str):
     return [
         [
             InlineKeyboardButton(
-                text=f"{EmojiAction.LIST} List", callback_data=f"{dir}.{LIST}"
+                text=messages.button.common.list, callback_data=f"{dir}.{LIST}"
             )
         ]
     ]
@@ -153,14 +156,14 @@ def pagin_page_row(dir: str, has_prev: bool, has_next: bool):
     if has_prev:
         result.append(
             InlineKeyboardButton(
-                text=f"{EmojiNav.LEFT} Previous",
+                text=messages.button.common.previous,
                 callback_data=PaginPageCallback(dir=dir, page=-1).pack(),
             )
         )
     if has_next:
         result.append(
             InlineKeyboardButton(
-                text=f"Next {EmojiNav.RIGHT}",
+                text=messages.button.common.next,
                 callback_data=PaginPageCallback(dir=dir, page=1).pack(),
             )
         )
@@ -191,7 +194,11 @@ class PaginOrderCallback(CallbackData, prefix="pgo"):
 
 
 def pagin_order_row(dir: str, columns: list[str], current: str, ascending: bool):
-    direction_emoji = EmojiNav.UP if ascending else EmojiNav.DOWN
+    direction_emoji = (
+        messages.button.common.ascending
+        if ascending
+        else messages.button.common.descending
+    )
     return [
         [
             InlineKeyboardButton(

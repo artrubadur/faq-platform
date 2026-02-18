@@ -8,6 +8,7 @@ from app.core.constants.dirs import (
     USERS_LIST,
     USERS_UPDATE,
 )
+from app.core.messages import messages
 
 main = InlineKeyboardMarkup(
     inline_keyboard=rows.crud_rows(USERS[1])
@@ -35,7 +36,10 @@ field_save_update = InlineKeyboardMarkup(
     inline_keyboard=rows.field_rows(
         USERS_UPDATE[1],
         USERS[1],
-        [rows.FieldButton("Username", "username"), rows.FieldButton("Role", "role")],
+        [
+            rows.FieldButton(messages.button.user.username, "username"),
+            rows.FieldButton(messages.button.user.role, "role"),
+        ],
     )
 )
 

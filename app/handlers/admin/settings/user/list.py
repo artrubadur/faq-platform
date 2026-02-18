@@ -41,36 +41,38 @@ async def process(
     page: int = data["tmp_page"]
     page_size: int = data["tmp_page_size"]
 
+    if "tmp_amount" not in data:
+        async with async_session() as session:
+            repo = UsersRepository(session)
+            service = UsersService(repo)
+            amount = await service.get_user_amount()
+        await state.update_data(tmp_amount=amount)
+    else:
+        amount = data["tmp_amount"]
+
+    max_page = (amount + page_size - 1) // page_size
+    page = min(max_page, page)
+    if page == 0:
+        logger.debug("No users found")
+        await send_empty_pagination(message, send_action)
+        return
     async with async_session() as session:
         repo = UsersRepository(session)
         service = UsersService(repo)
-
-        if "tmp_amount" not in data:
-            amount = await service.get_user_amount()
-            await state.update_data(tmp_amount=amount)
-        else:
-            amount = data["tmp_amount"]
-
-        max_page = (amount + page_size - 1) // page_size
-        page = min(max_page, page)
-        if page == 0:
-            logger.debug("No users found")
-            await send_empty_pagination(message, send_action)
-            return
-
         users = await service.get_paginated_users(page, page_size, order, ascending)
-        logger.debug("Users obtained", len=len(users))
-        sent_message = await send_pagination(
-            message,
-            send_action,
-            users,
-            order,
-            ascending,
-            page,
-            max_page,
-            page_size,
-        )
-        await last_message.set(sent_message, state)
+
+    logger.debug("Users obtained", len=len(users))
+    sent_message = await send_pagination(
+        message,
+        send_action,
+        users,
+        order,
+        ascending,
+        page,
+        max_page,
+        page_size,
+    )
+    await last_message.set(sent_message, state)
 
 
 @router.callback_query(F.data == DIR)

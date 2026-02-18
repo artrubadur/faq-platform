@@ -3,7 +3,7 @@ from typing import Awaitable, Callable
 from aiogram.types import Message
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
-from app.core.responses import responses
+from app.core.messages import messages
 from app.dialogs.actions import with_message_action
 from app.storage.models.question import Question
 from app.utils.format.output import format_response
@@ -11,7 +11,7 @@ from app.utils.format.output import format_response
 
 @with_message_action
 async def send_similar(
-    send: Callable[..., Awaitable[Message]], questions: list[Question]
+    send: Callable[..., Awaitable[Message]], message: Message, questions: list[Question]
 ) -> Message:
     builder = ReplyKeyboardBuilder()
     for question in questions[1:]:
@@ -21,7 +21,9 @@ async def send_similar(
 
     most_similar = questions[0]
     return await send(
-        text=most_similar.answer_text, reply_markup=reply_markup, parse_mode="HTML"
+        text=most_similar.answer_text,
+        reply_markup=reply_markup,
+        parse_mode=messages.parse_mode,
     )
 
 
@@ -39,6 +41,9 @@ async def send_failed(
     reply_markup = builder.as_markup(resize_keyboard=True)
 
     return await send(
-        text=format_response(responses.failed_template, message, exception=exception),
+        text=format_response(
+            messages.responses.public.failed, message, exception=exception
+        ),
+        parse_mode=messages.parse_mode,
         reply_markup=reply_markup,
     )
