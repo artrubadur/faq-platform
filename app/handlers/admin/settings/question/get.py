@@ -54,14 +54,15 @@ async def question_get_cb_handler(
 async def process_id_handler(
     message: Message, state: FSMContext, input_id: int, *, send_action: SendAction
 ):
-    async with async_session() as session:
-        repo = QuestionsRepository(session)
-        service = QuestionsService(repo)
-        try:
+    try:
+        async with async_session() as session:
+            repo = QuestionsRepository(session)
+            service = QuestionsService(repo)
             question = await service.get_question(input_id)
-        except NoResultFound:
-            await send_not_found(message, send_action, input_id)
-            return
+    except NoResultFound:
+        await send_not_found(message, send_action, input_id)
+        await state.set_state(None)
+        return
 
     await state.update_data(glb_found_question_id=question.id)
 

@@ -24,13 +24,12 @@ async def user_cb_handler(callback: CallbackQuery):
 
 @router.callback_query(BackCallback.filter(F.dir == DIR))
 async def user_back_cb_handler(
-    callback: CallbackQuery, state: FSMContext, bot: Bot, dispatcher: Dispatcher
+    callback: CallbackQuery, state: FSMContext
 ):
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    await state.set_state(None)
-    await clear_temp_data(callback.from_user.id, bot, dispatcher)
+    await clear_temp_data(state)
 
     await send_users_menu(
         callback.message, SendAction.ANSWER  # pyright: ignore[reportArgumentType]
@@ -39,7 +38,7 @@ async def user_back_cb_handler(
 
 @router.callback_query(CancelCallback.filter(F.dir == DIR))
 async def user_cancel_cb_handler(
-    callback: CallbackQuery, state: FSMContext, bot: Bot, dispatcher: Dispatcher
+    callback: CallbackQuery, state: FSMContext
 ):
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
@@ -48,8 +47,7 @@ async def user_cancel_cb_handler(
         parse_mode="HTML",
     )
 
-    await state.set_state(None)
-    await clear_temp_data(callback.from_user.id, bot, dispatcher)
+    await clear_temp_data(state)
 
     await send_users_menu(
         callback.message, SendAction.ANSWER  # pyright: ignore[reportArgumentType]

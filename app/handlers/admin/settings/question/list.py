@@ -12,12 +12,13 @@ from app.dialogs.rows.common import (
     PaginSizeCallback,
 )
 from app.dialogs.send.admin.question import send_empty_pagination, send_pagination
-from app.dialogs.send.common import send_invalid
+from app.dialogs.send.common import send_expired, send_invalid
 from app.repositories.questions import QuestionsRepository
 from app.services.common.process import process_page_msg
 from app.services.question.service import QuestionsService
 from app.storage.core import async_session
 from app.utils.history.last_message import LastMessage
+from app.utils.state import clear_temp_data, is_expired
 
 router = Router()
 
@@ -36,6 +37,16 @@ async def process(
     send_action: SendAction
 ):
     data = await state.get_data()
+    if is_expired(data):
+        await clear_temp_data(state)
+        await send_expired(
+            message,
+            SendAction.ANSWER,
+            PARENT_DIR,
+        )
+        await state.set_state(None)
+        return
+    
     order: str = data["tmp_order"]
     ascending: bool = data["tmp_ascending"]
     page: int = data["tmp_page"]
@@ -96,6 +107,7 @@ async def question_list_cb_handler(
         send_action=SendAction.EDIT,
     )
 
+    await state.update_data(tmp_in_operation=True)
     await state.set_state(QuestionListing.waiting_for_page)
 
 
@@ -170,7 +182,7 @@ async def question_list_cb_order_handler(
 
     new_order = callback_data.column
     data = await state.get_data()
-    if data["tmp_order"] == new_order:
+    if data.get("tmp_order", "") == new_order:
         await state.update_data(tmp_ascending=(not data["tmp_ascending"]))
     else:
         await state.update_data(tmp_order=new_order)

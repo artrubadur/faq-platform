@@ -1,4 +1,4 @@
-from aiogram import F, Router
+from aiogram import F, Bot, Dispatcher, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
@@ -15,7 +15,7 @@ from app.dialogs.send.admin.question import (
     send_found_similar,
     send_successfully_created,
 )
-from app.dialogs.send.common import send_invalid
+from app.dialogs.send.common import send_expired, send_invalid
 from app.repositories.questions import QuestionsRepository
 from app.services.question.process import (
     process_answer_text_msg,
@@ -24,6 +24,7 @@ from app.services.question.process import (
 from app.services.question.service import QuestionsService
 from app.storage.core import async_session
 from app.utils.history.last_message import LastMessage
+from app.utils.state import clear_temp_data, is_expired
 
 router = Router()
 
@@ -49,6 +50,7 @@ async def question_create_cb_handler(
     )
     await last_message.set(sent_message, state)
 
+    await state.update_data(tmp_in_operation=True)
     await state.set_state(QuestionCreation.waiting_for_question_text)
 
 
@@ -93,6 +95,16 @@ async def question_create_msg_answer_text_handler(
     await state.update_data(tmp_input_answer_text=input_answer_text)
 
     data = await state.get_data()
+    if is_expired(data):
+        await clear_temp_data(state)
+        await send_expired(
+            message,
+            SendAction.ANSWER,
+            PARENT_DIR,
+        )
+        await state.set_state(None)
+        return
+
     input_question_text: str = data["tmp_input_question_text"]
 
     await send_confirm_creation(
@@ -110,31 +122,42 @@ async def question_create_cb_create_confirm_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
+    if is_expired(data):
+        await clear_temp_data(state)
+        await send_expired(
+            callback.message,  # pyright: ignore[reportArgumentType]
+            SendAction.ANSWER,
+            PARENT_DIR,
+        )
+        await state.set_state(None)
+        return
+
     input_question_text: str = data["tmp_input_question_text"]
     input_answer_text: str = data["tmp_input_answer_text"]
 
-    async with async_session() as session:
-        repo = QuestionsRepository(session)
-        service = QuestionsService(repo)
-        try:
+    try:
+        async with async_session() as session:
+            repo = QuestionsRepository(session)
+            service = QuestionsService(repo)
             qustion = await service.create_question(
                 input_question_text, input_answer_text, True
             )
-            await state.set_data(data)
-            await send_successfully_created(
-                callback.message,  # pyright: ignore[reportArgumentType]
-                SendAction.EDIT,
-                qustion.id,
-                qustion.question_text,
-                qustion.answer_text,
-            )
-        except SimilarityError as e:
-            await send_found_similar(
-                callback.message,  # pyright: ignore[reportArgumentType]
-                SendAction.EDIT,
-                e.question.id,
-                e.question.question_text,
-            )
+    except SimilarityError as e:
+        await send_found_similar(
+            callback.message,  # pyright: ignore[reportArgumentType]
+            SendAction.EDIT,
+            e.question.id,
+            e.question.question_text,
+        )
+        return
+
+    await send_successfully_created(
+        callback.message,  # pyright: ignore[reportArgumentType]
+        SendAction.EDIT,
+        qustion.id,
+        qustion.question_text,
+        qustion.answer_text,
+    )
 
 
 @router.callback_query(ConfirmCallback.filter(F.dir == DIR and F.step == "similar"))
@@ -145,6 +168,16 @@ async def question_create_cb_similar_confirm_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
+    if is_expired(data):
+        await clear_temp_data(state)
+        await send_expired(
+            callback.message,  # pyright: ignore[reportArgumentType]
+            SendAction.ANSWER,
+            PARENT_DIR,
+        )
+        await state.set_state(None)
+        return
+    
     input_question_text: str = data.pop("tmp_input_question_text")
     input_answer_text: str = data.pop("tmp_input_answer_text")
     await state.set_data(data)

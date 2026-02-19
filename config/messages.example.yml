@@ -16,6 +16,7 @@ responses: # Messages sent to regular users
 
   admin: # Messages sent to administrators, organized by entity:
     invalid: "{emoji.status.warning} {exception}. Retry or back"
+    expired: "The time for the operation has expired. Start over"
     user: # User flows
       enter: 
         identity: "{emoji.action.enter} Enter the telegram id, share contact or forward a message"

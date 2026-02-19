@@ -30,6 +30,17 @@ async def send_invalid(
         reply_markup=reply_markup,
     )
 
+@with_message_action
+async def send_expired(
+    send: Callable[..., Awaitable[Message]], cancel_dir: str
+) -> Message:
+    reply_markup = InlineKeyboardMarkup(inline_keyboard=rows.back_row(cancel_dir))
+
+    return await send(
+        text=messages.responses.admin.expired,
+        parse_mode=messages.parse_mode,
+        reply_markup=reply_markup,
+    )
 
 @with_chat_message
 async def send_log(

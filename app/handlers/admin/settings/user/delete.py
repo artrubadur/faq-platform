@@ -15,12 +15,13 @@ from app.dialogs.send.admin.user import (
     send_not_found,
     send_successfully_deleted,
 )
-from app.dialogs.send.common import send_invalid
+from app.dialogs.send.common import send_expired, send_invalid
 from app.repositories import UsersRepository
 from app.services import UsersService
 from app.services.user.process import process_identity_msg
 from app.storage.core import async_session
 from app.utils.history.last_message import LastMessage
+from app.utils.state import clear_temp_data, is_expired
 
 router = Router()
 
@@ -52,6 +53,7 @@ async def user_delete_cb_handler(
     )
     await last_message.set(sent_message, state)
 
+    await state.update_data(tmp_in_operation=True)
     await state.set_state(UserDeletion.waiting_for_identity)
 
 
@@ -63,22 +65,24 @@ async def process_identity_handler(
     *,
     send_action: SendAction,
 ):
-    async with async_session() as session:
-        repo = UsersRepository(session)
-        service = UsersService(repo)
-        try:
+    try:
+        async with async_session() as session:
+            repo = UsersRepository(session)
+            service = UsersService(repo)
             user = await service.get_user(input_id)
-            await state.update_data(tmp_input_id=input_id)
-            await send_confirm_deletion(
-                message,
-                send_action,
-                user.telegram_id,
-                user.username,
-                user.role,
-            )
-        except NoResultFound:
-            await send_not_found(message, send_action, input_id, input_username)
+    except NoResultFound:
+        await send_not_found(message, send_action, input_id, input_username)
+        await state.set_state(None)
+        return
 
+    await state.update_data(tmp_input_id=input_id)
+    await send_confirm_deletion(
+        message,
+        send_action,
+        user.telegram_id,
+        user.username,
+        user.role,
+    )
     await state.set_state(None)
 
 
@@ -127,20 +131,31 @@ async def user_delete_cb_confirm_handler(callback: CallbackQuery, state: FSMCont
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    input_id: int = data.pop("tmp_input_id")
+    if is_expired(data):
+        await clear_temp_data(state)
+        await send_expired(
+            callback.message,  # pyright: ignore[reportArgumentType]
+            SendAction.ANSWER,
+            PARENT_DIR,
+        )
+        await state.set_state(None)
+        return
+    
+    input_id: int = data.pop("tmp_input_id", None)
     await state.set_data(data)
 
-    async with async_session() as session:
-        repo = UsersRepository(session)
-        service = UsersService(repo)
-        try:
+    try:
+        async with async_session() as session:
+            repo = UsersRepository(session)
+            service = UsersService(repo)
             user = await service.delete_user(input_id)
-        except NoResultFound:
-            await send_not_found(
-                callback.message,  # pyright: ignore[reportArgumentType]
-                SendAction.EDIT,
-                input_id,
-            )
+    except NoResultFound:
+        await send_not_found(
+            callback.message,  # pyright: ignore[reportArgumentType]
+            SendAction.EDIT,
+            input_id,
+        )
+        return
 
     logger.debug("User deleted", id=user.id)
     await send_successfully_deleted(
@@ -150,4 +165,3 @@ async def user_delete_cb_confirm_handler(callback: CallbackQuery, state: FSMCont
         user.username,
         user.role,
     )
-    await state.set_state(None)

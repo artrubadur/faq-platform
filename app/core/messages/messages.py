@@ -140,6 +140,7 @@ class MiscAdmRsp(BaseModel):
 
 class AdminRsp(BaseModel):
     invalid: str = "⚠ {exception}. Retry or back"
+    expired: str = "The time for the operation has expired. Start over"
     user: UserAdmRsp = UserAdmRsp()
     question: QuestionAdmRsp = QuestionAdmRsp()
     settings: SettingsAdmRsp = SettingsAdmRsp()

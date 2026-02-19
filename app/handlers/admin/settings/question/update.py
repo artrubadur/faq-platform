@@ -26,7 +26,7 @@ from app.dialogs.send.admin.question import (
     send_not_found,
     send_successfully_updated,
 )
-from app.dialogs.send.common import send_invalid
+from app.dialogs.send.common import send_expired, send_invalid
 from app.repositories.questions import QuestionsRepository
 from app.services.question.process import (
     process_answer_text_msg,
@@ -37,6 +37,7 @@ from app.services.question.process import (
 from app.services.question.service import QuestionsService
 from app.storage.core import async_session
 from app.utils.history.last_message import LastMessage
+from app.utils.state import clear_temp_data, is_expired
 
 router = Router()
 
@@ -69,22 +70,25 @@ async def question_update_cb_handler(
     )
     await last_message.set(sent_message, state)
 
+    await state.update_data(tmp_in_operation=True)
     await state.set_state(QuestionUpdate.waiting_for_id)
 
 
 async def process_id_handler(
     message: Message, state: FSMContext, input_id: int, *, send_action: SendAction
 ):
-    async with async_session() as session:
-        repo = QuestionsRepository(session)
-        service = QuestionsService(repo)
-        try:
+    try:
+        async with async_session() as session:
+            repo = QuestionsRepository(session)
+            service = QuestionsService(repo)
             question = await service.get_question(input_id)
-        except NoResultFound:
-            await send_not_found(message, send_action, input_id)
+    except NoResultFound:
+        await send_not_found(message, send_action, input_id)
+        await state.set_state(None)
+        return
 
     await state.update_data(
-        tmp_input_id=input_id,
+        tmp_orig_id=question.id,
         tmp_orig_question_text=question.question_text,
         tmp_orig_answer_text=question.answer_text,
         tmp_orig_rating=question.rating,
@@ -139,14 +143,24 @@ async def process_fields_handler(
     message: Message, state: FSMContext, *, send_action: SendAction
 ):
     data = await state.get_data()
-    id: int = data["tmp_input_id"]
+    if is_expired(data):
+        await clear_temp_data(state)
+        await send_expired(
+            message,
+            SendAction.ANSWER,
+            PARENT_DIR,
+        )
+        await state.set_state(None)
+        return
+    
+    id: int = data["tmp_orig_id"]
     question_text: str = data["tmp_orig_question_text"]
     answer_text: str = data["tmp_orig_answer_text"]
     rating: float = data["tmp_orig_rating"]
 
     edited_question_text: str = data.get("tmp_edited_question_text", question_text)
     edited_answer_text: str = data.get("tmp_edited_answer_text", answer_text)
-    edited_rating: float = data.pop("tmp_edited_rating", rating)
+    edited_rating: float = data.get("tmp_edited_rating", rating)
 
     recompute_embedding: bool = data.get("tmp_recompute_embedding", False)
 
@@ -345,7 +359,17 @@ async def question_update_cb_save_handler(callback: CallbackQuery, state: FSMCon
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    id: int = data.pop("tmp_input_id")
+    if is_expired(data):
+        await clear_temp_data(state)
+        await send_expired(
+            callback.message,  # pyright: ignore[reportArgumentType]
+            SendAction.ANSWER,
+            PARENT_DIR,
+        )
+        await state.set_state(None)
+        return
+    
+    id: int = data.pop("tmp_orig_id")
     question_text: str = data.pop("tmp_orig_question_text")
     answer_text: str = data.pop("tmp_orig_answer_text")
     rating: float = data.pop("tmp_orig_rating")
@@ -357,10 +381,10 @@ async def question_update_cb_save_handler(callback: CallbackQuery, state: FSMCon
     recompute_embedding: bool = data.pop("tmp_recompute_embedding", False)
     await state.set_data(data)
 
-    async with async_session() as session:
-        repo = QuestionsRepository(session)
-        service = QuestionsService(repo)
-        try:
+    try:
+        async with async_session() as session:
+            repo = QuestionsRepository(session)
+            service = QuestionsService(repo)
             question = await service.update_question(
                 id,
                 edited_question_text,
@@ -368,18 +392,20 @@ async def question_update_cb_save_handler(callback: CallbackQuery, state: FSMCon
                 edited_rating,
                 recompute_embedding,
             )
-            logger.debug("Question updated", id=question.id)
-            await send_successfully_updated(
-                callback.message,  # pyright: ignore[reportArgumentType]
-                SendAction.EDIT,
-                question.id,
-                question.question_text,
-                question.answer_text,
-                question.rating,
-            )
-        except NoResultFound:
-            await send_not_found(
-                callback.message,  # pyright: ignore[reportArgumentType]
-                SendAction.EDIT,
-                id,
-            )
+    except NoResultFound:
+        await send_not_found(
+            callback.message,  # pyright: ignore[reportArgumentType]
+            SendAction.EDIT,
+            id,
+        )
+        return
+
+    logger.debug("Question updated", id=question.id)
+    await send_successfully_updated(
+        callback.message,  # pyright: ignore[reportArgumentType]
+        SendAction.EDIT,
+        question.id,
+        question.question_text,
+        question.answer_text,
+        question.rating,
+    )

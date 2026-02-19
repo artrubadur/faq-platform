@@ -17,7 +17,7 @@ from app.dialogs.send.admin.user import (
     send_select_role,
     send_successfully_created,
 )
-from app.dialogs.send.common import send_invalid
+from app.dialogs.send.common import send_expired, send_invalid
 from app.repositories import UsersRepository
 from app.services import UsersService
 from app.services.user.process import (
@@ -27,6 +27,7 @@ from app.services.user.process import (
 )
 from app.storage.core import async_session
 from app.utils.history.last_message import LastMessage
+from app.utils.state import clear_temp_data, is_expired
 
 router = Router()
 
@@ -60,6 +61,7 @@ async def user_create_cb_handler(
     )
     await last_message.set(sent_message, state)
 
+    await state.update_data(tmp_in_operation=True)
     await state.set_state(UserCreation.waiting_for_identity)
 
 
@@ -207,6 +209,16 @@ async def process_role_handler(
     await state.update_data(tmp_input_role=input_role)
 
     data = await state.get_data()
+    if is_expired(data):
+        await clear_temp_data(state)
+        await send_expired(
+            message,
+            SendAction.ANSWER,
+            PARENT_DIR,
+        )
+        await state.set_state(None)
+        return
+    
     input_id: int = data["tmp_input_id"]
     input_username: str | None = data["tmp_input_username"]
 
@@ -265,23 +277,34 @@ async def user_create_cb_confirm_handler(callback: CallbackQuery, state: FSMCont
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
+    if is_expired(data):
+        await clear_temp_data(state)
+        await send_expired(
+            callback.message,  # pyright: ignore[reportArgumentType]
+            SendAction.ANSWER,
+            PARENT_DIR,
+        )
+        await state.set_state(None)
+        return
+    
     input_id: int = data.pop("tmp_input_id")
     input_username: str | None = data.pop("tmp_input_username")
     input_role: str = data.pop("tmp_input_role")
     await state.set_data(data)
 
-    async with async_session() as session:
-        repo = UsersRepository(session)
-        service = UsersService(repo)
-        try:
+    try:
+        async with async_session() as session:
+            repo = UsersRepository(session)
+            service = UsersService(repo)
             user = await service.create_user(input_id, input_username, input_role)
-        except IntegrityError:
-            await send_already_exists(
-                callback.message,  # pyright: ignore[reportArgumentType]
-                SendAction.EDIT,
-                input_id,
-                input_username,
-            )
+    except IntegrityError:
+        await send_already_exists(
+            callback.message,  # pyright: ignore[reportArgumentType]
+            SendAction.EDIT,
+            input_id,
+            input_username,
+        )
+        return
 
     logger.debug("User created", id=user.id)
     await send_successfully_created(

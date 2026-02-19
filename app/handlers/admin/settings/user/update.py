@@ -25,7 +25,7 @@ from app.dialogs.send.admin.user import (
     send_select_role,
     send_successfully_updated,
 )
-from app.dialogs.send.common import send_invalid
+from app.dialogs.send.common import send_expired, send_invalid
 from app.repositories import UsersRepository
 from app.services import UsersService
 from app.services.user.process import (
@@ -35,6 +35,7 @@ from app.services.user.process import (
 )
 from app.storage.core import async_session
 from app.utils.history.last_message import LastMessage
+from app.utils.state import clear_temp_data, is_expired
 
 router = Router()
 
@@ -68,6 +69,7 @@ async def user_update_cb_handler(
     )
     await last_message.set(sent_message, state)
 
+    await state.update_data(tmp_in_operation=True)
     await state.set_state(UserUpdate.waiting_for_identity)
 
 
@@ -79,13 +81,15 @@ async def process_identity_handler(
     *,
     send_action: SendAction,
 ):
-    async with async_session() as session:
-        repo = UsersRepository(session)
-        service = UsersService(repo)
-        try:
+    try:
+        async with async_session() as session:
+            repo = UsersRepository(session)
+            service = UsersService(repo)
             user = await service.get_user(input_id)
-        except NoResultFound:
-            await send_not_found(message, send_action, input_id, input_username)
+    except NoResultFound:
+        await send_not_found(message, send_action, input_id, input_username)
+        await state.set_state(None)
+        return
 
     await state.update_data(
         tmp_orig_id=user.telegram_id,
@@ -145,6 +149,16 @@ async def process_fields_handler(
     message: Message, state: FSMContext, *, send_action: SendAction
 ):
     data = await state.get_data()
+    if is_expired(data):
+        await clear_temp_data(state)
+        await send_expired(
+            message,
+            SendAction.ANSWER,
+            PARENT_DIR,
+        )
+        await state.set_state(None)
+        return
+    
     id: int = data["tmp_orig_id"]
     username: str | None = data["tmp_orig_username"]
     role: str = data["tmp_orig_role"]
@@ -266,10 +280,10 @@ async def user_update_msg_edit_role_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     sent_message = await send_select_role(
-        callback.message, # pyright: ignore[reportArgumentType]
+        callback.message,  # pyright: ignore[reportArgumentType]
         SendAction.EDIT,
         DIR,
-        DIR,  
+        DIR,
     )
     await last_message.set(sent_message, state)
 
@@ -317,6 +331,16 @@ async def user_update_cb_save_handler(callback: CallbackQuery, state: FSMContext
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
+    if is_expired(data):
+        await clear_temp_data(state)
+        await send_expired(
+            callback.message,  # pyright: ignore[reportArgumentType]
+            SendAction.ANSWER,
+            PARENT_DIR,
+        )
+        await state.set_state(None)
+        return
+    
     id: int = data.pop("tmp_orig_id")
     username: str | None = data.pop("tmp_orig_username")
     role: str = data.pop("tmp_orig_role")
@@ -324,30 +348,33 @@ async def user_update_cb_save_handler(callback: CallbackQuery, state: FSMContext
     edited_role: str = data.pop("tmp_edited_role", role)
     await state.set_data(data)
 
-    async with async_session() as session:
-        repo = UsersRepository(session)
-        service = UsersService(repo)
-        try:
+    try:
+        async with async_session() as session:
+            repo = UsersRepository(session)
+            service = UsersService(repo)
             user = await service.update_user(id, edited_username, edited_role)
-            logger.debug("User updated", id=user.id)
-            await send_successfully_updated(
-                callback.message,  # pyright: ignore[reportArgumentType]
-                SendAction.EDIT,
-                user.telegram_id,
-                user.username,
-                user.role,
-            )
-        except NoResultFound:
-            await send_not_found(
-                callback.message,  # pyright: ignore[reportArgumentType]
-                SendAction.EDIT,
-                id,
-                username,
-            )
-        except IntegrityError:
-            await send_already_exists(
-                callback.message,  # pyright: ignore[reportArgumentType]
-                SendAction.EDIT,
-                user.telegram_id,
-                user.username,
-            )
+    except NoResultFound:
+        await send_not_found(
+            callback.message,  # pyright: ignore[reportArgumentType]
+            SendAction.EDIT,
+            id,
+            username,
+        )
+        return
+    except IntegrityError:
+        await send_already_exists(
+            callback.message,  # pyright: ignore[reportArgumentType]
+            SendAction.EDIT,
+            user.telegram_id,
+            user.username,
+        )
+        return
+    
+    logger.debug("User updated", id=user.id)
+    await send_successfully_updated(
+        callback.message,  # pyright: ignore[reportArgumentType]
+        SendAction.EDIT,
+        user.telegram_id,
+        user.username,
+        user.role,
+    )

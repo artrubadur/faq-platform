@@ -7,7 +7,7 @@ from loguru import logger
 from app.core.messages import messages
 from app.dialogs.actions import SendAction
 from app.dialogs.send.admin.misc import send_invalid_argument, send_json
-from app.utils.state import clear_context, clear_temp_data, get_data, update_data
+from app.utils.state import clear_context, clear_temp_data_by_id, get_data, update_data
 
 router = Router()
 
@@ -68,7 +68,7 @@ async def cmd_handler(
                     await send_json(message, SendAction.ANSWER, data)
 
                 case "-tmp":
-                    data = await clear_temp_data(target_id, bot, dispatcher)
+                    data = await clear_temp_data_by_id(target_id, bot, dispatcher)
                     logger.debug("Temporary state is cleared", id=target_id)
                     await send_json(message, SendAction.ANSWER, data)
 

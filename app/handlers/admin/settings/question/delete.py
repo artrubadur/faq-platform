@@ -15,12 +15,13 @@ from app.dialogs.send.admin.question import (
     send_not_found,
     send_successfully_deleted,
 )
-from app.dialogs.send.common import send_invalid
+from app.dialogs.send.common import send_expired, send_invalid
 from app.repositories.questions import QuestionsRepository
 from app.services.question.process import process_id_msg
 from app.services.question.service import QuestionsService
 from app.storage.core import async_session
 from app.utils.history.last_message import LastMessage
+from app.utils.state import clear_temp_data, is_expired
 
 router = Router()
 
@@ -50,28 +51,31 @@ async def question_get_cb_handler(
     )
     await last_message.set(sent_message, state)
 
+    await state.update_data(tmp_in_operation=True)
     await state.set_state(QuestionDeletion.waiting_for_id)
 
 
 async def process_id_handler(
     message: Message, state: FSMContext, input_id: int, *, send_action: SendAction
 ):
-    async with async_session() as session:
-        repo = QuestionsRepository(session)
-        service = QuestionsService(repo)
-        try:
+    try:
+        async with async_session() as session:
+            repo = QuestionsRepository(session)
+            service = QuestionsService(repo)
             question = await service.get_question(input_id)
-            await state.update_data(tmp_input_id=input_id)
-            await send_confirm_deletion(
-                message,
-                SendAction.ANSWER,
-                question.id,
-                question.question_text,
-                question.answer_text,
-            )
-        except NoResultFound:
-            await send_not_found(message, send_action, input_id)
+    except NoResultFound:
+        await send_not_found(message, send_action, input_id)
+        await state.set_state(None)
+        return
 
+    await state.update_data(tmp_input_id=input_id)
+    await send_confirm_deletion(
+        message,
+        SendAction.ANSWER,
+        question.id,
+        question.question_text,
+        question.answer_text,
+    )
     await state.set_state(None)
 
 
@@ -118,20 +122,30 @@ async def question_delete_cb_confirm_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    input_id: int = data.pop("tmp_input_id")
+    if is_expired(data):
+        await clear_temp_data(state)
+        await send_expired(
+            callback.message,  # pyright: ignore[reportArgumentType]
+            SendAction.ANSWER,
+            PARENT_DIR,
+        )
+        await state.set_state(None)
+        return
+    input_id: int = data["tmp_input_id"]
     await state.set_data(data)
-
-    async with async_session() as session:
-        repo = QuestionsRepository(session)
-        service = QuestionsService(repo)
-        try:
+    
+    try:
+        async with async_session() as session:
+            repo = QuestionsRepository(session)
+            service = QuestionsService(repo)
             question = await service.delete_question(input_id)
-        except NoResultFound:
-            await send_not_found(
-                callback.message,  # pyright: ignore[reportArgumentType]
-                SendAction.EDIT,
-                input_id,
-            )
+    except NoResultFound:
+        await send_not_found(
+            callback.message,  # pyright: ignore[reportArgumentType]
+            SendAction.EDIT,
+            input_id,
+        )
+        return
 
     logger.debug("Question deleted", id=question.id)
     await send_successfully_deleted(
@@ -141,5 +155,3 @@ async def question_delete_cb_confirm_handler(
         question.question_text,
         question.answer_text,
     )
-
-    await state.set_state(None)

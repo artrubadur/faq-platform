@@ -65,17 +65,20 @@ async def process_identity_handler(
     *,
     send_action: SendAction,
 ):
-    async with async_session() as session:
-        repo = UsersRepository(session)
-        service = UsersService(repo)
-        try:
+    try:
+        async with async_session() as session:
+            repo = UsersRepository(session)
+            service = UsersService(repo)
             user = await service.get_user(input_id)
-        except NoResultFound:
-            await state.update_data(
-                glb_found_user_id=input_id, glb_found_username=input_username
-            )
-            await send_partially_found(message, send_action, input_id, input_username)
-
+    except NoResultFound:
+        await state.update_data(
+            glb_found_user_id=input_id, glb_found_username=input_username
+        )
+        logger.debug("User partially obtained", id=user.id)
+        await send_partially_found(message, send_action, input_id, input_username)
+        await state.set_state(None)
+        return
+    
     await state.update_data(
         glb_found_user_id=user.telegram_id, glb_found_username=user.username
     )
