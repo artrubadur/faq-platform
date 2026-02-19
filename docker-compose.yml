@@ -1,6 +1,19 @@
 services:
+  redis:
+    image: redis:7.4-alpine
+    container_name: redis_server
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass $$REDIS_PASS --appendonly yes
+    volumes:
+      - redis_data:/data
+    env_file:
+      - .env
+
   db:
     image: pgvector/pgvector:pg17
+    container_name: database_server
     restart: always
     environment:
       POSTGRES_DB: ${DB_NAME}
@@ -16,13 +29,17 @@ services:
     build:
       context: .
       dockerfile: app/Dockerfile
+    container_name: bot_server
     restart: always
     depends_on:
       - db
+      - redis
     environment:
       DB_HOST: db
+      REDIS_HOST: redis
     env_file:
       - .env
 
 volumes:
   postgres_data:
+  redis_data:
