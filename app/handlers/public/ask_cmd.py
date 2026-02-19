@@ -52,7 +52,7 @@ async def process_ask_handler(
 @router.message(Command("ask"))
 async def cmd_handler(message: Message, command: CommandObject):
     try:
-        input_question_text = await process_question_text_cmd(command)
+        input_question_text = process_question_text_cmd(command)
     except ValueError as e:
         await send_failed(message, SendAction.ANSWER, message, str(e))
         return
@@ -65,7 +65,7 @@ async def cmd_handler(message: Message, command: CommandObject):
 @router.message()
 async def msg_handler(message: Message):
     try:
-        input_question_text = await process_question_text_msg(message)
+        input_question_text = process_question_text_msg(message)
     except ValueError as e:
         await send_failed(message, SendAction.ANSWER, message, str(e))
         return

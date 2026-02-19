@@ -82,7 +82,7 @@ async def question_delete_msg_id_handler(
     await last_message.edit_reply_markup(message, state)
 
     try:
-        input_id = await process_id_msg(message)
+        input_id = process_id_msg(message)
     except ValueError as e:
         sent_message = await send_invalid(
             message, SendAction.ANSWER, PARENT_DIR, str(e)

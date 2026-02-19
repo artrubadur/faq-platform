@@ -5,7 +5,7 @@ from app.services.user.validate import validate_id, validate_role, validate_user
 from app.utils.format.input import format_input
 
 
-async def process_identity_msg(message: Message):
+def process_identity_msg(message: Message):
     if message.contact:
         input_id, input_username = message.contact.user_id, None
         if input_id is None:
@@ -24,7 +24,7 @@ async def process_identity_msg(message: Message):
     return valid_id, input_username
 
 
-async def process_username_msg(message: Message):
+def process_username_msg(message: Message):
     input_username = message.text
     if input_username is None:
         raise ValueError(messages.process.user.username_invalid)
@@ -34,7 +34,7 @@ async def process_username_msg(message: Message):
     return valid_username
 
 
-async def process_role_msg(message: Message):
+def process_role_msg(message: Message):
     input_role = message.text
     if input_role is None:
         raise ValueError(messages.process.user.role_invalid)

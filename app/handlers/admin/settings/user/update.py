@@ -109,7 +109,7 @@ async def user_update_msg_identity_handler(
     await last_message.edit_reply_markup(message, state)
 
     try:
-        input_id, input_username = await process_identity_msg(message)
+        input_id, input_username = process_identity_msg(message)
     except ValueError as e:
         sent_message = await send_invalid(
             message, SendAction.ANSWER, PARENT_DIR, str(e)
@@ -230,7 +230,7 @@ async def user_update_msg_edited_username_handler(
     await last_message.edit_reply_markup(message, state)
 
     try:
-        input_username = await process_username_msg(message)
+        input_username = process_username_msg(message)
     except ValueError as e:
         sent_message = await send_invalid(message, SendAction.ANSWER, DIR, str(e))
         await last_message.set(sent_message, state)
@@ -266,10 +266,10 @@ async def user_update_msg_edit_role_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     sent_message = await send_select_role(
-        callback.message,
+        callback.message, # pyright: ignore[reportArgumentType]
         SendAction.EDIT,
         DIR,
-        DIR,  # pyright: ignore[reportArgumentType]
+        DIR,  
     )
     await last_message.set(sent_message, state)
 
@@ -283,7 +283,7 @@ async def user_update_msg_edited_role_handler(
     await last_message.edit_reply_markup(message, state)
 
     try:
-        input_role = await process_role_msg(message)
+        input_role = process_role_msg(message)
     except ValueError as e:
         sent_message = await send_invalid(message, SendAction.ANSWER, DIR, str(e))
         await last_message.set(sent_message, state)

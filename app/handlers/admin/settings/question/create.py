@@ -59,7 +59,7 @@ async def question_create_msg_question_text_handler(
     await last_message.edit_reply_markup(message, state)
 
     try:
-        input_question_text = await process_question_text_msg(message)
+        input_question_text = process_question_text_msg(message)
     except ValueError as e:
         sent_message = await send_invalid(
             message, SendAction.ANSWER, PARENT_DIR, str(e)
@@ -82,7 +82,7 @@ async def question_create_msg_answer_text_handler(
     await last_message.edit_reply_markup(message, state)
 
     try:
-        input_answer_text = await process_answer_text_msg(message)
+        input_answer_text = process_answer_text_msg(message)
     except ValueError as e:
         sent_message = await send_invalid(
             message, SendAction.ANSWER, PARENT_DIR, str(e)

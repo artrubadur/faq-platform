@@ -10,7 +10,7 @@ from app.services.question.validate import (
 from app.utils.format.input import format_input
 
 
-async def process_id_msg(message: Message):
+def process_id_msg(message: Message):
     input_id = message.text
     if input_id is None:
         raise ValueError(messages.process.question.id_invalid)
@@ -20,7 +20,7 @@ async def process_id_msg(message: Message):
     return valid_id
 
 
-async def process_question_text_msg(message: Message):
+def process_question_text_msg(message: Message):
     input_question_text = message.text
     if input_question_text is None:
         raise ValueError(messages.process.question.msg_question_text_invalid)
@@ -30,7 +30,7 @@ async def process_question_text_msg(message: Message):
     return valid_question_text
 
 
-async def process_question_text_cmd(command: CommandObject):
+def process_question_text_cmd(command: CommandObject):
     input_question_text = command.args
     if input_question_text is None:
         raise ValueError(messages.process.question.cmd_question_text_invalid)
@@ -40,7 +40,7 @@ async def process_question_text_cmd(command: CommandObject):
     return valid_question_text
 
 
-async def process_answer_text_msg(message: Message):
+def process_answer_text_msg(message: Message):
     input_answer_text = message.html_text
     if input_answer_text is None:
         raise ValueError(messages.process.question.answer_text_invalid)
@@ -50,7 +50,7 @@ async def process_answer_text_msg(message: Message):
     return valid_answer_text
 
 
-async def process_rating_msg(message: Message):
+def process_rating_msg(message: Message):
     input_rating = message.text
     if input_rating is None:
         raise ValueError(messages.process.question.rating_invalid)

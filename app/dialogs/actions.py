@@ -15,7 +15,9 @@ class SendAction(str, Enum):
     REPLY = "reply"
 
 
-async def send_via_action(message: Message, action: SendAction, *args, **kwargs) -> Message:
+async def send_via_action(
+    message: Message, action: SendAction, *args, **kwargs
+) -> Message:
     match action:
         case SendAction.EDIT:
             return await message.edit_text(
@@ -35,6 +37,7 @@ def with_message_action(
     async def inner(message: Message, action: SendAction, *args, **kwargs):
         async def send(*send_args, **send_kwargs):
             return await send_via_action(message, action, *send_args, **send_kwargs)
+
         return await func(
             send,
             *args,

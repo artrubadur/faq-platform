@@ -106,7 +106,7 @@ async def question_list_msg_page_handler(
     await last_message.delete(message, state)
 
     try:
-        input_page = await process_page_msg(message)
+        input_page = process_page_msg(message)
     except ValueError as e:
         sent_message = await send_invalid(
             message, SendAction.ANSWER, PARENT_DIR, str(e)

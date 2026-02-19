@@ -98,7 +98,7 @@ async def user_get_msg_identity_handler(
     await last_message.edit_reply_markup(message, state)
 
     try:
-        input_id, input_username = await process_identity_msg(message)
+        input_id, input_username = process_identity_msg(message)
     except ValueError as e:
         sent_message = await send_invalid(
             message, SendAction.ANSWER, PARENT_DIR, str(e)
