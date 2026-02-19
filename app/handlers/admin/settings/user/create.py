@@ -27,7 +27,7 @@ from app.services.user.process import (
 )
 from app.storage.core import async_session
 from app.utils.history.last_message import LastMessage
-from app.utils.state import clear_temp_data, is_expired
+from app.utils.state import is_expired
 
 router = Router()
 
@@ -210,15 +210,14 @@ async def process_role_handler(
 
     data = await state.get_data()
     if is_expired(data):
-        await clear_temp_data(state)
+        await state.clear()
         await send_expired(
             message,
             SendAction.ANSWER,
             PARENT_DIR,
         )
-        await state.set_state(None)
         return
-    
+
     input_id: int = data["input_id"]
     input_username: str | None = data["input_username"]
 
@@ -278,19 +277,17 @@ async def user_create_cb_confirm_handler(callback: CallbackQuery, state: LSTCont
 
     data = await state.get_data()
     if is_expired(data):
-        await clear_temp_data(state)
+        await state.clear()
         await send_expired(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.ANSWER,
             PARENT_DIR,
         )
-        await state.set_state(None)
         return
-    
-    input_id: int = data.pop("input_id")
-    input_username: str | None = data.pop("input_username")
-    input_role: str = data.pop("input_role")
-    await state.set_data(data)
+
+    input_id: int = data["input_id"]
+    input_username: str | None = data["input_username"]
+    input_role: str = data["input_role"]
 
     try:
         async with async_session() as session:
@@ -298,6 +295,7 @@ async def user_create_cb_confirm_handler(callback: CallbackQuery, state: LSTCont
             service = UsersService(repo)
             user = await service.create_user(input_id, input_username, input_role)
     except IntegrityError:
+        await state.clear()
         await send_already_exists(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.EDIT,
@@ -305,6 +303,8 @@ async def user_create_cb_confirm_handler(callback: CallbackQuery, state: LSTCont
             input_username,
         )
         return
+
+    await state.clear()
 
     logger.debug("User created", id=user.id)
     await send_successfully_created(

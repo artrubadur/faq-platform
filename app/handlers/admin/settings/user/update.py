@@ -35,7 +35,7 @@ from app.services.user.process import (
 )
 from app.storage.core import async_session
 from app.utils.history.last_message import LastMessage
-from app.utils.state import clear_temp_data, is_expired
+from app.utils.state import is_expired
 
 router = Router()
 
@@ -87,8 +87,8 @@ async def process_identity_handler(
             service = UsersService(repo)
             user = await service.get_user(input_id)
     except NoResultFound:
+        await state.clear()
         await send_not_found(message, send_action, input_id, input_username)
-        await state.set_state(None)
         return
 
     await state.update_data(
@@ -150,15 +150,14 @@ async def process_fields_handler(
 ):
     data = await state.get_data()
     if is_expired(data):
-        await clear_temp_data(state)
+        await state.clear()
         await send_expired(
             message,
             SendAction.ANSWER,
             PARENT_DIR,
         )
-        await state.set_state(None)
         return
-    
+
     id: int = data["orig_id"]
     username: str | None = data["orig_username"]
     role: str = data["orig_role"]
@@ -222,7 +221,9 @@ async def user_update_cb_edit_username_handler(
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    found_username: str | None = await state.storage.get_value(state.key, "found_username", None, "long")
+    found_username: str | None = await state.storage.get_value(
+        state.key, "found_username", None, "long"
+    )
 
     sent_message = await send_enter_username(
         callback.message,  # pyright: ignore[reportArgumentType]
@@ -331,21 +332,20 @@ async def user_update_cb_save_handler(callback: CallbackQuery, state: LSTContext
 
     data = await state.get_data()
     if is_expired(data):
-        await clear_temp_data(state)
+        await state.clear()
         await send_expired(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.ANSWER,
             PARENT_DIR,
         )
-        await state.set_state(None)
         return
-    
-    id: int = data.pop("orig_id")
-    username: str | None = data.pop("orig_username")
-    role: str = data.pop("orig_role")
-    edited_username: str | None = data.pop("edited_username", username)
-    edited_role: str = data.pop("edited_role", role)
-    await state.set_data(data)
+
+    id: int = data["orig_id"]
+    username: str | None = data["orig_username"]
+    role: str = data["orig_role"]
+
+    edited_username: str | None = data.get("edited_username", username)
+    edited_role: str = data.get("edited_role", role)
 
     try:
         async with async_session() as session:
@@ -353,6 +353,7 @@ async def user_update_cb_save_handler(callback: CallbackQuery, state: LSTContext
             service = UsersService(repo)
             user = await service.update_user(id, edited_username, edited_role)
     except NoResultFound:
+        await state.clear()
         await send_not_found(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.EDIT,
@@ -361,6 +362,7 @@ async def user_update_cb_save_handler(callback: CallbackQuery, state: LSTContext
         )
         return
     except IntegrityError:
+        await state.clear()
         await send_already_exists(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.EDIT,
@@ -368,7 +370,9 @@ async def user_update_cb_save_handler(callback: CallbackQuery, state: LSTContext
             user.username,
         )
         return
-    
+
+    await state.clear()
+
     logger.debug("User updated", id=user.id)
     await send_successfully_updated(
         callback.message,  # pyright: ignore[reportArgumentType]

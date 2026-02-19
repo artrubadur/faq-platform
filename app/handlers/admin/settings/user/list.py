@@ -18,7 +18,7 @@ from app.services import UsersService
 from app.services.common.process import process_page_msg
 from app.storage.core import async_session
 from app.utils.history.last_message import LastMessage
-from app.utils.state import clear_temp_data, is_expired
+from app.utils.state import is_expired
 
 router = Router()
 
@@ -38,15 +38,14 @@ async def process(
 ):
     data = await state.get_data()
     if is_expired(data):
-        await clear_temp_data(state)
+        await state.clear()
         await send_expired(
             message,
             SendAction.ANSWER,
             PARENT_DIR,
         )
-        await state.set_state(None)
         return
-    
+
     order: str = data["tmp_order"]
     ascending: bool = data["tmp_ascending"]
     page: int = data["tmp_page"]

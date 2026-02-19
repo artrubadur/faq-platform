@@ -37,7 +37,7 @@ from app.services.question.process import (
 from app.services.question.service import QuestionsService
 from app.storage.core import async_session
 from app.utils.history.last_message import LastMessage
-from app.utils.state import clear_temp_data, is_expired
+from app.utils.state import is_expired
 
 router = Router()
 
@@ -145,15 +145,14 @@ async def process_fields_handler(
 ):
     data = await state.get_data()
     if is_expired(data):
-        await clear_temp_data(state)
+        await state.clear()
         await send_expired(
             message,
             SendAction.ANSWER,
             PARENT_DIR,
         )
-        await state.set_state(None)
         return
-    
+
     id: int = data["orig_id"]
     question_text: str = data["orig_question_text"]
     answer_text: str = data["orig_answer_text"]
@@ -361,26 +360,24 @@ async def question_update_cb_save_handler(callback: CallbackQuery, state: LSTCon
 
     data = await state.get_data()
     if is_expired(data):
-        await clear_temp_data(state)
+        await state.clear()
         await send_expired(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.ANSWER,
             PARENT_DIR,
         )
-        await state.set_state(None)
         return
-    
-    id: int = data.pop("orig_id")
-    question_text: str = data.pop("orig_question_text")
-    answer_text: str = data.pop("orig_answer_text")
-    rating: float = data.pop("orig_rating")
 
-    edited_question_text: str = data.pop("edited_question_text", question_text)
-    edited_answer_text: str = data.pop("edited_answer_text", answer_text)
-    edited_rating: float = data.pop("edited_rating", rating)
+    id: int = data["orig_id"]
+    question_text: str = data["orig_question_text"]
+    answer_text: str = data["orig_answer_text"]
+    rating: float = data["orig_rating"]
 
-    recompute_embedding: bool = data.pop("recompute_embedding", False)
-    await state.set_data(data)
+    edited_question_text: str = data.get("edited_question_text", question_text)
+    edited_answer_text: str = data.get("edited_answer_text", answer_text)
+    edited_rating: float = data.get("edited_rating", rating)
+
+    recompute_embedding: bool = data.get("recompute_embedding", False)
 
     try:
         async with async_session() as session:
@@ -394,12 +391,15 @@ async def question_update_cb_save_handler(callback: CallbackQuery, state: LSTCon
                 recompute_embedding,
             )
     except NoResultFound:
+        await state.clear()
         await send_not_found(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.EDIT,
             id,
         )
         return
+
+    await state.clear()
 
     logger.debug("Question updated", id=question.id)
     await send_successfully_updated(

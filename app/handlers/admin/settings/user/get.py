@@ -71,18 +71,24 @@ async def process_identity_handler(
             service = UsersService(repo)
             user = await service.get_user(input_id)
     except NoResultFound:
+        await state.clear()
         await state.storage.update_data(
-            state.key, {"found_user_id":input_id, "found_username": input_username}, "long"
+            state.key,
+            {"found_user_id": input_id, "found_username": input_username},
+            "long",
         )
         logger.debug("User partially obtained", id=user.id)
         await send_partially_found(message, send_action, input_id, input_username)
-        await state.set_state(None)
         return
-    
 
     await state.storage.update_data(
-            state.key, {"found_user_id":user.telegram_id, "found_username": user.username}, "long"
+        state.key,
+        {"found_user_id": user.telegram_id, "found_username": user.username},
+        "long",
     )
+
+    await state.clear()
+
     logger.debug("User obtained", id=user.id)
     await send_successfully_found(
         message,
@@ -91,8 +97,6 @@ async def process_identity_handler(
         user.username,
         user.role,
     )
-
-    await state.set_state(None)
 
 
 @router.message(UserFinding.waiting_for_identity)

@@ -11,10 +11,14 @@ class LastMessage:
         self.bot = bot
 
     async def set(self, message: Message, state: LSTContext):
-        await state.storage.update_data(state.key, {"last_bot_message_id": message.message_id}, "long")
+        await state.storage.update_data(
+            state.key, {"last_bot_message_id": message.message_id}, "long"
+        )
 
     async def get_id(self, state: LSTContext) -> int | None:
-        return await state.storage.get_value(state.key, "last_bot_message_id", None, "long")
+        return await state.storage.get_value(
+            state.key, "last_bot_message_id", None, "long"
+        )
 
     async def edit_reply_markup(
         self,

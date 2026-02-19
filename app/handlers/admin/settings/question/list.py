@@ -18,7 +18,7 @@ from app.services.common.process import process_page_msg
 from app.services.question.service import QuestionsService
 from app.storage.core import async_session
 from app.utils.history.last_message import LastMessage
-from app.utils.state import clear_temp_data, is_expired
+from app.utils.state import is_expired
 
 router = Router()
 
@@ -38,15 +38,14 @@ async def process(
 ):
     data = await state.get_data()
     if is_expired(data):
-        await clear_temp_data(state)
+        await state.clear()
         await send_expired(
             message,
             SendAction.ANSWER,
             PARENT_DIR,
         )
-        await state.set_state(None)
         return
-    
+
     order: str = data["order"]
     ascending: bool = data["ascending"]
     page: int = data["page"]
@@ -96,9 +95,7 @@ async def question_list_cb_handler(
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    await state.update_data(
-        order="id", ascending=True, page=1, page_size=5
-    )
+    await state.update_data(order="id", ascending=True, page=1, page_size=5)
 
     await process(
         callback.message,  # pyright: ignore[reportArgumentType],

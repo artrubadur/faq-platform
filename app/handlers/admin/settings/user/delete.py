@@ -21,7 +21,7 @@ from app.services import UsersService
 from app.services.user.process import process_identity_msg
 from app.storage.core import async_session
 from app.utils.history.last_message import LastMessage
-from app.utils.state import clear_temp_data, is_expired
+from app.utils.state import is_expired
 
 router = Router()
 
@@ -132,17 +132,15 @@ async def user_delete_cb_confirm_handler(callback: CallbackQuery, state: LSTCont
 
     data = await state.get_data()
     if is_expired(data):
-        await clear_temp_data(state)
+        await state.clear()
         await send_expired(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.ANSWER,
             PARENT_DIR,
         )
-        await state.set_state(None)
         return
-    
-    input_id: int = data.pop("input_id", None)
-    await state.set_data(data)
+
+    input_id: int = data["input_id"]
 
     try:
         async with async_session() as session:
@@ -150,12 +148,15 @@ async def user_delete_cb_confirm_handler(callback: CallbackQuery, state: LSTCont
             service = UsersService(repo)
             user = await service.delete_user(input_id)
     except NoResultFound:
+        await state.clear()
         await send_not_found(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.EDIT,
             input_id,
         )
         return
+
+    await state.clear()
 
     logger.debug("User deleted", id=user.id)
     await send_successfully_deleted(

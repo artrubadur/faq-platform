@@ -30,6 +30,7 @@ async def send_invalid(
         reply_markup=reply_markup,
     )
 
+
 @with_message_action
 async def send_expired(
     send: Callable[..., Awaitable[Message]], cancel_dir: str
@@ -41,6 +42,7 @@ async def send_expired(
         parse_mode=messages.parse_mode,
         reply_markup=reply_markup,
     )
+
 
 @with_chat_message
 async def send_log(

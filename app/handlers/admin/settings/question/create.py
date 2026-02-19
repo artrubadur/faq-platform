@@ -24,7 +24,7 @@ from app.services.question.process import (
 from app.services.question.service import QuestionsService
 from app.storage.core import async_session
 from app.utils.history.last_message import LastMessage
-from app.utils.state import clear_temp_data, is_expired
+from app.utils.state import is_expired
 
 router = Router()
 
@@ -96,13 +96,12 @@ async def question_create_msg_answer_text_handler(
 
     data = await state.get_data()
     if is_expired(data):
-        await clear_temp_data(state)
+        await state.clear()
         await send_expired(
             message,
             SendAction.ANSWER,
             PARENT_DIR,
         )
-        await state.set_state(None)
         return
 
     input_question_text: str = data["input_question_text"]
@@ -123,13 +122,12 @@ async def question_create_cb_create_confirm_handler(
 
     data = await state.get_data()
     if is_expired(data):
-        await clear_temp_data(state)
+        await state.clear()
         await send_expired(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.ANSWER,
             PARENT_DIR,
         )
-        await state.set_state(None)
         return
 
     input_question_text: str = data["input_question_text"]
@@ -139,7 +137,7 @@ async def question_create_cb_create_confirm_handler(
         async with async_session() as session:
             repo = QuestionsRepository(session)
             service = QuestionsService(repo)
-            qustion = await service.create_question(
+            question = await service.create_question(
                 input_question_text, input_answer_text, True
             )
     except SimilarityError as e:
@@ -151,12 +149,13 @@ async def question_create_cb_create_confirm_handler(
         )
         return
 
+    logger.debug("Question created", id=question.id)
     await send_successfully_created(
         callback.message,  # pyright: ignore[reportArgumentType]
         SendAction.EDIT,
-        qustion.id,
-        qustion.question_text,
-        qustion.answer_text,
+        question.id,
+        question.question_text,
+        question.answer_text,
     )
 
 
@@ -169,25 +168,22 @@ async def question_create_cb_similar_confirm_handler(
 
     data = await state.get_data()
     if is_expired(data):
-        await clear_temp_data(state)
+        await state.clear()
         await send_expired(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.ANSWER,
             PARENT_DIR,
         )
-        await state.set_state(None)
         return
-    
-    input_question_text: str = data.pop("input_question_text")
-    input_answer_text: str = data.pop("input_answer_text")
-    await state.set_data(data)
 
     async with async_session() as session:
         repo = QuestionsRepository(session)
         service = QuestionsService(repo)
         question = await service.create_question(
-            input_question_text, input_answer_text, False
+            data["input_question_text"], data["input_answer_text"], False
         )
+
+    await state.clear()
 
     logger.debug("Question created", id=question.id)
     await send_successfully_created(

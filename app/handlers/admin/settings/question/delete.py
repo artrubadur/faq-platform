@@ -21,7 +21,7 @@ from app.services.question.process import process_id_msg
 from app.services.question.service import QuestionsService
 from app.storage.core import async_session
 from app.utils.history.last_message import LastMessage
-from app.utils.state import clear_temp_data, is_expired
+from app.utils.state import is_expired
 
 router = Router()
 
@@ -124,29 +124,30 @@ async def question_delete_cb_confirm_handler(
 
     data = await state.get_data()
     if is_expired(data):
-        await clear_temp_data(state)
+        await state.clear()
         await send_expired(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.ANSWER,
             PARENT_DIR,
         )
-        await state.set_state(None)
         return
     input_id: int = data["input_id"]
-    await state.set_data(data)
-    
+
     try:
         async with async_session() as session:
             repo = QuestionsRepository(session)
             service = QuestionsService(repo)
             question = await service.delete_question(input_id)
     except NoResultFound:
+        await state.clear()
         await send_not_found(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.EDIT,
             input_id,
         )
         return
+
+    await state.clear()
 
     logger.debug("Question deleted", id=question.id)
     await send_successfully_deleted(
