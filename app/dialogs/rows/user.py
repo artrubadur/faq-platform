@@ -4,6 +4,7 @@ from aiogram.types import InlineKeyboardButton
 import app.dialogs.rows.common as rows
 from app.core.constants.dirs import USERS
 from app.core.messages import messages
+from app.storage.models.user import Role
 
 cancel_row = rows.cancel_row(USERS[1])
 
@@ -119,5 +120,6 @@ def role_rows(dir: str):
                 callback_data=RoleCallback(dir=dir, role=role).pack(),
             )
         ]
-        for role in ["banned", "user"]
+        for role in Role
+        if role != Role.ADMIN
     ]

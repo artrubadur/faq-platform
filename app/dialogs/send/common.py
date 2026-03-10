@@ -42,6 +42,25 @@ async def send_invalid(
 
 
 @with_message_action
+async def send_access_denied(
+    send: Callable[..., Awaitable[Message]],
+    cancel_dir: str | None,
+    exception: str | None,
+) -> Message:
+    reply_markup = (
+        InlineKeyboardMarkup(inline_keyboard=rows.back_row(cancel_dir))
+        if cancel_dir
+        else None
+    )
+
+    return await send(
+        text=messages.responses.admin.access_denied.format(exception=exception),
+        parse_mode=messages.parse_mode,
+        reply_markup=reply_markup,
+    )
+
+
+@with_message_action
 async def send_expired(
     send: Callable[..., Awaitable[Message]], cancel_dir: str
 ) -> Message:

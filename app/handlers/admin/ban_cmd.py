@@ -11,6 +11,7 @@ from app.dialogs.send.admin.misc import (
     send_invalid_argument,
     send_unbanned,
 )
+from app.dialogs.send.common import send_access_denied
 from app.repositories import UsersRepository
 from app.services import UsersService
 from app.storage.core import async_session
@@ -51,6 +52,14 @@ async def _process_ban_handler(
             message,
             SendAction.REPLY,
             messages.exceptions.user.not_found.format(identity=target_id),
+        )
+        return
+    except PermissionError as e:
+        await send_access_denied(
+            message,  # pyright: ignore[reportArgumentType]
+            SendAction.REPLY,
+            None,
+            str(e),
         )
         return
 

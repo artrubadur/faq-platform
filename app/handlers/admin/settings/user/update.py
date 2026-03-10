@@ -24,7 +24,7 @@ from app.dialogs.send.admin.user import (
     send_select_role,
     send_successfully_updated,
 )
-from app.dialogs.send.common import send_expired, send_invalid
+from app.dialogs.send.common import send_access_denied, send_expired, send_invalid
 from app.repositories import UsersRepository
 from app.services import UsersService
 from app.services.user.process import (
@@ -361,22 +361,28 @@ async def user_update_cb_save_handler(
             )
     except NoResultFound:
         await state.clear()
-        await send_not_found(
+        return await send_not_found(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.EDIT,
             id,
             username,
         )
-        return
     except IntegrityError:
         await state.clear()
-        await send_already_exists(
+        return await send_already_exists(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.EDIT,
             user.telegram_id,
             user.username,
         )
-        return
+    except PermissionError as e:
+        await state.clear()
+        return await send_access_denied(
+            callback.message,  # pyright: ignore[reportArgumentType]
+            SendAction.EDIT,
+            PARENT_DIR,
+            str(e),
+        )
 
     if role != edited_role:
         await update_data(bot, dispatcher, id, {"sender_role": edited_role}, "long")

@@ -1,3 +1,4 @@
+from app.core.messages import messages
 from app.repositories import UsersRepository
 from app.storage.models.user import Role, User
 
@@ -31,7 +32,13 @@ class UsersService:
         return list(users)
 
     async def delete_user(self, id: int) -> User:
+        user = await self.repository.get_by_id(id)
+        if user.role == Role.ADMIN:
+            raise PermissionError(messages.responses.admin.user.deletion.access_denied)
         return await self.repository.delete(id)
 
     async def update_user(self, id: int, **kwargs) -> User:
+        user = await self.repository.get_by_id(id)
+        if user.role == Role.ADMIN:
+            raise PermissionError(messages.responses.admin.user.update.access_denied)
         return await self.repository.update(id, **kwargs)

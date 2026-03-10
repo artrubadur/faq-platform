@@ -3,7 +3,7 @@ from typing import Sequence, Tuple
 from typing import cast as type_cast
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import Row, cast, func, select
+from sqlalchemy import Row, cast, delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.storage.models import Question
@@ -82,11 +82,14 @@ class QuestionsRepository:
         return result.all()
 
     async def update(self, id: int, **kwargs) -> Question:
-        question = await self.get_by_id(id)
-        for key, value in kwargs.items():
-            setattr(question, key, value)
+        result = await self.session.execute(
+            update(Question)
+            .where(Question.id == id)
+            .values(**kwargs)
+            .returning(Question)
+        )
         await self.session.commit()
-        return question
+        return result.scalar_one()
 
     async def increment_ratings(
         self, questions: list[Question], similarities: list[float]
@@ -95,8 +98,9 @@ class QuestionsRepository:
             question.rating += similarity
         await self.session.commit()
 
-    async def delete(self, id: int):
-        question = await self.get_by_id(id)
-        await self.session.delete(question)
+    async def delete(self, id: int) -> Question:
+        result = await self.session.execute(
+            delete(Question).where(Question.id == id).returning(Question)
+        )
         await self.session.commit()
-        return question
+        return result.scalar_one()

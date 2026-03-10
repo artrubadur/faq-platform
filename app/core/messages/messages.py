@@ -54,11 +54,13 @@ class UpdateUsrAdmRsp(BaseModel):
     confirm: str = "⏩ Update this user?\n" "{user}"
     select_field: str = "{user}\n" "⏩ Select the field to edit:"
     successful: str = "✅ The user has been successfully updated:\n" "{user}"
+    access_denied: str = "You can’t update an admin user."
 
 
 class DeletionUsrAdmRsp(BaseModel):
     confirm: str = "⏩ Confirm deletion?\n" "{user}"
     successful: str = "✅ Next user has been successfully deleted:\n" "{user}"
+    access_denied: str = "You can’t delete an admin user."
 
 
 class ListingUsrAdmRsp(BaseModel):
@@ -149,6 +151,7 @@ class BanAdmRsp(BaseModel):
 class AdminRsp(BaseModel):
     invalid: str = "⚠ {exception}. Retry or back"
     expired: str = "The time for the operation has expired. Start over"
+    access_denied: str = "Access denied: {exception}"
     user: UserAdmRsp = UserAdmRsp()
     question: QuestionAdmRsp = QuestionAdmRsp()
     settings: SettingsAdmRsp = SettingsAdmRsp()

@@ -35,7 +35,7 @@ def validate_username(username: str | None) -> str | None:
 def validate_role(role: str) -> str:
     res_val = role.lower()
 
-    if res_val not in Role:
+    if res_val not in Role or res_val == Role.ADMIN:
         raise ValueError(messages.validation.user.role_unexcepted)
 
     return res_val

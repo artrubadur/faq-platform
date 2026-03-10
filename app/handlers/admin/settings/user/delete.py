@@ -14,7 +14,7 @@ from app.dialogs.send.admin.user import (
     send_not_found,
     send_successfully_deleted,
 )
-from app.dialogs.send.common import send_expired, send_invalid
+from app.dialogs.send.common import send_access_denied, send_expired, send_invalid
 from app.repositories import UsersRepository
 from app.services import UsersService
 from app.services.user.process import process_identity_msg
@@ -149,12 +149,19 @@ async def user_delete_cb_confirm_handler(callback: CallbackQuery, state: TempCon
             user = await service.delete_user(input_id)
     except NoResultFound:
         await state.clear()
-        await send_not_found(
+        return await send_not_found(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.EDIT,
             input_id,
         )
-        return
+    except PermissionError as e:
+        await state.clear()
+        return await send_access_denied(
+            callback.message,  # pyright: ignore[reportArgumentType]
+            SendAction.EDIT,
+            PARENT_DIR,
+            str(e),
+        )
 
     await state.clear()
 

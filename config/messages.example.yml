@@ -16,8 +16,9 @@ responses: # Messages sent to regular users
     # last_name, username, full_name, date
 
   admin: # Messages sent to administrators, organized by entity:
-    invalid: "{emoji.status.warning} {exception}. Retry or back"
+    invalid: "{emoji.status.warning} {exception}. Retry or back" # < exception
     expired: "The time for the operation has expired. Start over"
+    access_denied: "Access denied: {exception}" # < exception
     ban: # < id, username
       banned: "{emoji.status.successful} User {identity} has been banned."
       unbanned: "{emoji.status.successful} User {identity} has been unbanned."
@@ -50,6 +51,7 @@ responses: # Messages sent to regular users
         successful: | # < user
           {emoji.status.successful} The user has been successfully updated:
           {user}
+        access_denied: "You can’t update an admin user."
       deletion:
         confirm: | # < user 
           {emoji.action.select} Confirm deletion?
@@ -57,6 +59,7 @@ responses: # Messages sent to regular users
         successful: | # < user
           {emoji.status.successful} Next user has been successfully deleted:
           {user}
+        access_denied: "You can’t delete an admin user."
       listing:
           successful: | # < content - table of users
             {emoji.action.list} User list: {page}/{max_page}

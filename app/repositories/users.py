@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Sequence, cast
 
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.storage.models.user import Role, User
@@ -50,14 +50,15 @@ class UsersRepository:
         return cast(int, amount.scalar())
 
     async def update(self, id: int, **kwargs) -> User:
-        user = await self.get_by_id(id)
-        for key, value in kwargs.items():
-            setattr(user, key, value)
+        result = await self.session.execute(
+            update(User).where(User.telegram_id == id).values(**kwargs).returning(User)
+        )
         await self.session.commit()
-        return user
+        return result.scalar_one()
 
-    async def delete(self, id: int):
-        user = await self.get_by_id(id)
-        await self.session.delete(user)
+    async def delete(self, id: int) -> User:
+        result = await self.session.execute(
+            delete(User).where(User.telegram_id == id).returning(User)
+        )
         await self.session.commit()
-        return user
+        return result.scalar_one()
