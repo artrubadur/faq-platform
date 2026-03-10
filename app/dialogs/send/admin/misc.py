@@ -6,7 +6,7 @@ from aiogram.types import InlineKeyboardMarkup, Message
 import app.dialogs.rows.root as rows
 from app.core.messages import messages
 from app.dialogs.actions import with_message_action
-from app.utils.format.output import format_exception
+from app.utils.format.output import format_exception, format_id, format_username
 
 
 @with_message_action
@@ -49,6 +49,33 @@ async def send_invalid_argument(
     return await send(
         text=format_exception(
             messages.exceptions.misc.invalid_argument.format(exception=exception)
+        ),
+        parse_mode=messages.parse_mode,
+    )
+
+
+@with_message_action
+async def send_banned(
+    send: Callable[..., Awaitable[Message]], id: int, username: str | None
+) -> Message:
+    return await send(
+        text=messages.responses.admin.ban.banned.format(
+            identity=(
+                format_username(username) if username is not None else format_id(id)
+            )
+        ),
+        parse_mode=messages.parse_mode,
+    )
+
+
+@with_message_action
+async def send_unbanned(
+    send: Callable[..., Awaitable[Message]], identity: int, username: str | None
+) -> Message:
+    return await send(
+        text=messages.responses.admin.ban.unbanned.format(
+            identity=identity,
+            username=username or messages.format.fallback.username,
         ),
         parse_mode=messages.parse_mode,
     )

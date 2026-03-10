@@ -33,5 +33,5 @@ class UsersService:
     async def delete_user(self, id: int) -> User:
         return await self.repository.delete(id)
 
-    async def update_user(self, id: int, username: str | None, role: str) -> User:
-        return await self.repository.update(id, username=username, role=role)
+    async def update_user(self, id: int, **kwargs) -> User:
+        return await self.repository.update(id, **kwargs)

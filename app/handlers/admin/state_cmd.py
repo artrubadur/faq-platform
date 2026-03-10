@@ -79,5 +79,5 @@ async def cmd_handler(
             await send_invalid_argument(
                 message,
                 SendAction.REPLY,
-                messages.exceptions.misc.invalid_argument.format(conent=action),
+                action,
             )

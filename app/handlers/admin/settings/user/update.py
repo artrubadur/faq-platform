@@ -356,7 +356,9 @@ async def user_update_cb_save_handler(
         async with async_session() as session:
             repo = UsersRepository(session)
             service = UsersService(repo)
-            user = await service.update_user(id, edited_username, edited_role)
+            user = await service.update_user(
+                id, username=edited_username, role=edited_role
+            )
     except NoResultFound:
         await state.clear()
         await send_not_found(

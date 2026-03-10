@@ -11,13 +11,16 @@ responses: # Messages sent to regular users
     error: > # < Internal error notification < message
       {emoji.status.failed} Unexcepted internal error!
       We are already fixing it. Try to retry
-    banned: "You have been added to the blacklist and can no longer use this bot."
+    banned: "{emoji.status.failed} You have been added to the blacklist and can no longer use this bot."
     # "message" variable representes id (user id), first_name,
     # last_name, username, full_name, date
 
   admin: # Messages sent to administrators, organized by entity:
     invalid: "{emoji.status.warning} {exception}. Retry or back"
     expired: "The time for the operation has expired. Start over"
+    ban: # < id, username
+      banned: "{emoji.status.successful} User {identity} has been banned."
+      unbanned: "{emoji.status.successful} User {identity} has been unbanned."
     user: # User flows
       enter: 
         identity: "{emoji.action.enter} Enter the telegram id, share contact or forward a message"

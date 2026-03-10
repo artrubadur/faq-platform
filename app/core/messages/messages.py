@@ -25,7 +25,9 @@ class PublicRsp(BaseModel):
     )
     failed: str = "{exception}. Try to reformulate it and ask again"
     error: str = "❌ Unexcepted internal error! We are already fixing it. Try to retry"
-    banned: str = "You have been added to the blacklist and can no longer use this bot."
+    banned: str = (
+        "❌ You have been added to the blacklist and can no longer use this bot."
+    )
 
 
 class UserAdmEnterRsp(BaseModel):
@@ -139,6 +141,11 @@ class MiscAdmRsp(BaseModel):
     state: StateMscAdmRsp = StateMscAdmRsp()
 
 
+class BanAdmRsp(BaseModel):
+    banned: str = "✅ User {identity} has been banned."
+    unbanned: str = "✅ User {identity} has been unbanned."
+
+
 class AdminRsp(BaseModel):
     invalid: str = "⚠ {exception}. Retry or back"
     expired: str = "The time for the operation has expired. Start over"
@@ -146,6 +153,7 @@ class AdminRsp(BaseModel):
     question: QuestionAdmRsp = QuestionAdmRsp()
     settings: SettingsAdmRsp = SettingsAdmRsp()
     misc: MiscAdmRsp = MiscAdmRsp()
+    ban: BanAdmRsp = BanAdmRsp()
 
 
 class Responses(BaseModel):
@@ -159,14 +167,14 @@ class SearchExc(BaseModel):
 
 
 class UserExc(BaseModel):
-    not_found: str = "❌ User {identity} not found"
+    not_found: str = "User {identity} not found"
     already_exists: str = (
         "A user with the ID {id} or the username {username} already exists"
     )
 
 
 class QuestionExc(BaseModel):
-    not_found: str = "❌ Question {id} not found"
+    not_found: str = "Question {id} not found"
     embedding_failed: str = "Failed to compute vector representation of question"
 
 

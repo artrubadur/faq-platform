@@ -120,5 +120,5 @@ def role_rows(dir: str):
                 callback_data=RoleCallback(dir=dir, role=role).pack(),
             )
         ]
-        for role in Role
+        for role in ["banned", "user"]
     ]
