@@ -1,4 +1,4 @@
-from aiogram.types import Message
+from aiogram.types import Message, MessageOriginUser
 
 from app.core.messages import messages
 from app.services.user.validate import validate_id, validate_role, validate_username
@@ -10,11 +10,11 @@ def process_identity_msg(message: Message):
         input_id, input_username = message.contact.user_id, None
         if input_id is None:
             raise ValueError(messages.process.user.contact_invalid)
-    elif message.forward_from:
-        input_id, input_username = (
-            message.forward_from.id,
-            message.forward_from.username,
-        )
+    elif isinstance(message.w, MessageOriginUser):
+        input_id = message.forward_origin.sender_user.id
+        input_username = message.forward_origin.sender_user.username
+    elif message.forward_origin is not None:
+        raise ValueError(messages.process.user.identity_invalid)
     elif message.text:
         input_id, input_username = format_input(message.text), None
     else:
