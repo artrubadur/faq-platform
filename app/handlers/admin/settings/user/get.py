@@ -4,7 +4,6 @@ from aiogram.types import CallbackQuery, Message
 from loguru import logger
 from sqlalchemy.exc import NoResultFound
 
-from app.storage.temp import TempContext
 from app.core.constants.dirs import USERS_GET
 from app.dialogs import SendAction
 from app.dialogs.rows.user import IdentityCallback
@@ -18,6 +17,7 @@ from app.repositories import UsersRepository
 from app.services import UsersService
 from app.services.user.process import process_identity_msg
 from app.storage.core import async_session
+from app.storage.temp import TempContext
 from app.utils.history.last_message import LastMessage
 
 router = Router()
@@ -38,8 +38,9 @@ async def user_get_cb_handler(
 
     sender_id = callback.from_user.id
     sender_username = callback.from_user.username
-    data = await state.storage.get_data(state.key, 
-                                        )
+    data = await state.storage.get_data(
+        state.key,
+    )
     found_user_id: int | None = data.get("found_user_id", None)
     found_username: str | None = data.get("found_username", None)
 

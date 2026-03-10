@@ -3,9 +3,11 @@ from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 import app.storage.models  # noqa: F401
+from app.bot.instance import bot, dp
 from app.core.config import config
 from app.storage.base import Base
 from app.storage.models.user import Role, User
+from app.utils.state.data import update_data
 
 database_url = f"postgresql+asyncpg://{config.db_user}:{config.db_pass}@{config.db_host}:5432/{config.db_name}"
 engine = create_async_engine(database_url)
@@ -48,6 +50,9 @@ async def sync_admin_roles():
         demoted_admins = demoted.scalars().all()
 
         await session.commit()
+
+    for id in promoted_admins:
+        await update_data(bot, dp, id, {"sender_role": Role.ADMIN}, "long")
 
     logger.info(
         "Admin access synchronized",

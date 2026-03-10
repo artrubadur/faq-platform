@@ -4,7 +4,6 @@ from aiogram.types import CallbackQuery, Message
 from loguru import logger
 from sqlalchemy.exc import NoResultFound
 
-from app.storage.temp import TempContext
 from app.core.constants.dirs import QUESTIONS_DELETE
 from app.dialogs import SendAction
 from app.dialogs.rows.common import ConfirmCallback
@@ -20,6 +19,7 @@ from app.repositories.questions import QuestionsRepository
 from app.services.question.process import process_id_msg
 from app.services.question.service import QuestionsService
 from app.storage.core import async_session
+from app.storage.temp import TempContext
 from app.utils.history.last_message import LastMessage
 from app.utils.state import is_expired
 
@@ -40,8 +40,9 @@ async def question_get_cb_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     found_question_id: int | None = await state.storage.get_value(
-        state.key, "found_question_id", None, 
-        
+        state.key,
+        "found_question_id",
+        None,
     )
 
     sent_message = await send_enter_id(

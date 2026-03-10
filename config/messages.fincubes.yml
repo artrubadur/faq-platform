@@ -10,6 +10,7 @@ responses:
     error: >
       ❌ Произошла непредвиденная ошибка!
       Мы уже работаем над исправлением. Пожалуйста, попробуйте позже.
+    banned: 'Ваш доступ к боту ограничен. Если вы считаете, что это произошло по ошибке, свяжитесь с нами: <a href="https://t.me/fincubes">t.me/fincubes</a> или <a href="mailto:mail@fincubes.ru">mail@fincubes.ru</a>.'
 
 exceptions:
   search:

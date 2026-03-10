@@ -1,10 +1,8 @@
-
 from aiogram import F, Router
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
 from loguru import logger
 
-from app.storage.temp import TempContext
 from app.core.constants.dirs import USERS_LIST
 from app.dialogs.actions import SendAction
 from app.dialogs.rows.common import (
@@ -18,6 +16,7 @@ from app.repositories import UsersRepository
 from app.services import UsersService
 from app.services.common.process import process_page_msg
 from app.storage.core import async_session
+from app.storage.temp import TempContext
 from app.utils.history.last_message import LastMessage
 from app.utils.state import is_expired
 
@@ -93,8 +92,15 @@ async def user_list_cb_handler(
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    await state.set_data({
-        "order": "id", "ascending": True, "page": 1, "page_size": 5, "in_operation": True})
+    await state.set_data(
+        {
+            "order": "id",
+            "ascending": True,
+            "page": 1,
+            "page_size": 5,
+            "in_operation": True,
+        }
+    )
 
     await process(
         callback.message,  # pyright: ignore[reportArgumentType]

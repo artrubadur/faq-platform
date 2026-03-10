@@ -11,6 +11,7 @@ responses: # Messages sent to regular users
     error: > # < Internal error notification < message
       {emoji.status.failed} Unexcepted internal error!
       We are already fixing it. Try to retry
+    banned: "You have been added to the blacklist and can no longer use this bot."
     # "message" variable representes id (user id), first_name,
     # last_name, username, full_name, date
 

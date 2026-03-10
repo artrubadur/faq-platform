@@ -17,7 +17,6 @@ def get_key(bot: Bot, target_id: int):
 async def set_data(
     bot: Bot,
     dispatcher: Dispatcher,
-    
     target_id: int,
     data: dict[str, Any],
     scope: StorageScope,

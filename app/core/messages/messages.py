@@ -25,6 +25,7 @@ class PublicRsp(BaseModel):
     )
     failed: str = "{exception}. Try to reformulate it and ask again"
     error: str = "❌ Unexcepted internal error! We are already fixing it. Try to retry"
+    banned: str = "You have been added to the blacklist and can no longer use this bot."
 
 
 class UserAdmEnterRsp(BaseModel):

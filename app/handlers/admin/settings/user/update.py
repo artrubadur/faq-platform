@@ -1,11 +1,9 @@
-
-from aiogram import F, Router
+from aiogram import Bot, Dispatcher, F, Router
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
 from loguru import logger
 from sqlalchemy.exc import IntegrityError, NoResultFound
 
-from app.storage.temp import TempContext
 from app.core.constants.dirs import USERS_UPDATE
 from app.dialogs import SendAction
 from app.dialogs.rows.common import (
@@ -35,8 +33,9 @@ from app.services.user.process import (
     process_username_msg,
 )
 from app.storage.core import async_session
+from app.storage.temp import TempContext
 from app.utils.history.last_message import LastMessage
-from app.utils.state import is_expired
+from app.utils.state import is_expired, update_data
 
 router = Router()
 
@@ -327,7 +326,12 @@ async def user_update_cb_edited_role_handler(
 
 
 @router.callback_query(SaveCallback.filter(F.dir == DIR))
-async def user_update_cb_save_handler(callback: CallbackQuery, state: TempContext):
+async def user_update_cb_save_handler(
+    callback: CallbackQuery,
+    state: TempContext,
+    bot: Bot,
+    dispatcher: Dispatcher,
+):
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
 
@@ -371,6 +375,9 @@ async def user_update_cb_save_handler(callback: CallbackQuery, state: TempContex
             user.username,
         )
         return
+
+    if role != edited_role:
+        await update_data(bot, dispatcher, id, {"sender_role": edited_role}, "long")
 
     await state.clear()
 

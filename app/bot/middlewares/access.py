@@ -2,6 +2,7 @@ from aiogram import BaseMiddleware
 from loguru import logger
 from sqlalchemy.exc import NoResultFound
 
+from app.handlers.common import banned_handler
 from app.repositories import UsersRepository
 from app.services import UsersService
 from app.storage.core import async_session
@@ -16,14 +17,12 @@ class AccessMiddleware(BaseMiddleware):
         if cached_role := await self._resolve_cached_role(state):
             return cached_role
 
-        return await self._resolve_stored_role(sender_id)
-
-    async def _resolve_cached_role(self, state: TempContext) -> str:
-        stored_role = await state.storage.get_value(
-            state.key, "sender_role", None, "long"
-        )
+        stored_role = await self._resolve_stored_role(sender_id)
         await state.storage.update_data(state.key, {"sender_role": stored_role}, "long")
         return stored_role
+
+    async def _resolve_cached_role(self, state: TempContext) -> str:
+        return await state.storage.get_value(state.key, "sender_role", None, "long")
 
     async def _resolve_stored_role(self, sender_id: int) -> str:
         try:
@@ -39,13 +38,29 @@ class AccessMiddleware(BaseMiddleware):
 class AdminMiddleware(AccessMiddleware):
     async def __call__(self, handler, event, data):
         sender_id = event.from_user.id
-        sender_role = self._resolve_role(data, sender_id)
+        sender_role = await self._resolve_role(data, sender_id)
 
         if sender_role != Role.ADMIN:
             logger.debug(
                 "Handler skipped: sender is not admin",
                 tg_id=sender_id,
             )
+            return
+
+        return await handler(event, data)
+
+
+class BannedMiddleware(AccessMiddleware):
+    async def __call__(self, handler, event, data):
+        sender_id = event.from_user.id
+        sender_role = await self._resolve_role(data, sender_id)
+
+        if sender_role == Role.BANNED:
+            logger.debug(
+                "Handler denied: sender is banned",
+                tg_id=sender_id,
+            )
+            await banned_handler(event)  # pyright: ignore[reportArgumentType]
             return
 
         return await handler(event, data)

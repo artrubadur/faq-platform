@@ -7,6 +7,7 @@ from loguru import logger
 from app.bot.instance import bot, dp
 from app.bot.middlewares import (
     AdminMiddleware,
+    BannedMiddleware,
     LastMessageMiddleware,
     LogHandlerMiddleware,
 )
@@ -34,6 +35,10 @@ async def startup():
     logger.info(constants_status)
     logger.info(commands_status)
 
+    banned_mw = BannedMiddleware()
+    dp.message.middleware(banned_mw)
+    dp.callback_query.middleware(banned_mw)
+
     last_message_mw = LastMessageMiddleware(bot)
     dp.message.middleware(last_message_mw)
     dp.callback_query.middleware(last_message_mw)
@@ -42,9 +47,9 @@ async def startup():
     dp.message.middleware(log_handler_mw)
     dp.callback_query.middleware(log_handler_mw)
 
-    admin_access_mw = AdminMiddleware()
-    admin_router.message.middleware(admin_access_mw)
-    admin_router.callback_query.middleware(admin_access_mw)
+    admin_mw = AdminMiddleware()
+    admin_router.message.middleware(admin_mw)
+    admin_router.callback_query.middleware(admin_mw)
 
     dp.include_router(admin_router)
     dp.include_router(common_router)
