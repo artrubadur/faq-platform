@@ -10,8 +10,8 @@ class EmbeddingService:
     async def compute(self, text: str) -> tuple[float, ...]:
         try:
             return await self.client.compute(text)
-        except Exception:
-            raise APIError(messages.exceptions.question.embedding_failed)
+        except Exception as exc:
+            raise APIError(messages.exceptions.question.embedding_failed) from exc
 
 
 embedding_service = EmbeddingService()

@@ -89,9 +89,9 @@ async def question_get_msg_id_handler(
 
     try:
         input_id = process_id_msg(message)
-    except ValueError as e:
+    except ValueError as exc:
         sent_message = await send_invalid(
-            message, SendAction.ANSWER, PARENT_DIR, str(e)
+            message, SendAction.ANSWER, PARENT_DIR, str(exc)
         )
         await last_message.set(sent_message, state)
         return

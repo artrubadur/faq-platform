@@ -101,9 +101,9 @@ async def user_create_msg_identity_handler(
 
     try:
         input_id, input_username = process_identity_msg(message)
-    except ValueError as e:
+    except ValueError as exc:
         sent_message = await send_invalid(
-            message, SendAction.ANSWER, PARENT_DIR, str(e)
+            message, SendAction.ANSWER, PARENT_DIR, str(exc)
         )
         await last_message.set(sent_message, state)
         return
@@ -165,9 +165,9 @@ async def user_create_msg_username_handler(
 
     try:
         input_username = process_username_msg(message)
-    except ValueError as e:
+    except ValueError as exc:
         sent_message = await send_invalid(
-            message, SendAction.ANSWER, PARENT_DIR, str(e)
+            message, SendAction.ANSWER, PARENT_DIR, str(exc)
         )
         await last_message.set(sent_message, state)
         return
@@ -236,9 +236,9 @@ async def user_create_msg_role_handler(
 
     try:
         input_role = process_role_msg(message)
-    except ValueError as e:
+    except ValueError as exc:
         sent_message = await send_invalid(
-            message, SendAction.ANSWER, PARENT_DIR, str(e)
+            message, SendAction.ANSWER, PARENT_DIR, str(exc)
         )
         await last_message.set(sent_message, state)
         return

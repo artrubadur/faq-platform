@@ -108,10 +108,10 @@ class EmbeddingRequestTemplate(RequestTemplate):
         for token in self._embedding_path_tokens:
             try:
                 current = current[token]
-            except (KeyError, IndexError, TypeError):
+            except (KeyError, IndexError, TypeError) as exc:
                 raise ConfigError(
                     f"Failed to extract embedding_path '{self.embedding_path}' at token '{token}'"
-                )
+                ) from exc
         return current
 
 

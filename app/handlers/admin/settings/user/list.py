@@ -121,9 +121,9 @@ async def user_list_msg_page_handler(
 
     try:
         input_page = process_page_msg(message)
-    except ValueError as e:
+    except ValueError as exc:
         sent_message = await send_invalid(
-            message, SendAction.ANSWER, PARENT_DIR, str(e)
+            message, SendAction.ANSWER, PARENT_DIR, str(exc)
         )
         await last_message.set(sent_message, state)
         return

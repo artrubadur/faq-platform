@@ -53,8 +53,8 @@ async def process_ask_handler(
 async def cmd_handler(message: Message, command: CommandObject):
     try:
         input_question_text = process_question_text_cmd(command)
-    except ValueError as e:
-        await send_failed(message, SendAction.ANSWER, message, str(e))
+    except ValueError as exc:
+        await send_failed(message, SendAction.ANSWER, message, str(exc))
         return
 
     await process_ask_handler(
@@ -66,8 +66,8 @@ async def cmd_handler(message: Message, command: CommandObject):
 async def msg_handler(message: Message):
     try:
         input_question_text = process_question_text_msg(message)
-    except ValueError as e:
-        await send_failed(message, SendAction.ANSWER, message, str(e))
+    except ValueError as exc:
+        await send_failed(message, SendAction.ANSWER, message, str(exc))
         return
 
     await process_ask_handler(

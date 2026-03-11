@@ -28,5 +28,5 @@ def validate_answer_text(question_text: str) -> str:
 def validate_rating(rating: str) -> float:
     try:
         return float(rating)
-    except ValueError:
-        raise ValueError(messages.validation.question.rating_incorrect)
+    except ValueError as exc:
+        raise ValueError(messages.validation.question.rating_incorrect) from exc

@@ -113,9 +113,9 @@ async def user_update_msg_identity_handler(
 
     try:
         input_id, input_username = process_identity_msg(message)
-    except ValueError as e:
+    except ValueError as exc:
         sent_message = await send_invalid(
-            message, SendAction.ANSWER, PARENT_DIR, str(e)
+            message, SendAction.ANSWER, PARENT_DIR, str(exc)
         )
         await last_message.set(sent_message, state)
         return
@@ -244,8 +244,8 @@ async def user_update_msg_edited_username_handler(
 
     try:
         input_username = process_username_msg(message)
-    except ValueError as e:
-        sent_message = await send_invalid(message, SendAction.ANSWER, DIR, str(e))
+    except ValueError as exc:
+        sent_message = await send_invalid(message, SendAction.ANSWER, DIR, str(exc))
         await last_message.set(sent_message, state)
         return
 
@@ -297,8 +297,8 @@ async def user_update_msg_edited_role_handler(
 
     try:
         input_role = process_role_msg(message)
-    except ValueError as e:
-        sent_message = await send_invalid(message, SendAction.ANSWER, DIR, str(e))
+    except ValueError as exc:
+        sent_message = await send_invalid(message, SendAction.ANSWER, DIR, str(exc))
         await last_message.set(sent_message, state)
         return
 
@@ -373,13 +373,13 @@ async def user_update_cb_save_handler(
             user.telegram_id,
             user.username,
         )
-    except PermissionError as e:
+    except PermissionError as exc:
         await state.clear()
         return await send_access_denied(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.EDIT,
             PARENT_DIR,
-            str(e),
+            str(exc),
         )
 
     if role != edited_role:

@@ -381,10 +381,10 @@ class Messages(YamlSettings):
                     return formatter.format(
                         obj, **constants.model_extra
                     )  # pyright: ignore[reportCallIssue]
-                except AttributeError:
+                except AttributeError as exc:
                     raise ConfigError(
                         f"Attempt to access a non-existent constant: {obj}"
-                    )
+                    ) from exc
             for field, value in obj.items():
                 obj[field] = recursive_apply(value)
 

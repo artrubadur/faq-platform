@@ -54,12 +54,12 @@ async def _process_ban_handler(
             messages.exceptions.user.not_found.format(identity=target_id),
         )
         return
-    except PermissionError as e:
+    except PermissionError as exc:
         await send_access_denied(
             message,  # pyright: ignore[reportArgumentType]
             SendAction.REPLY,
             None,
-            str(e),
+            str(exc),
         )
         return
 

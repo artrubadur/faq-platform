@@ -113,9 +113,9 @@ async def question_update_msg_id_handler(
 
     try:
         input_id = process_id_msg(message)
-    except ValueError as e:
+    except ValueError as exc:
         sent_message = await send_invalid(
-            message, SendAction.ANSWER, PARENT_DIR, str(e)
+            message, SendAction.ANSWER, PARENT_DIR, str(exc)
         )
         await last_message.set(sent_message, state)
         return
@@ -239,8 +239,8 @@ async def question_update_msg_edited_question_text_handler(
 
     try:
         input_question_text = process_question_text_msg(message)
-    except ValueError as e:
-        sent_message = await send_invalid(message, SendAction.ANSWER, DIR, str(e))
+    except ValueError as exc:
+        sent_message = await send_invalid(message, SendAction.ANSWER, DIR, str(exc))
         await last_message.set(sent_message, state)
         return
 
@@ -306,8 +306,8 @@ async def question_update_msg_edited_answer_text_handler(
 
     try:
         input_answer_text = process_answer_text_msg(message)
-    except ValueError as e:
-        sent_message = await send_invalid(message, SendAction.ANSWER, DIR, str(e))
+    except ValueError as exc:
+        sent_message = await send_invalid(message, SendAction.ANSWER, DIR, str(exc))
         await last_message.set(sent_message, state)
         return
 
@@ -341,8 +341,8 @@ async def question_update_msg_edited_rating_handler(
 
     try:
         input_rating = process_rating_msg(message)
-    except ValueError as e:
-        sent_message = await send_invalid(message, SendAction.ANSWER, DIR, str(e))
+    except ValueError as exc:
+        sent_message = await send_invalid(message, SendAction.ANSWER, DIR, str(exc))
         await last_message.set(sent_message, state)
         return
 

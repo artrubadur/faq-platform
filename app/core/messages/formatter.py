@@ -11,7 +11,9 @@ class SafeFormatter(Formatter):
     def get_value(self, key, args, kwargs):
         try:
             return super().get_value(key, args, kwargs)
-        except (KeyError, AttributeError):
+        except (KeyError, AttributeError) as exc:
             if key not in self.allowed_extra:
-                raise ConfigError(f"Attempt to access a non-existent field: {key}")
+                raise ConfigError(
+                    f"Attempt to access a non-existent field: {key}"
+                ) from exc
             return "{" + str(key) + "}"

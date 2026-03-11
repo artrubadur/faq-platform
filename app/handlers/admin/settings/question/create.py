@@ -62,9 +62,9 @@ async def question_create_msg_question_text_handler(
 
     try:
         input_question_text = process_question_text_msg(message)
-    except ValueError as e:
+    except ValueError as exc:
         sent_message = await send_invalid(
-            message, SendAction.ANSWER, PARENT_DIR, str(e)
+            message, SendAction.ANSWER, PARENT_DIR, str(exc)
         )
         await last_message.set(sent_message, state)
         return
@@ -85,9 +85,9 @@ async def question_create_msg_answer_text_handler(
 
     try:
         input_answer_text = process_answer_text_msg(message)
-    except ValueError as e:
+    except ValueError as exc:
         sent_message = await send_invalid(
-            message, SendAction.ANSWER, PARENT_DIR, str(e)
+            message, SendAction.ANSWER, PARENT_DIR, str(exc)
         )
         await last_message.set(sent_message, state)
         return
@@ -140,12 +140,12 @@ async def question_create_cb_create_confirm_handler(
             question = await service.create_question(
                 input_question_text, input_answer_text, True
             )
-    except SimilarityError as e:
+    except SimilarityError as exc:
         await send_found_similar(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.EDIT,
-            e.question.id,
-            e.question.question_text,
+            exc.question.id,
+            exc.question.question_text,
         )
         return
 

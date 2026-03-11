@@ -94,9 +94,9 @@ async def user_delete_msg_identity_handler(
 
     try:
         input_id, input_username = process_identity_msg(message)
-    except ValueError as e:
+    except ValueError as exc:
         sent_message = await send_invalid(
-            message, SendAction.ANSWER, PARENT_DIR, str(e)
+            message, SendAction.ANSWER, PARENT_DIR, str(exc)
         )
         await last_message.set(sent_message, state)
         return
@@ -153,13 +153,13 @@ async def user_delete_cb_confirm_handler(callback: CallbackQuery, state: TempCon
             SendAction.EDIT,
             input_id,
         )
-    except PermissionError as e:
+    except PermissionError as exc:
         await state.clear()
         return await send_access_denied(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.EDIT,
             PARENT_DIR,
-            str(e),
+            str(exc),
         )
 
     await state.clear()
