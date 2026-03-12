@@ -2,7 +2,7 @@ from aiogram import Router
 from aiogram.filters import Command, CommandObject
 from aiogram.types import Message
 
-from app.core.commands import commands
+from app.core.customization.commands import commands
 from app.dialogs import SendAction
 from app.dialogs.send.public.commands import send_command
 

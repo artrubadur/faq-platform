@@ -3,7 +3,7 @@ from typing import Awaitable, Callable
 from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
-from app.core.messages import messages
+from app.core.customization import messages
 from app.dialogs.actions import with_message_action
 from app.storage.models import Question
 from app.utils.format.output import format_response

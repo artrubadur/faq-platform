@@ -1,14 +1,8 @@
 from aiogram.types import InlineKeyboardMarkup
 
 import app.dialogs.rows.common as rows
-from app.core.constants.dirs import (
-    USERS,
-    USERS_CREATE,
-    USERS_DELETE,
-    USERS_LIST,
-    USERS_UPDATE,
-)
-from app.core.messages import messages
+from app.core.customization import messages
+from app.core.dirs import USERS, USERS_CREATE, USERS_DELETE, USERS_LIST, USERS_UPDATE
 
 main = InlineKeyboardMarkup(
     inline_keyboard=rows.crud_rows(USERS[1])

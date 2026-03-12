@@ -4,7 +4,7 @@ from aiogram.types import Message
 from loguru import logger
 from sqlalchemy.exc import NoResultFound
 
-from app.core.messages import messages
+from app.core.customization import messages
 from app.dialogs.actions import SendAction
 from app.dialogs.send.admin.misc import (
     send_banned,

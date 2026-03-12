@@ -1,6 +1,6 @@
 from aiogram.types import Message, MessageOriginUser
 
-from app.core.messages import messages
+from app.core.customization import messages
 from app.services.user.validate import validate_id, validate_role, validate_username
 from app.utils.format.input import format_input
 

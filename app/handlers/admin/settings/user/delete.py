@@ -4,7 +4,7 @@ from aiogram.types import CallbackQuery, Message
 from loguru import logger
 from sqlalchemy.exc import NoResultFound
 
-from app.core.constants.dirs import USERS_DELETE
+from app.core.dirs import USERS_DELETE
 from app.dialogs import SendAction
 from app.dialogs.rows.common import ConfirmCallback
 from app.dialogs.rows.user import IdentityCallback

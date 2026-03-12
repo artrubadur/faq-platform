@@ -4,7 +4,7 @@ from aiogram.types import CallbackQuery, Message
 from loguru import logger
 from sqlalchemy.exc import NoResultFound
 
-from app.core.constants.dirs import QUESTIONS_UPDATE
+from app.core.dirs import QUESTIONS_UPDATE
 from app.dialogs import SendAction
 from app.dialogs.rows.common import (
     BackCallback,

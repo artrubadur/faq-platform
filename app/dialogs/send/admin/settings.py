@@ -6,7 +6,7 @@ import app.dialogs.markups.question as qmu
 import app.dialogs.markups.user as umu
 import app.dialogs.rows.common as brows
 import app.dialogs.rows.settings as srows
-from app.core.messages import messages
+from app.core.customization import messages
 from app.dialogs.actions import with_message_action
 
 

@@ -5,7 +5,7 @@ from aiogram.types import InlineKeyboardMarkup, Message
 import app.dialogs.markups.question as mu
 import app.dialogs.rows.common as brows
 import app.dialogs.rows.question as qrows
-from app.core.messages import messages
+from app.core.customization import messages
 from app.dialogs.actions import with_message_action
 from app.repositories.questions import QuestionColumn
 from app.storage.models.question import Question

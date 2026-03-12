@@ -1,6 +1,6 @@
 from aiogram.types import Message
 
-from app.core.messages import messages
+from app.core.customization import messages
 from app.services.common.validate import validate_page
 from app.utils.format.input import format_input
 

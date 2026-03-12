@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardButton
 
-from app.core.messages import messages
+from app.core.customization import messages
 
 
 def go_row(dir: str):

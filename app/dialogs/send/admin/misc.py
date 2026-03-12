@@ -4,7 +4,7 @@ from typing import Any, Awaitable, Callable
 from aiogram.types import InlineKeyboardMarkup, Message
 
 import app.dialogs.rows.root as rows
-from app.core.messages import messages
+from app.core.customization import messages
 from app.dialogs.actions import with_message_action
 from app.utils.format.output import format_exception, format_id, format_username
 

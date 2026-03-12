@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardButton
 
-from app.core.constants.dirs import QUESTIONS, USERS
-from app.core.messages import messages
+from app.core.customization import messages
+from app.core.dirs import QUESTIONS, USERS
 
 
 def section_rows():

@@ -2,8 +2,8 @@ from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton
 
 import app.dialogs.rows.common as rows
-from app.core.constants.dirs import USERS
-from app.core.messages import messages
+from app.core.customization import messages
+from app.core.dirs import USERS
 from app.storage.models.user import Role
 
 cancel_row = rows.cancel_row(USERS[1])

@@ -2,7 +2,7 @@ from typing import Awaitable, Callable
 
 from aiogram.types import Message
 
-from app.core.messages import messages
+from app.core.customization import messages
 from app.dialogs.actions import with_message_action
 from app.utils.format.output import format_response
 

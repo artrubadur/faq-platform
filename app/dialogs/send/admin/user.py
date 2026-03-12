@@ -5,7 +5,7 @@ from aiogram.types import InlineKeyboardMarkup, Message
 import app.dialogs.markups.user as mu
 import app.dialogs.rows.common as brows
 import app.dialogs.rows.user as urows
-from app.core.messages import messages
+from app.core.customization import messages
 from app.dialogs.actions import with_message_action
 from app.repositories.users import UserColumn
 from app.storage.models.user import User

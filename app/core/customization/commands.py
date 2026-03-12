@@ -2,6 +2,8 @@ from pydantic import Field, field_validator
 from pydantic_settings import SettingsConfigDict
 
 from app.core.config import config
+from app.core.customization.constants import BOT_SYSTEM_KEYS, constants
+from app.core.customization.formatter import SafeFormatter
 from app.core.exceptions import ConfigError
 from app.utils.config import YamlSettings
 
@@ -12,7 +14,23 @@ class Commands(YamlSettings):
     commands: dict[str, str] = Field(default_factory=dict)
 
     @field_validator("commands", mode="before")
-    def validate_commands(cls, commands):
+    def apply_constants(cls, commands: dict[str, str]) -> dict[str, str]:
+        formatter = SafeFormatter(BOT_SYSTEM_KEYS)
+
+        for command, value in commands.items():
+            try:
+                commands[command] = formatter.format(
+                    value, **constants.model_extra
+                )  # pyright: ignore[reportCallIssue]
+            except AttributeError as exc:
+                raise ConfigError(
+                    f"Attempt to access a non-existent constant: {value}"
+                ) from exc
+
+        return commands
+
+    @field_validator("commands", mode="before")
+    def validate_commands(cls, commands: dict[str, str]) -> dict[str, str]:
         inter = SYSTEM_COMMANDS & set(commands.keys())
         if "start" in inter:
             raise ConfigError(

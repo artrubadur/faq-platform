@@ -4,9 +4,9 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 from pydantic_settings import SettingsConfigDict
 
 from app.core.config import config
-from app.core.constants.custom import BOT_SYSTEM_KEYS, constants
+from app.core.customization.constants import BOT_SYSTEM_KEYS, constants
+from app.core.customization.formatter import SafeFormatter
 from app.core.exceptions import ConfigError
-from app.core.messages.formatter import SafeFormatter
 from app.utils.config import YamlSettings
 
 # Responses

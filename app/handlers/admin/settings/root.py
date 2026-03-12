@@ -2,7 +2,7 @@ from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message
 
-from app.core.constants.dirs import SETTINGS
+from app.core.dirs import SETTINGS
 from app.dialogs import SendAction
 from app.dialogs.rows.common import BackCallback
 from app.dialogs.send.admin.settings import send_settings_menu

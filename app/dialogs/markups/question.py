@@ -1,14 +1,14 @@
 from aiogram.types import InlineKeyboardMarkup
 
 import app.dialogs.rows.common as rows
-from app.core.constants.dirs import (
+from app.core.customization import messages
+from app.core.dirs import (
     QUESTIONS,
     QUESTIONS_CREATE,
     QUESTIONS_DELETE,
     QUESTIONS_LIST,
     QUESTIONS_UPDATE,
 )
-from app.core.messages import messages
 
 main = InlineKeyboardMarkup(
     inline_keyboard=rows.crud_rows(QUESTIONS[1])

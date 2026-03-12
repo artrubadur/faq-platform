@@ -3,7 +3,7 @@ from aiogram.filters import Command, CommandObject
 from aiogram.types import Message
 from loguru import logger
 
-from app.core.messages import messages
+from app.core.customization import messages
 from app.dialogs import SendAction
 from app.dialogs.send.public.ask import send_failed, send_similar
 from app.repositories.questions import QuestionsRepository

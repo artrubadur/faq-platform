@@ -1,6 +1,6 @@
 import re
 
-from app.core.messages import messages
+from app.core.customization import messages
 from app.storage.models.user import Role
 
 

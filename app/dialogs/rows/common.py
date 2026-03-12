@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton
 
-from app.core.constants.dirs import CREATE, DELETE, GET, LIST, UPDATE
-from app.core.messages import messages
+from app.core.customization import messages
+from app.core.dirs import CREATE, DELETE, GET, LIST, UPDATE
 
 
 class CloseCallback(CallbackData, prefix="cls"):

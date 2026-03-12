@@ -2,7 +2,7 @@ from aiogram import Router
 from aiogram.filters import Command, CommandObject
 from aiogram.types import Message
 
-from app.core.messages import messages
+from app.core.customization import messages
 
 router = Router()
 

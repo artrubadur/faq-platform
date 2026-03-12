@@ -2,7 +2,7 @@ from enum import Enum
 
 from aiogram.types import Message
 
-from app.core.messages import messages
+from app.core.customization import messages
 from app.storage.models.question import Question
 from app.storage.models.user import User
 

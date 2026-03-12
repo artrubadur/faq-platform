@@ -3,7 +3,7 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
 from loguru import logger
 
-from app.core.constants.dirs import QUESTIONS_LIST
+from app.core.dirs import QUESTIONS_LIST
 from app.dialogs.actions import SendAction
 from app.dialogs.rows.common import (
     PaginOrderCallback,

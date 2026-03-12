@@ -1,4 +1,4 @@
-from app.core.messages import messages
+from app.core.customization import messages
 from app.repositories import UsersRepository
 from app.storage.models.user import Role, User
 
