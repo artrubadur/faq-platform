@@ -18,7 +18,7 @@ from app.services import UsersService
 from app.services.user.process import process_identity_msg
 from app.storage.instance import async_session
 from app.storage.temp import TempContext
-from app.utils.history.last_message import LastMessage
+from app.utils.state.history import LastMessage
 
 router = Router()
 
@@ -80,9 +80,8 @@ async def process_identity_handler(
             "long",
         )
         logger.debug("User partially obtained", id=user.id)
-        return await send_partially_found(
-            message, send_action, input_id, input_username
-        )
+        return
+    await send_partially_found(message, send_action, input_id, input_username)
 
     await state.storage.update_data(
         state.key,

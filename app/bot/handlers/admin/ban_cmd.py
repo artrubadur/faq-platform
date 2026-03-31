@@ -16,7 +16,7 @@ from app.repositories import UsersRepository
 from app.services import UsersService
 from app.storage.instance import async_session
 from app.storage.models.user import Role
-from app.utils.state import update_data
+from app.utils.state.data import update_data
 
 router = Router()
 

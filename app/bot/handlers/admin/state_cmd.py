@@ -6,7 +6,7 @@ from loguru import logger
 from app.core.customization import messages
 from app.dialogs.actions import SendAction
 from app.dialogs.send.admin.misc import send_invalid_argument, send_json
-from app.utils.state import clear_data, get_data, set_data, update_data
+from app.utils.state.data import clear_data, get_data, set_data, update_data
 
 router = Router()
 

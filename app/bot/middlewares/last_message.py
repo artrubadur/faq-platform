@@ -1,6 +1,6 @@
 from aiogram import BaseMiddleware, Bot
 
-from app.utils.history.last_message import LastMessage, last_message_var
+from app.utils.state.history import LastMessage, last_message_var
 
 
 class LastMessageMiddleware(BaseMiddleware):

@@ -2,6 +2,7 @@ import asyncio
 
 from loguru import logger
 
+from app.bot.handlers import admin_router, common_router, public_router
 from app.bot.instance import bot, dp, redis_client
 from app.bot.middlewares import (
     AdminMiddleware,
@@ -13,7 +14,6 @@ from app.bot.middlewares import (
 from app.core import commands_status, constants_status, messages_status, requests_status
 from app.core.config import config
 from app.core.logging.setup import setup_logging
-from app.handlers import admin_router, common_router, public_router
 from app.services.user.admin_sync import sync_admin_roles
 from app.storage.core import close_db, init_db
 

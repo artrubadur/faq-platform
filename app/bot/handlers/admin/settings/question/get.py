@@ -18,7 +18,7 @@ from app.services.question.process import process_id_msg
 from app.services.question.service import QuestionsService
 from app.storage.instance import async_session
 from app.storage.temp import TempContext
-from app.utils.history.last_message import LastMessage
+from app.utils.state.history import LastMessage
 
 router = Router()
 

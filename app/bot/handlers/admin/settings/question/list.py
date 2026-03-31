@@ -3,29 +3,28 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
 from loguru import logger
 
-from app.core.dirs import USERS_LIST
+from app.core.dirs import QUESTIONS_LIST
 from app.dialogs.actions import SendAction
 from app.dialogs.rows.common import (
     PaginOrderCallback,
     PaginPageCallback,
     PaginSizeCallback,
 )
-from app.dialogs.send.admin.user import send_empty_pagination, send_pagination
+from app.dialogs.send.admin.question import send_empty_pagination, send_pagination
 from app.dialogs.send.common import send_expired, send_invalid
-from app.repositories import UsersRepository
-from app.services import UsersService
+from app.repositories.questions import QuestionsRepository
 from app.services.common.process import process_page_msg
+from app.services.question.service import QuestionsService
 from app.storage.instance import async_session
 from app.storage.temp import TempContext
-from app.utils.history.last_message import LastMessage
-from app.utils.state import is_expired
+from app.utils.state.history import LastMessage, is_expired
 
 router = Router()
 
-PARENT_DIR, DIR = USERS_LIST
+PARENT_DIR, DIR = QUESTIONS_LIST
 
 
-class UserListing(StatesGroup):
+class QuestionListing(StatesGroup):
     waiting_for_page = State()
 
 
@@ -39,12 +38,11 @@ async def process(
     data = await state.get_data()
     if is_expired(data):
         await state.clear()
-        await send_expired(
+        return await send_expired(
             message,
             SendAction.ANSWER,
             PARENT_DIR,
         )
-        return
     await state.set_data(data)
 
     order: str = data["order"]
@@ -54,9 +52,9 @@ async def process(
 
     if "amount" not in data:
         async with async_session() as session:
-            repo = UsersRepository(session)
-            service = UsersService(repo)
-            amount = await service.get_user_amount()
+            repo = QuestionsRepository(session)
+            service = QuestionsService(repo)
+            amount = await service.get_questions_amount()
         await state.update_data(amount=amount)
     else:
         amount = data["amount"]
@@ -64,18 +62,22 @@ async def process(
     max_page = (amount + page_size - 1) // page_size
     page = min(max_page, page)
     if page == 0:
-        logger.debug("No users found")
-        return await send_empty_pagination(message, send_action)
-    async with async_session() as session:
-        repo = UsersRepository(session)
-        service = UsersService(repo)
-        users = await service.get_paginated_users(page, page_size, order, ascending)
+        logger.debug("No questions found")
+        await send_empty_pagination(message, send_action)
+        return
 
-    logger.debug("Users obtained", len=len(users))
+    async with async_session() as session:
+        repo = QuestionsRepository(session)
+        service = QuestionsService(repo)
+        questions = await service.get_paginated_questions(
+            page, page_size, order, ascending
+        )
+
+    logger.debug("Questions obtained", len=len(questions))
     sent_message = await send_pagination(
         message,
         send_action,
-        users,
+        questions,
         order,
         ascending,
         page,
@@ -86,7 +88,7 @@ async def process(
 
 
 @router.callback_query(F.data == DIR)
-async def user_list_cb_handler(
+async def question_list_cb_handler(
     callback: CallbackQuery, last_message: LastMessage, state: TempContext
 ):
     await callback.answer()
@@ -103,18 +105,17 @@ async def user_list_cb_handler(
     )
 
     await process(
-        callback.message,  # pyright: ignore[reportArgumentType]
+        callback.message,  # pyright: ignore[reportArgumentType],
         last_message,
         state,
         send_action=SendAction.EDIT,
     )
 
-    await state.update_data(in_operation=True)
-    await state.set_state(UserListing.waiting_for_page)
+    await state.set_state(QuestionListing.waiting_for_page)
 
 
-@router.message(UserListing.waiting_for_page)
-async def user_list_msg_page_handler(
+@router.message(QuestionListing.waiting_for_page)
+async def question_list_msg_page_handler(
     message: Message, last_message: LastMessage, state: TempContext
 ):
     await last_message.delete(message, state)
@@ -134,7 +135,7 @@ async def user_list_msg_page_handler(
 
 
 @router.callback_query(PaginPageCallback.filter(F.dir == DIR))
-async def user_list_cb_page_handler(
+async def question_list_cb_page_handler(
     callback: CallbackQuery,
     last_message: LastMessage,
     callback_data: PaginPageCallback,
@@ -155,7 +156,7 @@ async def user_list_cb_page_handler(
 
 
 @router.callback_query(PaginSizeCallback.filter(F.dir == DIR))
-async def user_list_cb_size_handler(
+async def question_list_cb_size_handler(
     callback: CallbackQuery,
     last_message: LastMessage,
     callback_data: PaginSizeCallback,
@@ -174,7 +175,7 @@ async def user_list_cb_size_handler(
 
 
 @router.callback_query(PaginOrderCallback.filter(F.dir == DIR))
-async def user_list_cb_order_handler(
+async def question_list_cb_order_handler(
     callback: CallbackQuery,
     last_message: LastMessage,
     callback_data: PaginOrderCallback,
@@ -184,7 +185,7 @@ async def user_list_cb_order_handler(
 
     new_order = callback_data.column
     data = await state.get_data()
-    if data["order"] == new_order:
+    if data.get("order", "") == new_order:
         await state.update_data(ascending=(not data["ascending"]))
     else:
         await state.update_data(order=new_order)

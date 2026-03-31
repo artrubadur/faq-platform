@@ -3,8 +3,8 @@ import time
 from loguru import logger
 from redis.asyncio import Redis
 
+from app.bot.handlers.common import rate_limit_handler
 from app.bot.middlewares.access import AccessMiddleware
-from app.handlers.common import rate_limit_handler
 from app.storage.models.user import Role
 
 

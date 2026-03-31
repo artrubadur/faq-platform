@@ -20,8 +20,7 @@ from app.services import UsersService
 from app.services.user.process import process_identity_msg
 from app.storage.instance import async_session
 from app.storage.temp import TempContext
-from app.utils.history.last_message import LastMessage
-from app.utils.state import is_expired
+from app.utils.state.history import LastMessage, is_expired
 
 router = Router()
 

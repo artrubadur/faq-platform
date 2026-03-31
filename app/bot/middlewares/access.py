@@ -2,7 +2,7 @@ from aiogram import BaseMiddleware
 from loguru import logger
 from sqlalchemy.exc import NoResultFound
 
-from app.handlers.common import banned_handler
+from app.bot.handlers.common import banned_handler
 from app.repositories import UsersRepository
 from app.services import UsersService
 from app.storage.instance import async_session
