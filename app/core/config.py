@@ -10,10 +10,10 @@ class RequestsConfig(BaseModel):
 
 class PathConfig(BaseModel):
     logging: Path = Path("./config/logging.yml")
-    constants: Path = Path("./config/constants.yml")
-    messages: Path = Path("./config/messages.yml")
-    commands: Path = Path("./config/commands.yml")
-    requests: Path = Path("./config/requests.yml")
+    constants: Path = Path("./config/bot/constants.yml")
+    messages: Path = Path("./config/bot/messages.yml")
+    commands: Path = Path("./config/bot/commands.yml")
+    requests: Path = Path("./config/api/requests.yml")
 
 
 class BotConfig(BaseModel):
