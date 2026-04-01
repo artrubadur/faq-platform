@@ -1,4 +1,8 @@
-from pydantic import BaseModel
+from typing import Literal
+
+from pydantic import BaseModel, Field, model_validator
+
+QuestionFields = Literal["id", "question_text", "answer_text", "rating"]
 
 
 class CreateQuestionRequest(BaseModel):
@@ -15,14 +19,22 @@ class UpdateQuestionRequest(BaseModel):
 
 
 class ListQuestionsRequest(BaseModel):
-    page: int
-    page_size: int
-    order_by: str
+    page: int = Field(ge=1)
+    page_size: int = Field(ge=1)
+    order_by: QuestionFields
     ascending: bool
 
 
 class SuggestQuestionsRequest(BaseModel):
     question_text: str
-    max_similar_amount: int
-    max_popular_amount: int
-    max_amount: int
+    max_similar_amount: int = Field(ge=0)
+    max_popular_amount: int = Field(ge=0)
+    max_amount: int = Field(ge=0)
+
+    @model_validator(mode="after")
+    def validate_limits(self) -> "SuggestQuestionsRequest":
+        if self.max_similar_amount > self.max_amount:
+            raise ValueError("'max_similar_amount' cannot be greater than 'max_amount'")
+        if self.max_popular_amount > self.max_amount:
+            raise ValueError("'max_popular_amount' cannot be greater than 'max_amount'")
+        return self

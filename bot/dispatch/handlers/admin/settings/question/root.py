@@ -1,8 +1,7 @@
-import locale
-
 from aiogram import F, Router
 from aiogram.types import CallbackQuery
 
+from bot.core.customization.messages import messages
 from bot.core.dirs import QUESTIONS
 from bot.dialogs import SendAction
 from bot.dialogs.rows.common import BackCallback, CancelCallback
@@ -39,7 +38,7 @@ async def question_cancel_cb_handler(callback: CallbackQuery, state: TempContext
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
     await callback.message.edit_text(
-        locale.format.canceled.format(old=callback.message.html_text),
+        messages.format.canceled.format(old=callback.message.html_text),
         parse_mode="HTML",
     )
 

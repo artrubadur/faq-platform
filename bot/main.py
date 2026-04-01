@@ -1,5 +1,3 @@
-import asyncio
-
 from loguru import logger
 
 from bot.core import commands_status, constants_status, messages_status
@@ -13,12 +11,10 @@ from bot.dispatch.middlewares import (
     LogHandlerMiddleware,
     RateLimitMiddleware,
 )
-from shared.logging.setup import setup_logging
+from bot.services.http_client import close_orchestrator_client
 
 
 async def startup():
-    setup_logging()
-
     logger.info(messages_status)
     logger.info(constants_status)
     logger.info(commands_status)
@@ -60,10 +56,4 @@ async def startup():
 @dp.shutdown()
 async def shutdown():
     logger.info("Bot stopped by user")
-
-
-if __name__ == "__main__":
-    try:
-        asyncio.run(startup())
-    except KeyboardInterrupt:
-        pass
+    await close_orchestrator_client()

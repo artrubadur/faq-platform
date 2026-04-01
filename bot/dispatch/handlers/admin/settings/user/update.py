@@ -347,10 +347,14 @@ async def user_update_cb_save_handler(
     edited_username: str | None = data.get("edited_username", username)
     edited_role: Role = data.get("edited_role", role)
 
+    payload = {}
+    if username != edited_username:
+        payload["username"] = edited_username
+    if role != edited_role:
+        payload["role"] = edited_role
+
     try:
-        user = await user_gateway.update_user(
-            id, username=edited_username, role=edited_role
-        )
+        user = await user_gateway.update_user(id, **payload)
     except NotFoundError:
         await state.clear()
         return await send_not_found(

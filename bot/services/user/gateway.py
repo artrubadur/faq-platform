@@ -1,11 +1,15 @@
+from bot.services.http_client import orchestrator_client
 from shared.contracts.user.requests import (
     CreateUserRequest,
     ListUsersRequest,
     UpdateUserRequest,
+    UserFields,
     UsersByRoleRequest,
 )
 from shared.contracts.user.responses import Role, UserResponse, UsersAmountResponse
-from shared.http.client import InternalApiClient, client
+from shared.http.client import InternalApiClient
+
+_UNSET = object()
 
 
 class UserGateway:
@@ -44,7 +48,7 @@ class UserGateway:
         self,
         page: int,
         page_size: int,
-        order_by: str,
+        order_by: UserFields,
         ascending: bool,
     ) -> list[UserResponse]:
         request = ListUsersRequest(
@@ -71,13 +75,25 @@ class UserGateway:
         data = await self.client.delete(f"/users/{id}")
         return UserResponse.model_validate(data)
 
-    async def update_user(self, id: int, **kwargs) -> UserResponse:
-        request = UpdateUserRequest.model_validate(kwargs)
-        data = await self.client.put(
+    async def update_user(
+        self,
+        id: int,
+        role: Role | None = None,
+        username: str | None | object = _UNSET,
+    ) -> UserResponse:
+        payload = {}
+
+        if username is not _UNSET:
+            payload["username"] = username
+        if role is not None:
+            payload["role"] = role
+
+        request = UpdateUserRequest.model_validate(payload)
+        data = await self.client.patch(
             f"/users/{id}",
-            json_data=request.model_dump(mode="json"),
+            json_data=request.model_dump(mode="json", exclude_unset=True),
         )
         return UserResponse.model_validate(data)
 
 
-user_gateway = UserGateway(client)
+user_gateway = UserGateway(orchestrator_client)

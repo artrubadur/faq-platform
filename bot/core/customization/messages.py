@@ -34,6 +34,7 @@ class UserAdmEnterRsp(BaseModel):
 class CreationUsrAdmRsp(BaseModel):
     confirm: str = "⏩ Confirm creation?\n" "{user}"
     successful: str = "✅ User has been successfully created:\n" "{user}"
+    access_denied: str = "You can’t create an admin user."
 
 
 class FindingUsrAdmRsp(BaseModel):

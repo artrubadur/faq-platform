@@ -3,7 +3,6 @@ from typing import TypeVar
 
 import httpx
 
-from bot.core.config import config
 from shared.http.exceptions import (
     BadGatewayError,
     ConflictError,
@@ -53,15 +52,18 @@ def raise_api_error(exc: httpx.HTTPStatusError) -> None:
 class InternalApiClient:
     def __init__(
         self,
-        base_url: str,
-        timeout: float,
+        base_url: str | None = None,
+        timeout: float = 5.0,
         retries: int = 2,
         retry_delay: float = 0.5,
     ) -> None:
-        self._client = httpx.AsyncClient(
-            base_url=base_url,
-            timeout=httpx.Timeout(timeout),
-        )
+        client_kwargs: dict = {
+            "timeout": httpx.Timeout(timeout),
+        }
+        if base_url is not None:
+            client_kwargs["base_url"] = base_url
+
+        self._client = httpx.AsyncClient(**client_kwargs)
         self._retries = retries
         self._retry_delay = retry_delay
 
@@ -73,9 +75,10 @@ class InternalApiClient:
         method: str,
         path: str,
         *,
+        headers: dict | None = None,
         params: dict | None = None,
         json_data: dict | None = None,
-    ) -> dict:
+    ) -> dict | list:
 
         last_error: Exception = InternalApiRequestError("You'll never see me")
 
@@ -84,6 +87,7 @@ class InternalApiClient:
                 response = await self._client.request(
                     method,
                     path,
+                    headers=headers,
                     params=params,
                     json=json_data,
                 )
@@ -111,22 +115,34 @@ class InternalApiClient:
 
         raise last_error
 
-    async def get(self, path: str, params: dict | None = None) -> dict:
+    async def request(
+        self,
+        method: str,
+        path: str,
+        *,
+        headers: dict | None = None,
+        params: dict | None = None,
+        json_data: dict | None = None,
+    ) -> dict | list:
+        return await self._request(
+            method,
+            path,
+            headers=headers,
+            params=params,
+            json_data=json_data,
+        )
+
+    async def get(self, path: str, params: dict | None = None) -> dict | list:
         return await self._request("GET", path, params=params)
 
-    async def post(self, path: str, json_data: dict | None = None) -> dict:
+    async def post(self, path: str, json_data: dict | None = None) -> dict | list:
         return await self._request("POST", path, json_data=json_data)
 
-    async def patch(self, path: str, json_data: dict | None = None) -> dict:
+    async def put(self, path: str, json_data: dict | None = None) -> dict | list:
+        return await self._request("PUT", path, json_data=json_data)
+
+    async def patch(self, path: str, json_data: dict | None = None) -> dict | list:
         return await self._request("PATCH", path, json_data=json_data)
 
-    async def delete(self, path: str, json_data: dict | None = None) -> dict:
+    async def delete(self, path: str, json_data: dict | None = None) -> dict | list:
         return await self._request("DELETE", path, json_data=json_data)
-
-
-client = InternalApiClient(
-    config.orchestrator.base_url,
-    config.orchestrator.timeout,
-    config.orchestrator.retries,
-    config.orchestrator.retry_delay,
-)

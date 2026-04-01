@@ -1,6 +1,7 @@
 embedding:
-  url: "https://llm.api.cloud.yandex.net/foundationModels/v1/textEmbedding"
   method: "POST"
+  path: "https://llm.api.cloud.yandex.net/foundationModels/v1/textEmbedding"
+
   headers:
     Authorization: "Bearer {iam_token}"
     Content-Type: "application/json"

@@ -1,6 +1,8 @@
+from bot.services.http_client import orchestrator_client
 from shared.contracts.question.requests import (
     CreateQuestionRequest,
     ListQuestionsRequest,
+    QuestionFields,
     SuggestQuestionsRequest,
     UpdateQuestionRequest,
 )
@@ -9,7 +11,7 @@ from shared.contracts.question.responses import (
     QuestionsAmountResponse,
     QuestionSuggestionResponse,
 )
-from shared.http.client import InternalApiClient, client
+from shared.http.client import InternalApiClient
 
 
 class QuestionGateway:
@@ -19,8 +21,8 @@ class QuestionGateway:
     ) -> None:
         self.client = client
 
-    async def get_question(self, question_id: int) -> QuestionResponse:
-        data = await self.client.get(f"/questions/{question_id}")
+    async def get_question(self, id: int) -> QuestionResponse:
+        data = await self.client.get(f"/questions/{id}")
         return QuestionResponse.model_validate(data)
 
     async def create_question(
@@ -42,11 +44,11 @@ class QuestionGateway:
 
     async def update_question(
         self,
-        question_id: int,
-        question_text: str | None,
-        answer_text: str | None,
-        rating: float | None,
-        recompute_embedding: bool,
+        id: int,
+        question_text: str | None = None,
+        answer_text: str | None = None,
+        rating: float | None = None,
+        recompute_embedding: bool = False,
     ) -> QuestionResponse:
         request = UpdateQuestionRequest(
             question_text=question_text,
@@ -55,7 +57,7 @@ class QuestionGateway:
             recompute_embedding=recompute_embedding,
         )
         data = await self.client.patch(
-            f"/questions/{question_id}",
+            f"/questions/{id}",
             json_data=request.model_dump(mode="json"),
         )
         return QuestionResponse.model_validate(data)
@@ -68,7 +70,7 @@ class QuestionGateway:
         self,
         page: int,
         page_size: int,
-        order_by: str,
+        order_by: QuestionFields,
         ascending: bool,
     ) -> list[QuestionResponse]:
         request = ListQuestionsRequest(
@@ -107,4 +109,4 @@ class QuestionGateway:
         return QuestionSuggestionResponse.model_validate(data)
 
 
-question_gateway = QuestionGateway(client)
+question_gateway = QuestionGateway(orchestrator_client)

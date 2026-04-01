@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 
-WORKDIR /bot
+WORKDIR /app
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -18,4 +18,4 @@ RUN poetry config virtualenvs.create false \
 COPY --exclude=__pycache__ ./bot ./bot
 COPY --exclude=__pycache__ ./shared ./shared
 
-CMD ["python", "-m", "bot.main"]
+CMD ["python", "-m", "bot"]

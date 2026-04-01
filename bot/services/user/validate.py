@@ -38,7 +38,4 @@ def validate_role(role: str) -> Role:
     except ValueError as exc:
         raise ValueError(messages.validation.user.role_unexcepted) from exc
 
-    if role_enum is Role.ADMIN:
-        raise ValueError(messages.validation.user.role_unexcepted)
-
     return role_enum

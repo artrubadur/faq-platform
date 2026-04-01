@@ -38,20 +38,22 @@ async def _process_ban_handler(
     target_id = int(args)
 
     try:
-        updated = await user_gateway.update_user(target_id, role=role)
+        updated = await user_gateway.update_user(target_id, role)
     except NotFoundError:
-        return await send_invalid_argument(
+        await send_invalid_argument(
             message,
             SendAction.REPLY,
             messages.exceptions.user.not_found.format(identity=target_id),
         )
+        return
     except ForbiddenError as exc:
-        return await send_access_denied(
+        await send_access_denied(
             message,  # pyright: ignore[reportArgumentType]
             SendAction.REPLY,
             None,
             str(exc),
         )
+        return
 
     await update_data(
         bot,

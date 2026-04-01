@@ -16,6 +16,7 @@ from bot.services.common.process import process_page_msg
 from bot.services.user.gateway import user_gateway
 from bot.utils.state.history import LastMessage, is_expired
 from bot.utils.state.temp import TempContext
+from shared.contracts.user.requests import UserFields
 
 router = Router()
 
@@ -44,7 +45,7 @@ async def process(
         return
     await state.set_data(data)
 
-    order: str = data["order"]
+    order: UserFields = data["order"]
     ascending: bool = data["ascending"]
     page: int = data["page"]
     page_size: int = data["page_size"]

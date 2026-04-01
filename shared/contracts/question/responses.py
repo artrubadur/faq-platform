@@ -1,7 +1,9 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class QuestionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     question_text: str
     answer_text: str

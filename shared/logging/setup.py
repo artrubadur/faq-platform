@@ -5,8 +5,8 @@ from pathlib import Path
 import yaml
 from loguru import logger
 
-from bot.utils.format.log import serialize_json
 from shared.logging.filter import DuplicateFilter, make_duplicate_patch
+from shared.utils.log import serialize_json
 
 LOGGING_PATH = Path("config/logging.yml")
 

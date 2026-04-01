@@ -373,14 +373,16 @@ async def question_update_cb_save_handler(callback: CallbackQuery, state: TempCo
 
     recompute_embedding: bool = data.get("recompute_embedding", False)
 
+    payload: dict = {"recompute_embedding": recompute_embedding}
+    if question_text != edited_question_text:
+        payload["question_text"] = edited_question_text
+    if answer_text != edited_answer_text:
+        payload["answer_text"] = edited_answer_text
+    if rating != edited_rating:
+        payload["edited_rating"] = edited_rating
+
     try:
-        question = await question_gateway.update_question(
-            id,
-            edited_question_text if question_text != edited_question_text else None,
-            edited_answer_text if answer_text != edited_answer_text else None,
-            edited_rating if rating != edited_rating else None,
-            recompute_embedding,
-        )
+        question = await question_gateway.update_question(id, **payload)
     except NotFoundError:
         await state.clear()
         await send_not_found(

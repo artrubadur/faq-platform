@@ -35,6 +35,7 @@ responses: # Messages sent to regular users
         successful: | # < user
           {emoji.status.successful} User has been successfully created:
           {user}
+        access_denied: "You can’t create an admin user."
       finding:
         successful: | # < user
           {emoji.status.successful} The user has been successfully found in the database:
