@@ -1,8 +1,8 @@
 .venv
 .vscode
 .idea
-.env
+*.env
 .ruff_cache
 __pycache__
 log
-_app
+.codex

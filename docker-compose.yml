@@ -28,7 +28,7 @@ services:
   bot:
     build:
       context: .
-      dockerfile: app/Dockerfile
+      dockerfile: bot/Dockerfile
     container_name: bot_server
     restart: always
     depends_on:
@@ -38,7 +38,7 @@ services:
       DB__HOST: db
       REDIS__HOST: redis
     env_file:
-      - .env
+      - bot.env
 
 volumes:
   postgres_data:

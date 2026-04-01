@@ -1,0 +1,106 @@
+from aiogram import Bot, Dispatcher, Router
+from aiogram.filters import Command, CommandObject
+from aiogram.types import Message
+from loguru import logger
+
+from bot.core.customization import messages
+from bot.dialogs.actions import SendAction
+from bot.dialogs.send.admin.misc import (
+    send_banned,
+    send_invalid_argument,
+    send_unbanned,
+)
+from bot.dialogs.send.common import send_access_denied
+from bot.services.api.exceptions import ForbiddenError, NotFoundError
+from bot.services.api.schemas.user import Role
+from bot.services.user.gateway import user_gateway
+from bot.utils.state.data import update_data
+
+router = Router()
+
+
+async def _process_ban_handler(
+    message: Message,
+    command: CommandObject,
+    bot: Bot,
+    dispatcher: Dispatcher,
+    role: Role,
+):
+    args = command.args
+    if not args or not args.isdigit():
+        await send_invalid_argument(
+            message,
+            SendAction.REPLY,
+            "id",
+        )
+        return
+
+    target_id = int(args)
+
+    try:
+        updated = await user_gateway.update_user(target_id, role=role)
+    except NotFoundError:
+        return await send_invalid_argument(
+            message,
+            SendAction.REPLY,
+            messages.exceptions.user.not_found.format(identity=target_id),
+        )
+    except ForbiddenError as exc:
+        return await send_access_denied(
+            message,  # pyright: ignore[reportArgumentType]
+            SendAction.REPLY,
+            None,
+            str(exc),
+        )
+
+    await update_data(
+        bot,
+        dispatcher,
+        target_id,
+        {"sender_role": role},
+        "long",
+    )
+
+    return updated
+
+
+@router.message(Command("ban"))
+async def bun_cmd_handler(
+    message: Message,
+    command: CommandObject,
+    bot: Bot,
+    dispatcher: Dispatcher,
+):
+    updated = await _process_ban_handler(message, command, bot, dispatcher, Role.BANNED)
+    if updated is None:
+        return
+
+    logger.debug("The user was banned", tg_id=message.from_user.id)
+
+    await send_banned(
+        message,
+        SendAction.ANSWER,
+        updated.telegram_id,
+        updated.username,
+    )
+
+
+@router.message(Command("unban"))
+async def unban_cmd_handler(
+    message: Message,
+    command: CommandObject,
+    bot: Bot,
+    dispatcher: Dispatcher,
+):
+    updated = await _process_ban_handler(message, command, bot, dispatcher, Role.USER)
+    if updated is None:
+        return
+
+    logger.debug("The user was unbanned", tg_id=message.from_user.id)
+
+    await send_unbanned(
+        message,
+        SendAction.ANSWER,
+        updated.telegram_id,
+        updated.username,
+    )
