@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "faq_bot"
-version = "1.0.0"
-description = ""
+name = "faq-bot"
+version = "2.0.0"
+description = "Telegram FAQ bot with a FastAPI orchestrator and semantic search."
 authors = ["artrubadur"]
 package-mode = false
 
