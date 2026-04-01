@@ -13,10 +13,6 @@ handlers:
     rotation: "10 MB"
     retention: 5
 
-  - sink: telegram
-    level: "INFO"
-    cooldown: 3
-
 activation:
   - ["aiogram.event", "WARNING"]
   - ["aiogram.dispatcher", "INFO"]

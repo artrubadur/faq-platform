@@ -15,7 +15,7 @@ class DuplicateFilter:
 
     def __call__(self, record: dict[str, Any]):
         key = self._create_cache_key(record)
-        count = self._history[key]  #  Executed after the patch
+        count = self._history.get(key, 0)  #  Executed after the patch
         return count <= self.repeat_limit
 
     def _increment_history(self, key: int):
@@ -35,10 +35,10 @@ class DuplicateFilter:
         return self._increment_history(key)
 
 
-def make_duplicate_patch(duplicate_filter: DuplicateFilter, repeat_limit: int):
+def make_duplicate_patch(duplicate_filter: DuplicateFilter):
     def duplicate_patch(record):
         count = duplicate_filter.get_count(record)
-        if count > 1 and count <= repeat_limit:
+        if count > 1 and count <= duplicate_filter.repeat_limit:
             record["_repeat"] = count
 
     return duplicate_patch
