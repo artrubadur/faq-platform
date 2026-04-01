@@ -2,14 +2,15 @@
 
 ## High-Level Components
 
-- `app/main.py`: application bootstrap and polling entrypoint.
-- `app/bot`: bot/dispatcher/storage instances and middlewares.
-- `app/handlers`: Telegram update handlers (public/admin/common).
-- `app/dialogs`: outgoing message builders, keyboards, callback payloads.
-- `app/services`: business logic and validation.
-- `app/repositories`: SQLAlchemy-based DB access layer.
-- `app/storage`: DB models, async engine/session, temp storage, schema sync.
-- `app/core`: global config, customization loaders, logging setup, exceptions.
+- `bot/main.py`: Telegram bot bootstrap and polling entrypoint.
+- `bot/dispatch`: routers, handlers, FSM middlewares, instance wiring.
+- `bot/dialogs`: outgoing message builders, keyboards, callback payloads.
+- `bot/services`: validation and orchestrator API gateway calls.
+- `orchestrator/main.py`: FastAPI bootstrap and lifecycle hooks.
+- `orchestrator/api`: REST routes, dependency injection, error handlers.
+- `orchestrator/repositories`: SQLAlchemy-based DB access layer.
+- `orchestrator/db`: models, async session/engine, schema reconciliation.
+- `orchestrator/integrations`: external embedding provider client/templates.
 
 ## Request Flows
 
@@ -27,7 +28,7 @@
 Rating update details:
 
 - Rating is updated only when at least one similar question is found and the top
-  similarity reaches `QUESTIONS__SIMILAREST_THRESHOLD`.
+  similarity reaches `SEARCH__BEST_MATCH_THRESHOLD`.
 - If the threshold is exactly `1`, the top question receives `+1.0`.
 - Otherwise, the gain is based on two factors:
   - normalized confidence above the threshold

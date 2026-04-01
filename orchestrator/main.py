@@ -20,7 +20,7 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     await init_db()
     async with async_session() as session:
         users_service = UsersService(UsersRepository(session))
-        await users_service.sync_admin_roles(config.db_schema.admins)
+        await users_service.sync_admin_roles(config.admin.ids)
 
     logger.info(requests_status)
     logger.info("Orchestrator is starting")
@@ -34,11 +34,9 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
 
 app = FastAPI(
     lifespan=lifespan,
-    title=config.api.title,
-    version=config.api.version,
-    docs_url=config.api.docs_url,
-    redoc_url=config.api.redoc_url,
-    openapi_url=config.api.openapi_url,
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
 )
 
 app.include_router(users_router)

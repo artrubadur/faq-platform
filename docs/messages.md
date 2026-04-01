@@ -4,11 +4,13 @@
 button labels.
 
 Reference schema and default examples:
-[config/messages.example.yml](../config/messages.example.yml)
+[config/bot/messages.example.yml](../config/bot/messages.example.yml)
 
 ## Loading Behavior
 
-- File path comes from `PATHS__MESSAGES` (default: `./config/messages.yml`).
+- Runtime path is `config/messages.yml`.
+- In Docker Compose, host file mapping is controlled by
+  `COMPOSE__BOT_MESSAGES_PATH` from `.env`.
 - Missing file does not break startup; built-in defaults from Python models are
   used.
 - Existing values override defaults selectively.

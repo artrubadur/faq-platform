@@ -23,13 +23,13 @@ class QuestionsService:
         self,
         repository: QuestionsRepository,
         embedding_provider: EmbeddingProvider,
-        similarest_threshold: float,
-        similar_threshold: float,
+        best_match_threshold: float,
+        related_threshold: float,
     ):
         self.repository = repository
         self.embedding_provider = embedding_provider
-        self.similarest_distance = 1 - similarest_threshold
-        self.similar_distance = 1 - similar_threshold
+        self.best_match_distance = 1 - best_match_threshold
+        self.related_distance = 1 - related_threshold
 
     def _to_response(self, question: Question) -> QuestionResponse:
         return QuestionResponse.model_validate(question)
@@ -53,7 +53,9 @@ class QuestionsService:
 
         if request.check_similarity:
             rows = await self.repository.get_similar(
-                embedding=embedding, limit=1, max_distance=self.similarest_distance
+                embedding=embedding,
+                limit=1,
+                max_distance=self.best_match_distance,
             )
             if len(rows) > 0:
                 similar, _ = rows[0]
@@ -104,7 +106,7 @@ class QuestionsService:
         rows = await self.repository.get_similar(
             embedding=embedding,
             limit=amount,
-            max_distance=self.similar_distance,
+            max_distance=self.related_distance,
         )
 
         questions: list[Question] = [row[0] for row in rows]
@@ -113,7 +115,7 @@ class QuestionsService:
         if similarities:
             sim1 = similarities[0]
             sim2 = similarities[1] if len(similarities) > 1 else 0.0
-            threshold = config.questions.similarest_threshold
+            threshold = config.search.best_match_threshold
 
             if (
                 sim1 >= threshold - 1e-6
@@ -160,7 +162,7 @@ class QuestionsService:
         suggestions = (similar + popular)[: request.max_amount]
         is_confident = (
             len(similarities) != 0
-            and similarities[0] >= config.questions.similarest_threshold
+            and similarities[0] >= config.search.best_match_threshold
         )
 
         return QuestionSuggestionResponse(

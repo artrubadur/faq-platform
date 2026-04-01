@@ -1,6 +1,5 @@
-# TODO: Implement and translate
 class InternalApiError(Exception):
-    """Базовая ошибка внутреннего API."""
+    """Base internal API error."""
 
     def __init__(self, message: str, data: dict | None = None) -> None:
         super().__init__(message)
@@ -8,36 +7,36 @@ class InternalApiError(Exception):
 
 
 class InternalApiConnectionError(InternalApiError):
-    """Ошибка соединения с внутренним API."""
+    """Connection error to the internal API."""
 
 
 class InternalApiTimeoutError(InternalApiError):
-    """Таймаут внутреннего API."""
+    """Internal API timeout error."""
 
 
 class InternalApiRequestError(InternalApiError):
-    """Общая ошибка HTTP-запроса к внутреннему API."""
+    """General HTTP request error to the internal API."""
 
 
 class ForbiddenError(InternalApiError):
-    """Forbidden"""
+    """Access to the requested resource is forbidden."""
 
 
 class BadGatewayError(InternalApiError):
-    """BadGatewayError"""
+    """Bad gateway error from upstream service."""
 
 
 class NotFoundError(InternalApiError):
-    """Сущность не найдена."""
+    """Requested entity was not found."""
 
 
 class ConflictError(InternalApiError):
-    """Конфликт данных."""
+    """Data conflict error."""
 
 
 class ValidationError(InternalApiError):
-    """Ошибка валидации на стороне API."""
+    """Validation error on the API side."""
 
 
 class TemporaryUnavailableError(InternalApiError):
-    """Временная недоступность API."""
+    """Temporary API unavailability error."""

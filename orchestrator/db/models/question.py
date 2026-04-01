@@ -11,12 +11,12 @@ class Question(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     question_text: Mapped[str] = mapped_column(
-        String(config.db_schema.max_question_text_len)
+        String(config.db_schema.question_text_max_len)
     )
     answer_text: Mapped[str] = mapped_column(
-        String(config.db_schema.max_answer_text_len)
+        String(config.db_schema.answer_text_max_len)
     )
     rating: Mapped[float] = mapped_column(Float, server_default=text("0.0"))
     embedding: Mapped[list[float]] = mapped_column(
-        Vector(config.db_schema.embedding_dim)
+        Vector(config.db_schema.question_embedding_dim)
     )

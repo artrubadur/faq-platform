@@ -30,16 +30,17 @@ poetry install
 ### 3. Configure environment
 
 ```bash
+cp env/bot.env.example env/bot.env
+cp env/orchestrator.env.example env/orchestrator.env
 cp .env.example .env
 ```
 
-Configure your embedding API request format in `config/requests.yml` and update
-`.env` with real values for:
+Configure your embedding API request template in `config/requests.yml` and
+update:
 
-- Telegram bot token
-- Database and Redis connection settings
-- Embedding provider credentials
-- Embedding vector dimension (`DB_SCHEMA__QUESTION_EMBEDDING_DIM`)
+- `env/bot.env` (`BOT__TOKEN`, Redis settings, orchestrator client URL/timeouts)
+- `env/orchestrator.env` (DB settings, search/schema settings,
+  embedding provider credentials `REQUESTS__*`, admin list `ADMIN__IDS`)
 
 ### 4. Start dependencies (if needed)
 
@@ -47,20 +48,28 @@ Configure your embedding API request format in `config/requests.yml` and update
 docker compose up -d db redis
 ```
 
-### 5. Run bot
+### 5. Run orchestrator
 
 ```bash
-poetry run python -m app.main
+poetry run python -m orchestrator
+```
+
+### 6. Run bot
+
+```bash
+poetry run python -m bot
 ```
 
 ## Quick Start (Docker Compose)
 
 ```bash
+cp env/bot.env.example env/bot.env
+cp env/orchestrator.env.example env/orchestrator.env
 cp .env.example .env
 docker compose up --build
 ```
 
-This starts `db`, `redis`, and `bot`.
+This starts `db`, `redis`, `orchestrator`, and `bot`.
 
 ## Command Reference
 
@@ -78,8 +87,8 @@ This starts `db`, `redis`, and `bot`.
 - `/unban <telegram_id>`
 - `/state ...` - inspect and mutate FSM state.
 
-Admin routes require `admin` role and are controlled by `BOT__ADMINS` + DB role
-sync at startup.
+Admin routes require `admin` role and are controlled by `ADMIN__IDS` + DB role
+sync at orchestrator startup.
 
 ## Documentation
 

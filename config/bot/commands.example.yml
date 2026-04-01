@@ -1,2 +1,4 @@
 commands:
   example: You can create your own simple commands!
+  credits: By @artrubadur
+  ping: Pong!

@@ -24,9 +24,9 @@ async def process_ask_handler(
 ):
     suggestion = await question_gateway.suggest_questions(
         question_text,
-        config.questions.max_similar_amount,
-        config.questions.max_popular_amount,
-        config.questions.max_amount,
+        config.question_limits.max_similar_amount,
+        config.question_limits.max_popular_amount,
+        config.question_limits.max_amount,
     )
 
     if not suggestion.is_confident:

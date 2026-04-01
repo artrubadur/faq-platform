@@ -20,8 +20,8 @@ async def cmd_handler(message: Message):
         suggestion = await question_gateway.suggest_questions(
             "",
             0,
-            config.questions.max_popular_amount,
-            config.questions.max_popular_amount,
+            config.question_limits.max_popular_amount,
+            config.question_limits.max_popular_amount,
         )
         questions = suggestion.questions
     except Exception:

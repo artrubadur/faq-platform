@@ -16,3 +16,5 @@ handlers:
 activation:
   - ["aiogram.event", "WARNING"]
   - ["aiogram.dispatcher", "INFO"]
+  - ["uvicorn.error", "INFO"]
+  - ["uvicorn.access", "WARNING"]

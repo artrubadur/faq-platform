@@ -52,8 +52,8 @@ def get_questions_service(
     return QuestionsService(
         repository,
         embedding_provider,
-        config.questions.similarest_threshold,
-        config.questions.similar_threshold,
+        config.search.best_match_threshold,
+        config.search.related_threshold,
     )
 
 

@@ -2,10 +2,10 @@ from bot.core.config import config
 from shared.http.client import InternalApiClient
 
 orchestrator_client = InternalApiClient(
-    base_url=config.orchestrator.base_url,
-    timeout=config.orchestrator.timeout,
-    retries=config.orchestrator.retries,
-    retry_delay=config.orchestrator.retry_delay,
+    base_url=config.orchestrator_client.base_url,
+    timeout=config.orchestrator_client.timeout,
+    retries=config.orchestrator_client.retries,
+    retry_delay=config.orchestrator_client.retry_delay,
 )
 
 

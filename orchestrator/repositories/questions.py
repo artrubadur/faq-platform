@@ -71,7 +71,7 @@ class QuestionsRepository:
         limit: int,
         max_distance: float = 1,
     ) -> list[Row[Tuple[Question, float]]]:
-        embedding_vec = cast(embedding, Vector(config.db_schema.embedding_dim))
+        embedding_vec = cast(embedding, Vector(config.db_schema.question_embedding_dim))
         distance = func.cosine_distance(Question.embedding, embedding_vec)
 
         result = await self.session.execute(

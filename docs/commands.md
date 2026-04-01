@@ -16,7 +16,7 @@ commands:
 - Key = command name (without `/`).
 - Value = response template.
 
-Reference example: [config/commands.example.yml](../config/commands.example.yml)
+Reference example: [config/bot/commands.example.yml](../config/bot/commands.example.yml)
 
 ## Reserved Command Names
 

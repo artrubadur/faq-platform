@@ -3,13 +3,11 @@ services:
     image: redis:7.4-alpine
     container_name: redis_server
     restart: always
-    ports:
-      - "6379:6379"
-    command: redis-server --requirepass ${REDIS__PASSWORD:-password} --appendonly yes
+    command: sh -c 'redis-server --requirepass "$$REDIS__PASSWORD" --appendonly yes'
     volumes:
       - redis_data:/data
     env_file:
-      - bot.env
+      - env/bot.env
 
   db:
     image: pgvector/pgvector:pg17
@@ -19,8 +17,6 @@ services:
       POSTGRES_DB: faq_bot_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -36,10 +32,11 @@ services:
     environment:
       DB__HOST: db
     env_file:
-      - orchestrator.env
+      - env/orchestrator.env
     volumes:
-      - ${PATHS__LOGGING:-./config/logging.yml}:/app/config/logging.yml:ro
-      - ${PATHS__REQUESTS:-./config/orchestrator/requests.yml}:/app/config/requests.yml:ro
+      - ${COMPOSE__LOGGING_PATH:-./config/logging.yml}:/app/config/logging.yml:ro
+      - ${COMPOSE__ORCHESTRATOR_REQUESTS_PATH:-./config/orchestrator/requests.yml}:/app/config/requests.yml:ro
+  
   bot:
     build:
       context: .
@@ -51,14 +48,14 @@ services:
       - redis
     environment:
       REDIS__HOST: redis
-      ORCHESTRATOR__BASE_URL: http://orchestrator:8000
+      ORCHESTRATOR_CLIENT__BASE_URL: http://orchestrator:8000
     env_file:
-      - bot.env
+      - env/bot.env
     volumes:
-      - ${PATHS__LOGGING:-./config/logging.yml}:/app/config/logging.yml:ro
-      - ${PATHS__CONSTANTS:-./config/bot/constants.yml}:/app/config/constants.yml:ro
-      - ${PATHS__MESSAGES:-./config/bot/messages.yml}:/app/config/messages.yml:ro
-      - ${PATHS__COMMANDS:-./config/bot/commands.yml}:/app/config/commands.yml:ro
+      - ${COMPOSE__LOGGING_PATH:-./config/logging.yml}:/app/config/logging.yml:ro
+      - ${COMPOSE__BOT_CONSTANTS_PATH:-./config/bot/constants.example.yml}:/app/config/constants.yml:ro
+      - ${COMPOSE__BOT_MESSAGES_PATH:-./config/bot/messages.example.yml}:/app/config/messages.yml:ro
+      - ${COMPOSE__BOT_COMMANDS_PATH:-./config/bot/commands.example.yml}:/app/config/commands.yml:ro
 
 volumes:
   postgres_data:
