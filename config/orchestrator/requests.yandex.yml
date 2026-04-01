@@ -6,5 +6,6 @@ embedding:
     Content-Type: "application/json"
   body:
     modelUri: "emb://{folder_id}/text-search-query/latest"
+    
   embedding_path: "embedding"
   text_path: "body.text"

@@ -9,7 +9,7 @@ services:
     volumes:
       - redis_data:/data
     env_file:
-      - .env
+      - bot.env
 
   db:
     image: pgvector/pgvector:pg17
@@ -24,6 +24,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    env_file:
+      - orchestrator.env
 
   bot:
     build:
@@ -39,6 +41,11 @@ services:
       REDIS__HOST: redis
     env_file:
       - bot.env
+    volumes:
+      - ${PATHS__LOGGING:-./config/logging.yml}:/bot/config/logging.yml:ro
+      - ${PATHS__CONSTANTS:-./config/bot/constants.yml}:/bot/config/constants.yml:ro
+      - ${PATHS__MESSAGES:-./config/bot/messages.yml}:/bot/config/messages.yml:ro
+      - ${PATHS__COMMANDS:-./config/bot/commands.yml}:/bot/config/commands.yml:ro
 
 volumes:
   postgres_data:

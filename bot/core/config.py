@@ -1,14 +1,5 @@
-from pathlib import Path
-
 from pydantic import BaseModel, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
-
-class PathConfig(BaseModel):
-    logging: Path = Path("./config/logging.yml")
-    constants: Path = Path("./config/bot/constants.yml")
-    messages: Path = Path("./config/bot/messages.yml")
-    commands: Path = Path("./config/bot/commands.yml")
 
 
 class BotConfig(BaseModel):
@@ -54,13 +45,12 @@ class OrchestratorConfig(BaseModel):
 
 class Config(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file="bot.env",
+        env_file=".env",
         env_file_encoding="utf-8",
         frozen=True,
         env_nested_delimiter="__",
     )
 
-    paths: PathConfig = Field(default_factory=PathConfig)
     bot: BotConfig
     redis: RedisConfig
     questions: QuestionsConfig = Field(default_factory=QuestionsConfig)

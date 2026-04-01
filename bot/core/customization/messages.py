@@ -1,16 +1,17 @@
+from pathlib import Path
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 from pydantic_settings import SettingsConfigDict
 
-from bot.core.config import config
 from bot.core.customization.constants import BOT_SYSTEM_KEYS, constants
 from bot.core.customization.formatter import SafeFormatter
-from bot.utils.config import YamlSettings
+from shared.utils.config import YamlSettings
+
+MESSAGES_PATH = Path("config/messages.yml")
+
 
 # Responses
-
-
 class PublicRsp(BaseModel):
     start: str = (
         "Hello, {first_name}! I will help you find the answer — just send a question"
@@ -363,7 +364,7 @@ class Format(BaseModel):
 
 
 class Messages(YamlSettings):
-    model_config = SettingsConfigDict(yaml_file=config.paths.messages, frozen=False)
+    model_config = SettingsConfigDict(yaml_file=MESSAGES_PATH, frozen=False)
 
     parse_mode: Literal["html", "markdown", None] = "html"
 
@@ -411,9 +412,9 @@ messages: Messages = Messages()
 
 
 status = "Failed to check the status of messages"
-if not config.paths.messages.exists():
-    status = f"No messages loaded: File {str(config.paths.messages)} does not exists."
+if not MESSAGES_PATH.exists() or not MESSAGES_PATH.is_file():
+    status = f"No messages loaded: File {str(MESSAGES_PATH)} does not exists."
 elif len(messages.model_fields_set) == 0:
-    status = f"No messages loaded: File {str(config.paths.messages)} is empty."
+    status = f"No messages loaded: File {str(MESSAGES_PATH)} is empty."
 else:
-    status = f"Messages has been loaded from {str(config.paths.messages)}"
+    status = f"Messages has been loaded from {str(MESSAGES_PATH)}"

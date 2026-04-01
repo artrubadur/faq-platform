@@ -8,9 +8,11 @@ from loguru import logger
 from bot.utils.format.log import serialize_json
 from shared.logging.filter import DuplicateFilter, make_duplicate_patch
 
+LOGGING_PATH = Path("config/logging.yml")
 
-def setup_logging(config_path: Path):
-    with open(config_path, "r") as f:
+
+def setup_logging():
+    with open(LOGGING_PATH, "r") as f:
         config = yaml.safe_load(f)
 
     logger.remove()
@@ -50,8 +52,8 @@ def setup_logging(config_path: Path):
                 level = record.levelno
 
             frame, depth = logging.currentframe(), 2
-            while frame.f_code.co_filename == logging.__file__:
-                frame = frame.f_back
+            while frame.f_code.co_filename == logging.__file__:  # type: ignore
+                frame = frame.f_back  # type: ignore
                 depth += 1
 
             logger.opt(depth=depth, exception=record.exc_info).patch(

@@ -17,7 +17,7 @@ from shared.logging.setup import setup_logging
 
 
 async def startup():
-    setup_logging(config.paths.logging)
+    setup_logging()
 
     logger.info(messages_status)
     logger.info(constants_status)

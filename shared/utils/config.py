@@ -30,7 +30,8 @@ class DeepConvertMixin(BaseModel):
     def deep_convert(self) -> "DeepConvertMixin":
         reserved = PYDANTIC_SYSTEM_KEYS.union(self.reserved, {"reserved"})
 
-        for key, value in self.__pydantic_extra__.items():
+        extra = self.__pydantic_extra__ or {}
+        for key, value in extra.items():
             if key in reserved:
                 raise ValueError(f"The key '{key}' is reserved by the system")
 

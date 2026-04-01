@@ -76,7 +76,8 @@ class InternalApiClient:
         params: dict | None = None,
         json_data: dict | None = None,
     ) -> dict:
-        last_error: Exception | None = None
+
+        last_error: Exception = InternalApiRequestError("You'll never see me")
 
         for attempt in range(self._retries + 1):
             try:
@@ -108,7 +109,6 @@ class InternalApiClient:
             if attempt < self._retries:
                 await asyncio.sleep(self._retry_delay)
 
-        assert last_error is not None
         raise last_error
 
     async def get(self, path: str, params: dict | None = None) -> dict:

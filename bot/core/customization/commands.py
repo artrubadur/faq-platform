@@ -1,12 +1,14 @@
+from pathlib import Path
+
 from pydantic import Field, field_validator
 from pydantic_settings import SettingsConfigDict
 
-from bot.core.config import config
 from bot.core.customization.constants import BOT_SYSTEM_KEYS, constants
 from bot.core.customization.formatter import SafeFormatter
-from bot.utils.config import YamlSettings
+from shared.utils.config import YamlSettings
 
 SYSTEM_COMMANDS = {"start", "ask", "goto", "state", "settings", "error"}
+COMMANDS_PATH = Path("config/commands.yml")
 
 
 class Commands(YamlSettings):
@@ -41,16 +43,16 @@ class Commands(YamlSettings):
 
         return commands
 
-    model_config = SettingsConfigDict(yaml_file=config.paths.commands, frozen=True)
+    model_config = SettingsConfigDict(yaml_file=COMMANDS_PATH, frozen=True)
 
 
 commands: Commands = Commands()
 
 
 status = "Failed to check the status of commands"
-if not config.paths.commands.exists():
-    status = f"No commands loaded: File {str(config.paths.commands)} does not exists."
+if not COMMANDS_PATH.exists() or not COMMANDS_PATH.is_file():
+    status = f"No commands loaded: File {str(COMMANDS_PATH)} does not exists."
 elif len(commands.model_fields_set) == 0:
-    status = f"No commands loaded: File {str(config.paths.commands)} is empty."
+    status = f"No commands loaded: File {str(COMMANDS_PATH)} is empty."
 else:
-    status = f"Commands has been loaded from {str(config.paths.commands)}"
+    status = f"Commands has been loaded from {str(COMMANDS_PATH)}"
