@@ -5,15 +5,15 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 from bot.core.customization import messages
 from bot.dialogs.actions import with_message_action
-from bot.services.api.schemas.question import QuestionDto
 from bot.utils.format.output import format_response
+from shared.contracts.question.responses import QuestionResponse
 
 
 @with_message_action
 async def send_similar(
     send: Callable[..., Awaitable[Message]],
     message: Message,
-    suggestions: list[QuestionDto],
+    suggestions: list[QuestionResponse],
 ) -> Message:
     builder = ReplyKeyboardBuilder()
     for question in suggestions[1:]:
@@ -34,7 +34,7 @@ async def send_failed(
     send: Callable[..., Awaitable[Message]],
     message: Message,
     exception: str,
-    suggestions: list[QuestionDto] = [],
+    suggestions: list[QuestionResponse] = [],
 ) -> Message:
     builder = ReplyKeyboardBuilder()
     for question in suggestions[1:]:

@@ -4,7 +4,6 @@ from loguru import logger
 
 from bot.core import commands_status, constants_status, messages_status
 from bot.core.config import config
-from bot.core.logging.setup import setup_logging
 from bot.dispatch.handlers import admin_router, common_router, public_router
 from bot.dispatch.instance import bot, dp, redis_client
 from bot.dispatch.middlewares import (
@@ -14,6 +13,7 @@ from bot.dispatch.middlewares import (
     LogHandlerMiddleware,
     RateLimitMiddleware,
 )
+from shared.logging.setup import setup_logging
 
 
 async def startup():

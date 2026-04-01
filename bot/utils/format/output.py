@@ -3,8 +3,8 @@ from enum import Enum
 from aiogram.types import Message
 
 from bot.core.customization import messages
-from bot.services.api.schemas.question import QuestionDto
-from bot.services.api.schemas.user import UserDto
+from shared.contracts.question.responses import QuestionResponse
+from shared.contracts.user.responses import Role, UserResponse
 
 
 def format_response(text: str, message: Message, **kwargs):
@@ -41,8 +41,8 @@ def format_user_link(id: int, username: str | None):
     )
 
 
-def format_user_role(role: str):
-    return messages.format.field.user_role.format(user_role=role)
+def format_user_role(role: Role):
+    return messages.format.field.user_role.format(user_role=role.value)
 
 
 def format_question_text(question_text: str):
@@ -57,7 +57,7 @@ def format_rating(rating: float | str):
     return messages.format.field.rating.format(rating=rating)
 
 
-def format_user(id: int, username: str | None = None, role: str | None = None) -> str:
+def format_user(id: int, username: str | None = None, role: Role | None = None) -> str:
     result = [
         messages.format.user.id.format(id=format_id(id)),
         messages.format.user.user_link.format(user_link=format_user_link(id, username)),
@@ -80,8 +80,8 @@ def format_edited_user(
     id: int,
     username: str | None,
     edited_username: str | None,
-    role: str,
-    edited_role: str,
+    role: Role,
+    edited_role: Role,
 ):
     is_username_changed = username != edited_username
     is_role_changed = role != edited_role
@@ -210,10 +210,10 @@ def format_edited_question(
     return "\n".join(result)
 
 
-def format_user_table(rows: list[UserDto], columns: list, idx_offset=0):
+def format_user_table(rows: list[UserResponse], columns: list[str], idx_offset=0):
     full_headers = [""] + columns
 
-    def extract_value(row, field):
+    def extract_value(row: UserResponse, field: str):
         val = getattr(row, field, "")
 
         if isinstance(val, Enum):
@@ -248,7 +248,7 @@ def format_user_table(rows: list[UserDto], columns: list, idx_offset=0):
     return "\n".join([header_line, separator] + rows_lines)
 
 
-def format_question_table(rows: list[QuestionDto], columns: list, idx_offset=0):
+def format_question_table(rows: list[QuestionResponse], columns: list, idx_offset=0):
     def extract_value(row, field):
         val = getattr(row, field, "")
 

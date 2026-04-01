@@ -5,15 +5,15 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 from bot.core.customization import messages
 from bot.dialogs.actions import with_message_action
-from bot.services.api.schemas.question import QuestionDto
 from bot.utils.format.output import format_response
+from shared.contracts.question.responses import QuestionResponse
 
 
 @with_message_action
 async def send_start(
     send: Callable[..., Awaitable[Message]],
     message: Message,
-    questions: list[QuestionDto] = [],
+    questions: list[QuestionResponse] = [],
 ) -> Message:
     if len(questions) == 0 or isinstance(questions, list) and len(questions) == 0:
         builder = ReplyKeyboardBuilder()

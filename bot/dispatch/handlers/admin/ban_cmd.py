@@ -11,10 +11,10 @@ from bot.dialogs.send.admin.misc import (
     send_unbanned,
 )
 from bot.dialogs.send.common import send_access_denied
-from bot.services.api.exceptions import ForbiddenError, NotFoundError
-from bot.services.api.schemas.user import Role
 from bot.services.user.gateway import user_gateway
 from bot.utils.state.data import update_data
+from shared.contracts.user.responses import Role
+from shared.http.exceptions import ForbiddenError, NotFoundError
 
 router = Router()
 

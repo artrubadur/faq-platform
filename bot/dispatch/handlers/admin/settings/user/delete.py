@@ -15,11 +15,11 @@ from bot.dialogs.send.admin.user import (
     send_successfully_deleted,
 )
 from bot.dialogs.send.common import send_access_denied, send_expired, send_invalid
-from bot.services.api.exceptions import ForbiddenError, NotFoundError
 from bot.services.user.gateway import user_gateway
 from bot.services.user.process import process_identity_msg
 from bot.utils.state.history import LastMessage, is_expired
 from bot.utils.state.temp import TempContext
+from shared.http.exceptions import ForbiddenError, NotFoundError
 
 router = Router()
 
@@ -146,7 +146,7 @@ async def user_delete_cb_confirm_handler(callback: CallbackQuery, state: TempCon
             SendAction.EDIT,
             input_id,
         )
-    except ForbiddenError as exc:
+    except ForbiddenError:
         await state.clear()
         return await send_access_denied(
             callback.message,  # pyright: ignore[reportArgumentType]

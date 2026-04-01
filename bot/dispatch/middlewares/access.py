@@ -2,10 +2,10 @@ from aiogram import BaseMiddleware
 from loguru import logger
 
 from bot.dispatch.handlers.common import banned_handler
-from bot.services.api.exceptions import NotFoundError
-from bot.services.api.schemas.user import Role
 from bot.services.user.gateway import user_gateway
 from bot.utils.state.temp import TempContext
+from shared.contracts.user.responses import Role
+from shared.http.exceptions import NotFoundError
 
 
 class AccessMiddleware(BaseMiddleware):

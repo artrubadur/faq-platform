@@ -6,10 +6,10 @@ from loguru import logger
 from bot.core.config import config
 from bot.dialogs.actions import SendAction
 from bot.dialogs.send.public.start import send_start
-from bot.services.api.exceptions import ConflictError
-from bot.services.api.schemas.user import Role
 from bot.services.question.gateway import question_gateway
 from bot.services.user.gateway import user_gateway
+from shared.contracts.user.responses import Role
+from shared.http.exceptions import ConflictError
 
 router = Router()
 

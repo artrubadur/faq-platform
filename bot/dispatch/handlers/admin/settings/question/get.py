@@ -12,11 +12,11 @@ from bot.dialogs.send.admin.question import (
     send_successfully_found,
 )
 from bot.dialogs.send.common import send_invalid
-from bot.services.api.exceptions import NotFoundError
 from bot.services.question.gateway import question_gateway
 from bot.services.question.process import process_id_msg
 from bot.utils.state.history import LastMessage
 from bot.utils.state.temp import TempContext
+from shared.http.exceptions import NotFoundError
 
 router = Router()
 

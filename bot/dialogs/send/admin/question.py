@@ -1,4 +1,3 @@
-from dataclasses import fields
 from typing import Awaitable, Callable
 
 from aiogram.types import InlineKeyboardMarkup, Message
@@ -8,7 +7,6 @@ import bot.dialogs.rows.common as brows
 import bot.dialogs.rows.question as qrows
 from bot.core.customization import messages
 from bot.dialogs.actions import with_message_action
-from bot.services.api.schemas.question import QuestionDto
 from bot.utils.format.output import (
     format_edited_question,
     format_exception,
@@ -16,6 +14,7 @@ from bot.utils.format.output import (
     format_question,
     format_question_table,
 )
+from shared.contracts.question.responses import QuestionResponse
 
 
 # Input
@@ -265,7 +264,7 @@ async def send_successfully_updated(
 @with_message_action
 async def send_pagination(
     send: Callable[..., Awaitable[Message]],
-    questions: list[QuestionDto],
+    questions: list[QuestionResponse],
     order: str,
     ascending: bool,
     page: int,
@@ -277,7 +276,7 @@ async def send_pagination(
     has_next = page != max_page
     index_offset = (page - 1) * page_size
 
-    columns = [f.name for f in fields(QuestionDto) if f.name != "answer_text"]
+    columns = [name for name in QuestionResponse.model_fields if name != "answer_text"]
 
     reply_markup = mu.make_listing_markup(
         columns, order, ascending, page_size, has_prev, has_next

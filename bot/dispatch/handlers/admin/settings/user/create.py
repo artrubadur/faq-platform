@@ -16,7 +16,6 @@ from bot.dialogs.send.admin.user import (
     send_successfully_created,
 )
 from bot.dialogs.send.common import send_expired, send_invalid
-from bot.services.api.exceptions import ConflictError
 from bot.services.user.gateway import user_gateway
 from bot.services.user.process import (
     process_identity_msg,
@@ -25,6 +24,8 @@ from bot.services.user.process import (
 )
 from bot.utils.state.history import LastMessage, is_expired
 from bot.utils.state.temp import TempContext
+from shared.contracts.user.responses import Role
+from shared.http.exceptions import ConflictError
 
 router = Router()
 
@@ -199,7 +200,7 @@ async def process_role_handler(
     message: Message,
     last_message: LastMessage,
     state: TempContext,
-    input_role: str,
+    input_role: Role,
     *,
     send_action: SendAction,
 ):
@@ -212,7 +213,7 @@ async def process_role_handler(
             PARENT_DIR,
         )
 
-    await state.update_data(input_role=input_role, in_operation=True)
+    await state.update_data(input_role=input_role.value, in_operation=True)
 
     input_id: int = data["input_id"]
     input_username: str | None = data["input_username"]
@@ -282,7 +283,7 @@ async def user_create_cb_confirm_handler(callback: CallbackQuery, state: TempCon
 
     input_id: int = data["input_id"]
     input_username: str | None = data["input_username"]
-    input_role: str = data["input_role"]
+    input_role: Role = data["input_role"]
 
     try:
         user = await user_gateway.create_user(input_id, input_username, input_role)

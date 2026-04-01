@@ -14,6 +14,7 @@ class InternalApiConnectionError(InternalApiError):
 class InternalApiTimeoutError(InternalApiError):
     """Таймаут внутреннего API."""
 
+
 class InternalApiRequestError(InternalApiError):
     """Общая ошибка HTTP-запроса к внутреннему API."""
 

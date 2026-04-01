@@ -1,5 +1,6 @@
-from dataclasses import dataclass
 from enum import StrEnum
+
+from pydantic import BaseModel
 
 
 class Role(StrEnum):
@@ -8,9 +9,12 @@ class Role(StrEnum):
     ADMIN = "admin"
 
 
-@dataclass(slots=True, frozen=True)
-class UserDto:
+class UserResponse(BaseModel):
     id: int
     telegram_id: int
     username: str | None
     role: Role
+
+
+class UsersAmountResponse(BaseModel):
+    amount: int

@@ -11,6 +11,7 @@ RUN poetry config virtualenvs.create false \
   && poetry install --no-cache --without=dev
 
 COPY --exclude=__pycache__ ./bot ./bot
-COPY ./config ./config
+COPY --exclude=__pycache__ ./shared ./shared
+COPY --exclude=api ./config ./config
 
 CMD ["python", "-m", "bot.main"]

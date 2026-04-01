@@ -5,7 +5,7 @@ from redis.asyncio import Redis
 
 from bot.dispatch.handlers.common import rate_limit_handler
 from bot.dispatch.middlewares.access import AccessMiddleware
-from bot.services.api.schemas.user import Role
+from shared.contracts.user.responses import Role
 
 
 class RateLimitMiddleware(AccessMiddleware):

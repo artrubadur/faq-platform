@@ -1,7 +1,7 @@
 import re
 
 from bot.core.customization import messages
-from bot.services.api.schemas.user import Role
+from shared.contracts.user.responses import Role
 
 
 def validate_id(id: str | int) -> int:
@@ -32,10 +32,13 @@ def validate_username(username: str | None) -> str | None:
     return res_val
 
 
-def validate_role(role: str) -> str:
-    res_val = role.lower()
+def validate_role(role: str) -> Role:
+    try:
+        role_enum = Role(role.lower())
+    except ValueError as exc:
+        raise ValueError(messages.validation.user.role_unexcepted) from exc
 
-    if res_val not in Role or res_val == Role.ADMIN:
+    if role_enum is Role.ADMIN:
         raise ValueError(messages.validation.user.role_unexcepted)
 
-    return res_val
+    return role_enum

@@ -25,7 +25,6 @@ from bot.dialogs.send.admin.user import (
     send_successfully_updated,
 )
 from bot.dialogs.send.common import send_access_denied, send_expired, send_invalid
-from bot.services.api.exceptions import ConflictError, ForbiddenError, NotFoundError
 from bot.services.user.gateway import user_gateway
 from bot.services.user.process import (
     process_identity_msg,
@@ -35,6 +34,8 @@ from bot.services.user.process import (
 from bot.utils.state.data import update_data
 from bot.utils.state.history import LastMessage, is_expired
 from bot.utils.state.temp import TempContext
+from shared.contracts.user.responses import Role
+from shared.http.exceptions import ConflictError, ForbiddenError, NotFoundError
 
 router = Router()
 
@@ -155,10 +156,10 @@ async def process_fields_handler(
 
     id: int = data["orig_id"]
     username: str | None = data["orig_username"]
-    role: str = data["orig_role"]
+    role: Role = data["orig_role"]
 
     edited_username: str | None = data.get("edited_username", username)
-    edited_role: str = data.get("edited_role", role)
+    edited_role: Role = data.get("edited_role", role)
 
     await send_changes(
         message,
@@ -341,10 +342,10 @@ async def user_update_cb_save_handler(
 
     id: int = data["orig_id"]
     username: str | None = data["orig_username"]
-    role: str = data["orig_role"]
+    role: Role = data["orig_role"]
 
     edited_username: str | None = data.get("edited_username", username)
-    edited_role: str = data.get("edited_role", role)
+    edited_role: Role = data.get("edited_role", role)
 
     try:
         user = await user_gateway.update_user(
@@ -366,7 +367,7 @@ async def user_update_cb_save_handler(
             id,
             username,
         )
-    except ForbiddenError as exc:
+    except ForbiddenError:
         await state.clear()
         return await send_access_denied(
             callback.message,  # pyright: ignore[reportArgumentType]

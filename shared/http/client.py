@@ -4,12 +4,11 @@ from typing import TypeVar
 import httpx
 
 from bot.core.config import config
-from bot.services.api.exceptions import (
+from shared.http.exceptions import (
     BadGatewayError,
     ConflictError,
     ForbiddenError,
     InternalApiConnectionError,
-    InternalApiError,
     InternalApiRequestError,
     InternalApiTimeoutError,
     NotFoundError,
@@ -36,19 +35,19 @@ def raise_api_error(exc: httpx.HTTPStatusError) -> None:
 
     # TODO: check usage
     if status == 403:
-        raise ForbiddenError(message)
+        raise ForbiddenError(message, data) from exc
     if status == 404:
-        raise NotFoundError(message) from exc
+        raise NotFoundError(message, data) from exc
     if status == 409:
         raise ConflictError(message, data) from exc
     if status == 422:
-        raise ValidationError(message) from exc
+        raise ValidationError(message, data) from exc
     if status == 501:
-        raise BadGatewayError(message) from exc
+        raise BadGatewayError(message, data) from exc
     if status in (502, 503, 504):
-        raise TemporaryUnavailableError(message)
+        raise TemporaryUnavailableError(message, data)
 
-    raise InternalApiRequestError(message) from exc
+    raise InternalApiRequestError(message, data) from exc
 
 
 class InternalApiClient:

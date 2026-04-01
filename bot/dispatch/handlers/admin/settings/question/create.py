@@ -14,7 +14,6 @@ from bot.dialogs.send.admin.question import (
     send_successfully_created,
 )
 from bot.dialogs.send.common import send_expired, send_invalid
-from bot.services.api.exceptions import ConflictError
 from bot.services.question.gateway import question_gateway
 from bot.services.question.process import (
     process_answer_text_msg,
@@ -22,6 +21,7 @@ from bot.services.question.process import (
 )
 from bot.utils.state.history import LastMessage, is_expired
 from bot.utils.state.temp import TempContext
+from shared.http.exceptions import ConflictError
 
 router = Router()
 

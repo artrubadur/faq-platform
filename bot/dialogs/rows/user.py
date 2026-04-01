@@ -4,7 +4,7 @@ from aiogram.types import InlineKeyboardButton
 import bot.dialogs.rows.common as rows
 from bot.core.customization import messages
 from bot.core.dirs import USERS
-from bot.services.api.schemas.user import Role
+from shared.contracts.user.responses import Role
 
 cancel_row = rows.cancel_row(USERS[1])
 
@@ -109,7 +109,7 @@ def username_rows(
 
 class RoleCallback(CallbackData, prefix="role"):
     dir: str
-    role: str
+    role: Role
 
 
 def role_rows(dir: str):

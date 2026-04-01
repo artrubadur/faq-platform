@@ -1,9 +1,7 @@
 from pathlib import Path
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
-
 
 
 class PathConfig(BaseModel):
@@ -26,7 +24,7 @@ class RedisConfig(BaseModel):
 
 class QuestionsConfig(BaseModel):
     max_question_text_len: int = Field(default=384, ge=1)
-    max_answer_text_len:int = Field(default=384, ge=1)
+    max_answer_text_len: int = Field(default=384, ge=1)
     max_similar_amount: int = Field(default=7, ge=0)
     max_popular_amount: int = Field(default=7, ge=0)
     max_amount: int = Field(default=7, ge=1)

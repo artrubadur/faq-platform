@@ -1,4 +1,3 @@
-from dataclasses import fields
 from typing import Awaitable, Callable
 
 from aiogram.types import InlineKeyboardMarkup, Message
@@ -8,7 +7,6 @@ import bot.dialogs.rows.common as brows
 import bot.dialogs.rows.user as urows
 from bot.core.customization import messages
 from bot.dialogs.actions import with_message_action
-from bot.services.api.schemas.user import UserDto
 from bot.utils.format.output import (
     format_edited_user,
     format_exception,
@@ -17,6 +15,7 @@ from bot.utils.format.output import (
     format_user_table,
     format_username,
 )
+from shared.contracts.user.responses import Role, UserResponse
 
 
 # Input
@@ -84,7 +83,7 @@ async def send_confirm_creation(
     send: Callable[..., Awaitable[Message]],
     id: int,
     username: str | None,
-    role: str,
+    role: Role,
 ) -> Message:
     return await send(
         text=messages.responses.admin.user.creation.confirm.format(
@@ -100,7 +99,7 @@ async def send_successfully_created(
     send: Callable[..., Awaitable[Message]],
     id: int,
     username: str | None,
-    role: str,
+    role: Role,
 ) -> Message:
     return await send(
         text=messages.responses.admin.user.creation.successful.format(
@@ -132,7 +131,7 @@ async def send_successfully_found(
     send: Callable[..., Awaitable[Message]],
     id: int,
     username: str | None,
-    role: str,
+    role: Role,
 ) -> Message:
     return await send(
         text=messages.responses.admin.user.finding.successful.format(
@@ -148,7 +147,7 @@ async def send_partially_found(
     send: Callable[..., Awaitable[Message]],
     id: int,
     username: str | None = None,
-    role: str | None = None,
+    role: Role | None = None,
 ) -> Message:
     return await send(
         text=messages.responses.admin.user.finding.partially_found.format(
@@ -181,7 +180,7 @@ async def send_confirm_deletion(
     send: Callable[..., Awaitable[Message]],
     id: int,
     username: str | None,
-    role: str,
+    role: Role,
 ) -> Message:
     return await send(
         text=messages.responses.admin.user.deletion.confirm.format(
@@ -197,7 +196,7 @@ async def send_successfully_deleted(
     send: Callable[..., Awaitable[Message]],
     id: int,
     username: str | None,
-    role: str,
+    role: Role,
 ) -> Message:
     return await send(
         text=messages.responses.admin.user.deletion.successful.format(
@@ -214,7 +213,7 @@ async def send_confirm_update(
     send: Callable[..., Awaitable[Message]],
     id: int,
     username: str | None,
-    role: str,
+    role: Role,
 ) -> Message:
     return await send(
         text=messages.responses.admin.user.update.confirm.format(
@@ -231,8 +230,8 @@ async def send_changes(
     id: int,
     username: str | None,
     edited_username: str | None,
-    role: str,
-    edited_role: str,
+    role: Role,
+    edited_role: Role,
 ) -> Message:
     changes_text = format_edited_user(id, username, edited_username, role, edited_role)
     return await send(
@@ -249,7 +248,7 @@ async def send_successfully_updated(
     send: Callable[..., Awaitable[Message]],
     id: int,
     username: str | None,
-    role: str,
+    role: Role,
 ) -> Message:
     return await send(
         text=messages.responses.admin.user.update.successful.format(
@@ -263,7 +262,7 @@ async def send_successfully_updated(
 @with_message_action
 async def send_pagination(
     send: Callable[..., Awaitable[Message]],
-    users: list[UserDto],
+    users: list[UserResponse],
     order: str,
     ascending: bool,
     page: int,
@@ -275,7 +274,7 @@ async def send_pagination(
     has_next = page != max_page
     index_offset = (page - 1) * page_size
 
-    columns = [f.name for f in fields(UserDto)]
+    columns = list(UserResponse.model_fields)
 
     reply_markup = mu.make_listing_markup(
         columns, order, ascending, page_size, has_prev, has_next
