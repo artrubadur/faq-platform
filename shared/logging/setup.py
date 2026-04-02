@@ -11,7 +11,31 @@ from shared.utils.log import serialize_json
 LOGGING_PATH = Path("config/logging.yml")
 
 
+class InterceptHandler(logging.Handler):
+    def emit(self, record):
+        try:
+            level = logger.level(record.levelname).name
+        except ValueError:
+            level = record.levelno
+
+        frame, depth = logging.currentframe(), 2
+        while frame.f_code.co_filename == logging.__file__:  # type: ignore
+            frame = frame.f_back  # type: ignore
+            depth += 1
+
+        logger.opt(depth=depth, exception=record.exc_info).patch(
+            lambda r: r.update(name=record.name)
+        ).log(level, record.getMessage())
+
+
 def setup_logging():
+    config = {}
+
+    logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
+
+    if not LOGGING_PATH.exists() or not LOGGING_PATH.is_file():
+        return f"No logging configuration loaded: File {str(LOGGING_PATH)} does not exist. Falling back to the default."
+
     with open(LOGGING_PATH, "r") as f:
         config = yaml.safe_load(f)
 
@@ -44,20 +68,4 @@ def setup_logging():
 
         logger.add(**h, backtrace=True, diagnose=False)
 
-    class InterceptHandler(logging.Handler):
-        def emit(self, record):
-            try:
-                level = logger.level(record.levelname).name
-            except ValueError:
-                level = record.levelno
-
-            frame, depth = logging.currentframe(), 2
-            while frame.f_code.co_filename == logging.__file__:  # type: ignore
-                frame = frame.f_back  # type: ignore
-                depth += 1
-
-            logger.opt(depth=depth, exception=record.exc_info).patch(
-                lambda r: r.update(name=record.name)
-            ).log(level, record.getMessage())
-
-    logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
+    return f"Logging configuration has been loaded from {str(LOGGING_PATH)}"

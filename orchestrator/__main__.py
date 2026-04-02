@@ -1,11 +1,13 @@
 import uvicorn
+from loguru import logger
 
 from orchestrator.core.config import config
 from shared.logging.setup import setup_logging
 
 
 def main() -> None:
-    setup_logging()
+    logging_status = setup_logging()
+    logger.info(logging_status)
     uvicorn.run(
         "orchestrator.main:app",
         host=config.api.host,

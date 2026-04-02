@@ -1,11 +1,14 @@
 import asyncio
 
+from loguru import logger
+
 from bot.main import startup
 from shared.logging.setup import setup_logging
 
 
 def main() -> None:
-    setup_logging()
+    logging_status = setup_logging()
+    logger.info(logging_status)
     try:
         asyncio.run(startup())
     except KeyboardInterrupt:
