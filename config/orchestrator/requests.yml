@@ -1,12 +1,14 @@
 embedding:
   method: "POST"
-  path: "https://llm.api.cloud.yandex.net/foundationModels/v1/textEmbedding"
+  url: "https://llm.api.cloud.yandex.net/foundationModels/v1/textEmbedding"
 
   headers:
     Authorization: "Bearer {iam_token}"
     Content-Type: "application/json"
+
   body:
     modelUri: "emb://{folder_id}/text-search-query/latest"
     
-  embedding_path: "embedding"
-  text_path: "body.text"
+  path:
+    text: ["text"]
+    embedding: ["embedding"]

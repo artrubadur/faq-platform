@@ -14,7 +14,7 @@ class RequestTemplate(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     method: str = "POST"
-    path: str
+    url: str
     headers: dict = Field(default_factory=dict)
     body: dict = Field(default_factory=dict)
 
@@ -58,40 +58,16 @@ class RequestTemplate(BaseModel):
         object.__setattr__(self, "body", body)
 
 
+class EmbeddingRequestPaths(BaseModel):
+    embedding: list[str | int]
+    text: list[str | int]
+
 class EmbeddingRequestTemplate(RequestTemplate):
-    embedding_path: str
-    text_path: str
-    _embedding_path_tokens: tuple[str, ...] = PrivateAttr(default_factory=tuple)
-    _text_path_tokens: tuple[str, ...] = PrivateAttr(default_factory=tuple)
-
-    def model_post_init(self, __context) -> None:
-        super().model_post_init(__context)
-        object.__setattr__(
-            self, "_embedding_path_tokens", self._compile_path(self.embedding_path)
-        )
-        object.__setattr__(
-            self, "_text_path_tokens", self._compile_path(self.text_path)
-        )
-
-    def _compile_path(self, path: str) -> tuple[str, ...]:
-        tokens = []
-        for part in path.split("."):
-            part = part.strip()
-            if not part:
-                raise ValueError(f"Path '{path}' contains an empty part")
-            tokens.append(part)
-
-        if tokens and tokens[0] == "body":
-            tokens = tokens[1:]
-
-        if len(tokens) == 0:
-            raise ValueError("Path '{path} path is empty")
-
-        return tuple(tokens)
+    path: EmbeddingRequestPaths
 
     def build(self, text: str) -> dict:
         body = dict(self.body)
-        tokens = self._text_path_tokens
+        tokens = self.path.text
 
         current = body
         for token in tokens[:-1]:
@@ -102,12 +78,12 @@ class EmbeddingRequestTemplate(RequestTemplate):
 
     def extract(self, data) -> Any:
         current = data
-        for token in self._embedding_path_tokens:
+        for token in self.path.embedding:
             try:
                 current = current[token]
             except (KeyError, IndexError, TypeError) as exc:
                 raise ValueError(
-                    f"Failed to extract embedding_path '{self.embedding_path}' at token '{token}'"
+                    f"Failed to extract embedding by '{self.path.embedding}' at token '{token}'"
                 ) from exc
         return current
 

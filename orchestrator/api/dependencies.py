@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from orchestrator.core.config import config
 from orchestrator.db.session import async_session
-from orchestrator.integrations.embedding.provider import embedding_provider
+from orchestrator.integrations.embedding import embedding_provider
 from orchestrator.repositories.questions import QuestionsRepository
 from orchestrator.repositories.users import UsersRepository
 from orchestrator.services.question import QuestionsService

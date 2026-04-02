@@ -21,7 +21,7 @@ class EmbeddingProvider:
     async def _send_request(self, body: dict) -> dict | list:
         return await self.client.request(
             self.template.method,
-            self.template.path,
+            self.template.url,
             headers=self.template.headers,
             json_data=body,
         )

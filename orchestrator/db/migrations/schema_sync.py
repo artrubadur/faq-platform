@@ -5,7 +5,7 @@ from sqlalchemy.orm import InstrumentedAttribute
 
 from orchestrator.db.models import Question
 from orchestrator.db.session import engine
-from orchestrator.integrations.embedding.provider import embedding_provider
+from orchestrator.integrations.embedding import embedding_provider
 
 
 async def _find_rows_exceeding_length(
