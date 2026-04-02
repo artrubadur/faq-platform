@@ -15,7 +15,7 @@ async def send_start(
     message: Message,
     questions: list[QuestionResponse] = [],
 ) -> Message:
-    if len(questions) == 0 or isinstance(questions, list) and len(questions) == 0:
+    if questions:
         builder = ReplyKeyboardBuilder()
         for question in questions:
             builder.button(text=question.question_text)

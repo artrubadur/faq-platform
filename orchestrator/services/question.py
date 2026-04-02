@@ -144,6 +144,13 @@ class QuestionsService:
         exclude_ids = [q.id for q in (exclude_questions or [])]
         return await self.repository.get_most_popular(amount, exclude_ids)
 
+    async def get_popular_questions(
+        self,
+        amount: int,
+    ) -> list[QuestionResponse]:
+        questions = await self._get_most_popular_questions(amount)
+        return [self._to_response(question) for question in questions]
+
     async def suggest_questions(
         self,
         request: SuggestQuestionsRequest,

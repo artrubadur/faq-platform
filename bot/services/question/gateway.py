@@ -85,6 +85,16 @@ class QuestionGateway:
         )
         return [QuestionResponse.model_validate(item) for item in data]
 
+    async def get_popular_questions(
+        self,
+        amount: int,
+    ) -> list[QuestionResponse]:
+        data = await self.client.get(
+            "/questions/popular",
+            params={"amount": amount},
+        )
+        return [QuestionResponse.model_validate(item) for item in data]
+
     async def delete_question(self, question_id: int) -> QuestionResponse:
         data = await self.client.delete(f"/questions/{question_id}")
         return QuestionResponse.model_validate(data)

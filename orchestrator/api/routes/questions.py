@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
 from orchestrator.api.dependencies import QuestionsServiceDep
 from shared.contracts.question.requests import (
@@ -45,6 +45,14 @@ async def get_paginated_questions(
     service: QuestionsServiceDep,
 ) -> list[QuestionResponse]:
     return await service.get_paginated_questions(request)
+
+
+@router.get("/popular", response_model=list[QuestionResponse])
+async def get_popular_questions(
+    amount: Annotated[int, Query(ge=0)],
+    service: QuestionsServiceDep,
+) -> list[QuestionResponse]:
+    return await service.get_popular_questions(amount)
 
 
 @router.get("/{question_id}", response_model=QuestionResponse)

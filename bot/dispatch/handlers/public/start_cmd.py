@@ -17,13 +17,9 @@ router = Router()
 @router.message(CommandStart())
 async def cmd_handler(message: Message):
     try:
-        suggestion = await question_gateway.suggest_questions(
-            "",
-            0,
-            config.question_limits.max_popular_amount,
+        questions = await question_gateway.get_popular_questions(
             config.question_limits.max_popular_amount,
         )
-        questions = suggestion.questions
     except Exception:
         logger.exception("Failed to fetch popular questions")
         questions = []
