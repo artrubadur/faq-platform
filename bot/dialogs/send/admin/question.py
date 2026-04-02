@@ -124,6 +124,20 @@ async def send_found_similar(
     )
 
 
+@with_message_action
+async def send_embedding_failed(
+    send: Callable[..., Awaitable[Message]],
+    cancel_dir: str,
+) -> Message:
+    reply_markup = InlineKeyboardMarkup(inline_keyboard=brows.cancel_row(cancel_dir))
+
+    return await send(
+        text=messages.exceptions.question.embedding_failed,
+        parse_mode=messages.parse_mode,
+        reply_markup=reply_markup,
+    )
+
+
 # Finding
 @with_message_action
 async def send_successfully_found(

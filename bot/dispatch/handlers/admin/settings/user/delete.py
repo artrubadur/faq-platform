@@ -3,7 +3,6 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
 from loguru import logger
 
-from bot.core.customization import messages
 from bot.core.dirs import USERS_DELETE
 from bot.dialogs import SendAction
 from bot.dialogs.rows.common import ConfirmCallback
@@ -146,13 +145,13 @@ async def user_delete_cb_confirm_handler(callback: CallbackQuery, state: TempCon
             SendAction.EDIT,
             input_id,
         )
-    except ForbiddenError:
+    except ForbiddenError as exc:
         await state.clear()
         return await send_access_denied(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.EDIT,
             PARENT_DIR,
-            messages.responses.admin.user.deletion.access_denied,
+            str(exc),
         )
 
     await state.clear()

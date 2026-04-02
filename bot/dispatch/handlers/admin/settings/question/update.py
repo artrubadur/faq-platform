@@ -17,6 +17,7 @@ from bot.dialogs.send.admin.question import (
     send_changes,
     send_confirm_recompute,
     send_confirm_update,
+    send_embedding_failed,
     send_enter_answer_text,
     send_enter_id,
     send_enter_question_text,
@@ -34,7 +35,7 @@ from bot.services.question.process import (
 )
 from bot.utils.state.history import LastMessage, is_expired
 from bot.utils.state.temp import TempContext
-from shared.http.exceptions import NotFoundError
+from shared.http.exceptions import BadGatewayError, NotFoundError
 
 router = Router()
 
@@ -391,6 +392,13 @@ async def question_update_cb_save_handler(callback: CallbackQuery, state: TempCo
             id,
         )
         return
+    except BadGatewayError:
+        await state.clear()
+        return await send_embedding_failed(
+            callback.message,  # pyright: ignore[reportArgumentType]
+            SendAction.ANSWER,
+            PARENT_DIR,
+        )
 
     await state.clear()
 

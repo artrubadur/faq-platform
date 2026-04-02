@@ -3,7 +3,6 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
 from loguru import logger
 
-from bot.core.customization import messages
 from bot.core.dirs import USERS_UPDATE
 from bot.dialogs import SendAction
 from bot.dialogs.rows.common import (
@@ -371,13 +370,13 @@ async def user_update_cb_save_handler(
             id,
             username,
         )
-    except ForbiddenError:
+    except ForbiddenError as exc:
         await state.clear()
         return await send_access_denied(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.EDIT,
             PARENT_DIR,
-            messages.responses.admin.user.update.access_denied,
+            str(exc),
         )
 
     if role != edited_role:

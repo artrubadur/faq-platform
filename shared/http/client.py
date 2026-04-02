@@ -32,7 +32,6 @@ def raise_api_error(exc: httpx.HTTPStatusError) -> None:
     message, data = extract_payload(exc.response)
     status = exc.response.status_code
 
-    # TODO: check usage
     if status == 403:
         raise ForbiddenError(message, data) from exc
     if status == 404:
@@ -41,7 +40,7 @@ def raise_api_error(exc: httpx.HTTPStatusError) -> None:
         raise ConflictError(message, data) from exc
     if status == 422:
         raise ValidationError(message, data) from exc
-    if status == 501:
+    if status == 502:
         raise BadGatewayError(message, data) from exc
     if status in (502, 503, 504):
         raise TemporaryUnavailableError(message, data)

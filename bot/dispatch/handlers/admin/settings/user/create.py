@@ -3,7 +3,6 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
 from loguru import logger
 
-from bot.core.customization import messages
 from bot.core.dirs import USERS_CREATE
 from bot.dialogs import SendAction
 from bot.dialogs.rows.common import ConfirmCallback
@@ -16,7 +15,7 @@ from bot.dialogs.send.admin.user import (
     send_select_role,
     send_successfully_created,
 )
-from bot.dialogs.send.common import send_expired, send_invalid
+from bot.dialogs.send.common import send_access_denied, send_expired, send_invalid
 from bot.services.user.gateway import user_gateway
 from bot.services.user.process import (
     process_identity_msg,
@@ -296,13 +295,13 @@ async def user_create_cb_confirm_handler(callback: CallbackQuery, state: TempCon
             input_id,
             input_username,
         )
-    except ForbiddenError:
+    except ForbiddenError as exc:
         await state.clear()
-        return await send_invalid(
+        return await send_access_denied(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.ANSWER,
             PARENT_DIR,
-            messages.responses.admin.user.creation.access_denied,
+            str(exc),
         )
 
     await state.clear()

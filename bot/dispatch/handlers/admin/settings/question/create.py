@@ -8,6 +8,7 @@ from bot.dialogs.actions import SendAction
 from bot.dialogs.rows.common import ConfirmCallback
 from bot.dialogs.send.admin.question import (
     send_confirm_creation,
+    send_embedding_failed,
     send_enter_answer_text,
     send_enter_question_text,
     send_found_similar,
@@ -21,7 +22,7 @@ from bot.services.question.process import (
 )
 from bot.utils.state.history import LastMessage, is_expired
 from bot.utils.state.temp import TempContext
-from shared.http.exceptions import ConflictError
+from shared.http.exceptions import BadGatewayError, ConflictError
 
 router = Router()
 
@@ -141,6 +142,12 @@ async def question_create_cb_create_confirm_handler(
             exc.data["id"],
             exc.data["question_text"],
         )
+    except BadGatewayError:
+        return await send_embedding_failed(
+            callback.message,  # pyright: ignore[reportArgumentType]
+            SendAction.ANSWER,
+            PARENT_DIR,
+        )
 
     logger.debug("Question created", id=question.id)
     await send_successfully_created(
@@ -171,9 +178,17 @@ async def question_create_cb_similar_confirm_handler(
     input_question_text: str = data["input_question_text"]
     input_answer_text: str = data["input_answer_text"]
 
-    question = await question_gateway.create_question(
-        input_question_text, input_answer_text, False
-    )
+    try:
+        question = await question_gateway.create_question(
+            input_question_text, input_answer_text, False
+        )
+    except BadGatewayError:
+        await state.clear()
+        return await send_embedding_failed(
+            callback.message,  # pyright: ignore[reportArgumentType]
+            SendAction.ANSWER,
+            PARENT_DIR,
+        )
 
     await state.clear()
 

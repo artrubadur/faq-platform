@@ -1,3 +1,4 @@
+from loguru import logger
 from sqlalchemy.exc import NoResultFound
 
 from orchestrator.core.config import config
@@ -38,6 +39,7 @@ class QuestionsService:
         try:
             return await self.embedding_provider.compute_embedding(text)
         except Exception as exc:
+            logger.exception("Failed to compute the question embedding")
             raise BadGatewayError("Failed to compute the question embedding") from exc
 
     async def _get_existing_question(self, id: int) -> Question:
@@ -47,9 +49,7 @@ class QuestionsService:
             raise NotFoundError(f"Question {id} not found") from exc
 
     async def create_question(self, request: CreateQuestionRequest) -> QuestionResponse:
-        embedding = await self.embedding_provider.compute_embedding(
-            request.question_text
-        )
+        embedding = await self._compute_embedding(request.question_text)
 
         if request.check_similarity:
             rows = await self.repository.get_similar(
@@ -102,7 +102,7 @@ class QuestionsService:
         question_text: str,
         amount: int,
     ) -> tuple[list[Question], list[float]]:
-        embedding = await self.embedding_provider.compute_embedding(question_text)
+        embedding = await self._compute_embedding(question_text)
         rows = await self.repository.get_similar(
             embedding=embedding,
             limit=amount,
@@ -142,8 +142,7 @@ class QuestionsService:
         exclude_questions: list[Question] | None = None,
     ) -> list[Question]:
         exclude_ids = [q.id for q in (exclude_questions or [])]
-        questions = await self.repository.get_most_popular(amount, exclude_ids)
-        return list(questions)
+        return await self.repository.get_most_popular(amount, exclude_ids)
 
     async def suggest_questions(
         self,
@@ -187,9 +186,7 @@ class QuestionsService:
 
         if request.recompute_embedding:
             question_text = request.question_text or existing.question_text
-            update_fields["embedding"] = (
-                await self.embedding_provider.compute_embedding(question_text)
-            )
+            update_fields["embedding"] = await self._compute_embedding(question_text)
 
         if not update_fields:
             return self._to_response(existing)
