@@ -159,13 +159,17 @@ class QuestionsService:
             request.question_text,
             request.max_similar_amount + 1,
         )
+        similar = similar[: request.max_amount]
 
         popular_amount = max(
             0,
             min(request.max_amount - len(similar), request.max_popular_amount),
         )
-        popular = await self._get_most_popular_questions(popular_amount, similar)
-        suggestions = (similar + popular)[: request.max_amount]
+        popular = []
+        if popular_amount > 0:
+            popular = await self._get_most_popular_questions(popular_amount, similar)
+        suggestions = similar + popular
+        
         is_confident = (
             len(similarities) != 0
             and similarities[0] >= config.search.best_match_threshold
