@@ -10,7 +10,7 @@
 - `orchestrator/api`: REST routes, dependency injection, error handlers.
 - `orchestrator/repositories`: SQLAlchemy-based DB access layer.
 - `orchestrator/db`: models, async session/engine, schema reconciliation.
-- `orchestrator/integrations`: external embedding provider client/templates.
+- `orchestrator/integrations`: external embedding/rerank provider clients and templates.
 
 ## Request Flows
 
@@ -19,22 +19,27 @@
 1. User sends `/ask <text>` or plain text.
 2. Input is validated and normalized.
 3. Embedding is computed via configured request template.
-4. DB similarity search (`pgvector` cosine distance).
-5. The top match may receive a rating increase based on confidence and the gap
-   from the second match.
-6. If confidence is high, best answer is returned.
-7. If confidence is low, fallback text + suggestions are returned.
+4. DB similarity search (`pgvector` cosine distance) fetches
+   `max_similar_amount + 1` candidates.
+5. Similar candidates may be reranked by an external LLM (`SUGGESTION__RERANK`).
+6. Confidence is computed from top similarity threshold plus margin from second
+   candidate (`SEARCH__BEST_MATCH_THRESHOLD` + `SEARCH__BEST_MATCH_MARGIN`).
+7. On confident match, the top question receives a rating increase.
+8. On non-confident match, the extra probe candidate is dropped and suggestions
+   are supplemented with popular questions.
+9. If no similar questions are found, only popular questions are returned.
 
 Rating update details:
 
 - Rating is updated only when at least one similar question is found and the top
-  similarity reaches `SEARCH__BEST_MATCH_THRESHOLD`.
+  candidate is considered confident.
+- A confident match must satisfy both:
+  - top similarity >= `SEARCH__BEST_MATCH_THRESHOLD`
+  - `(top_similarity - second_similarity) >= SEARCH__BEST_MATCH_MARGIN`
 - If the threshold is exactly `1`, the top question receives `+1.0`.
-- Otherwise, the gain is based on two factors:
-  - normalized confidence above the threshold
-  - similarity gap between the first and second match
-- The final gain is `norm^2 * gap`, clamped to `[0, 1]`, and applied only to
-  the best match.
+- Otherwise, gain is based on normalized confidence above threshold.
+- The final gain is `norm^2` and is applied only to the best match, where
+  `norm = (top_similarity - SEARCH__BEST_MATCH_THRESHOLD) / (1 - SEARCH__BEST_MATCH_THRESHOLD)`.
 
 ### Admin Flow
 
@@ -94,7 +99,7 @@ YAML-driven runtime customization:
 - `messages.yml` -> response texts and format templates
 - `constants.yml` -> startup-resolved constants
 - `commands.yml` -> dynamic public commands
-- `requests.yml` -> embedding API request templates
+- `requests.yml` -> embedding and rerank API request templates
 
 ## Schema Synchronization
 

@@ -16,7 +16,7 @@ class EmbeddingProvider:
         body = self.template.build(text)
         response_data = await self._send_request(body)
         embedding = self.template.extract(response_data)
-        return [float(value) for value in embedding]
+        return embedding
 
     async def _send_request(self, body: dict) -> dict | list:
         return await self.client.request(

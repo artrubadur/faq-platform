@@ -10,7 +10,7 @@ environments.
 - PostgreSQL (with `pgvector` extension)
 - Redis
 - Telegram bot token
-- Embedding API credentials
+- Embedding/rerank API credentials
 
 ## Local Setup
 
@@ -32,11 +32,21 @@ Set required values:
 - `env/bot.env`: `BOT__TOKEN`, Redis settings, orchestrator client settings
 - `env/orchestrator.env`: DB settings, `REQUESTS__*`, and `ADMIN__IDS`
 
-### 3. Verify runtime YAML configs
+### 3. Prepare runtime YAML configs
 
-Default runtime files are already provided:
+Create orchestrator request config at runtime path:
 
-- `config/logging.yml`
+```bash
+cp config/orchestrator/requests.yml config/requests.yml
+```
+
+Runtime files:
+
+- `config/logging.yml` (already present)
+- `config/requests.yml` (required by orchestrator)
+
+Reference template:
+
 - `config/orchestrator/requests.yml`
 
 ### 4. Start infra
@@ -139,7 +149,12 @@ Database:
 Search thresholds:
 
 - `SEARCH__BEST_MATCH_THRESHOLD` (default `0.7`)
+- `SEARCH__BEST_MATCH_MARGIN` (default `0.1`)
 - `SEARCH__RELATED_THRESHOLD` (default `0.4`)
+
+Suggestion behavior:
+
+- `SUGGESTION__RERANK` (default `true`, enables/disables external reranking)
 
 Embedding provider HTTP client:
 
@@ -147,10 +162,16 @@ Embedding provider HTTP client:
 - `EMBEDDING_HTTP__RETRIES` (default `2`)
 - `EMBEDDING_HTTP__RETRY_DELAY` (default `0.5`)
 
-Embedding request variables:
+Rerank provider HTTP client:
 
-- `REQUESTS__FOLDER_ID` (required by the Yandex template)
-- `REQUESTS__IAM_TOKEN` (required by the Yandex template)
+- `RERANK_HTTP__TIMEOUT` (default `5`)
+- `RERANK_HTTP__RETRIES` (default `2`)
+- `RERANK_HTTP__RETRY_DELAY` (default `0.5`)
+
+Request template variables:
+
+- `REQUESTS__FOLDER_ID` (required by Yandex embedding/rerank templates)
+- `REQUESTS__IAM_TOKEN` (required by Yandex embedding/rerank templates)
 
 Schema constraints:
 
@@ -185,13 +206,17 @@ variables from `.env`.
 
 ### `config/requests.yml` (required)
 
-Defines how embeddings are requested and parsed:
+Defines how embedding and rerank requests are built/parsed:
 
 - HTTP method/url/headers/body template
-- `text_path`: where question text is injected
-- `embedding_path`: where embedding vector is read from response
+- `path.target`: where payload text is injected into request body
+- `path.source`: where response value is extracted from response payload
 
-The app requires the `embedding` template section.
+Sections:
+
+- `embedding` is required.
+- `rerank` is optional when `SUGGESTION__RERANK=false`.
+- `rerank` is required when `SUGGESTION__RERANK=true`.
 
 Reference with Yandex Cloud API template: `config/orchestrator/requests.yml`.
 
@@ -249,8 +274,8 @@ At bot boot (`bot/main.py`):
 
 ## Troubleshooting
 
-- Startup error about missing embedding settings:
-  check `REQUESTS__*` env values and `config/requests.yml`.
+- Startup error about missing request templates/settings:
+  check `REQUESTS__*` env values, `SUGGESTION__RERANK`, and `config/requests.yml`.
 - `vector` type errors:
   ensure `init.sql` ran and extension exists in PostgreSQL.
 - Admin commands not available:

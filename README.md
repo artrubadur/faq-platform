@@ -6,6 +6,7 @@ admin UI for managing users and questions.
 ## Features
 
 - Semantic question search using external embeddings.
+- Optional LLM-based reranking for similar-question suggestions.
 - PostgreSQL + pgvector storage for questions and embeddings.
 - Redis-backed temporary state with separate short and long TTL scopes.
 - Admin workflows for question/user CRUD, pagination, bans, and diagnostics.
@@ -33,14 +34,18 @@ poetry install
 cp env/bot.env.example env/bot.env
 cp env/orchestrator.env.example env/orchestrator.env
 cp .env.example .env
+cp config/orchestrator/requests.yml config/requests.yml
 ```
 
-Configure your embedding API request template in `config/requests.yml` and
-update:
+`config/orchestrator/requests.yml` is a reference template. Runtime path is
+`config/requests.yml`.
+
+Configure request templates and update:
 
 - `env/bot.env` (`BOT__TOKEN`, Redis settings, orchestrator client URL/timeouts)
 - `env/orchestrator.env` (DB settings, search/schema settings,
-  embedding provider credentials `REQUESTS__*`, admin list `ADMIN__IDS`)
+  embedding/rerank provider credentials `REQUESTS__*`, suggestion settings,
+  admin list `ADMIN__IDS`)
 
 ### 4. Start dependencies (if needed)
 

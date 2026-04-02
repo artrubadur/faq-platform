@@ -10,5 +10,50 @@ embedding:
     modelUri: "emb://{folder_id}/text-search-query/latest"
     
   path:
-    text: ["text"]
-    embedding: ["embedding"]
+    target: ["text"]
+    source: ["embedding"]
+
+rerank:
+  method: "POST"
+  url: "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
+
+  headers:
+    Authorization: "Bearer {iam_token}"
+    Content-Type: "application/json"
+
+  body:
+    modelUri: "gpt://{folder_id}/yandexgpt-5-lite/latest"
+    messages:
+      - role: "system"
+        text: |
+          You are a re-ranking function.
+          Given a user query and a list of candidate questions, return the candidate IDs sorted from most relevant to least relevant.
+          Rules:
+          - Rank by semantic relevance to the user query.
+          - Compare intent, not just shared words.
+          - Prefer exact intent matches over broad thematic similarity.
+          - The provided score is only a hint and must not dominate your decision.
+          - Do not omit IDs.
+          - Do not duplicate IDs.
+      - role: "user"
+        text: |
+          User query:
+          {query}
+
+          Candidates:
+          {candidates}
+
+    jsonSchema:
+      schema:
+        type: "array"
+        items:
+          type: "integer"
+
+    completionOptions:
+      stream: false
+      temperature: 0
+      maxTokens: 128
+
+  path:
+    target: ["messages", 1, "text"]
+    source: ["result", "alternatives", 0, "message", "text"]

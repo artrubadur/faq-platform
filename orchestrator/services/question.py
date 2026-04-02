@@ -2,8 +2,9 @@ from loguru import logger
 from sqlalchemy.exc import NoResultFound
 
 from orchestrator.core.config import config
+from orchestrator.core.requests import RerankCandidate
 from orchestrator.db.models.question import Question
-from orchestrator.integrations.embedding.provider import EmbeddingProvider
+from orchestrator.integrations import EmbeddingProvider, RerankProvider
 from orchestrator.repositories import QuestionsRepository
 from shared.contracts.question.requests import (
     CreateQuestionRequest,
@@ -24,11 +25,13 @@ class QuestionsService:
         self,
         repository: QuestionsRepository,
         embedding_provider: EmbeddingProvider,
+        rerank_provider: RerankProvider | None,
         best_match_threshold: float,
         related_threshold: float,
     ):
         self.repository = repository
         self.embedding_provider = embedding_provider
+        self.rerank_provider = rerank_provider
         self.best_match_distance = 1 - best_match_threshold
         self.related_distance = 1 - related_threshold
 
@@ -41,6 +44,31 @@ class QuestionsService:
         except Exception as exc:
             logger.exception("Failed to compute the question embedding")
             raise BadGatewayError("Failed to compute the question embedding") from exc
+
+    async def _rerank(
+        self, query: str, similar: list[Question], similarities: list[float]
+    ):
+        if self.rerank_provider is None:
+            return similar
+
+        candidates = [
+            RerankCandidate(questions.id, questions.question_text, similarity)
+            for questions, similarity in zip(similar, similarities)
+        ]
+
+        try:
+            reranking = await self.rerank_provider.rerank(query, candidates)
+        except Exception:
+            logger.exception("Failed to re-rank similar questions ")
+            return similar
+
+        order = {qid: i for i, qid in enumerate(reranking)}
+        return sorted(
+            similar,
+            key=lambda q: order.get(
+                q.id, len(order)
+            ),  # for IDs that are not in re-ranking for some re-ranker mistake
+        )
 
     async def _get_existing_question(self, id: int) -> Question:
         try:
@@ -97,6 +125,23 @@ class QuestionsService:
             raise NotFoundError(f"Question {id} not found") from exc
         return self._to_response(question)
 
+    async def _get_most_popular_questions(
+        self,
+        amount: int,
+        exclude_questions: list[Question] = [],
+    ) -> list[Question]:
+        if amount == 0:
+            return []
+        exclude_ids = [q.id for q in exclude_questions]
+        return await self.repository.get_most_popular(amount, exclude_ids)
+
+    async def get_popular_questions(
+        self,
+        amount: int,
+    ) -> list[QuestionResponse]:
+        questions = await self._get_most_popular_questions(amount)
+        return [self._to_response(question) for question in questions]
+
     async def _get_similar_questions(
         self,
         question_text: str,
@@ -112,44 +157,52 @@ class QuestionsService:
         questions: list[Question] = [row[0] for row in rows]
         similarities: list[float] = [1 - row[1] for row in rows]
 
-        if similarities:
-            sim1 = similarities[0]
-            sim2 = similarities[1] if len(similarities) > 1 else 0.0
-            threshold = config.search.best_match_threshold
-
-            if (
-                sim1 >= threshold - 1e-6
-            ):  # Handle floating-point precision issues for threshold == 1
-                if threshold == 1:
-                    await self.repository.increment_ratings([questions[0]], [1.0])
-                else:
-                    norm = (sim1 - threshold) / (1 - threshold)
-                    norm = max(0.0, min(norm, 1.0))
-
-                    gap = (sim1 - sim2) * 10
-                    gap = max(0.0, min(gap, 1.0))
-
-                    gain = norm**2 * gap
-
-                    if gain > 0:
-                        await self.repository.increment_ratings([questions[0]], [gain])
-
         return questions, similarities
 
-    async def _get_most_popular_questions(
+    def _build_similarity_map(
         self,
-        amount: int,
-        exclude_questions: list[Question] | None = None,
-    ) -> list[Question]:
-        exclude_ids = [q.id for q in (exclude_questions or [])]
-        return await self.repository.get_most_popular(amount, exclude_ids)
+        questions: list[Question],
+        similarities: list[float],
+    ) -> dict[int, float]:
+        return {
+            question.id: similarity
+            for question, similarity in zip(questions, similarities)
+        }
 
-    async def get_popular_questions(
+    def _calculate_rating_gain(
         self,
-        amount: int,
-    ) -> list[QuestionResponse]:
-        questions = await self._get_most_popular_questions(amount)
-        return [self._to_response(question) for question in questions]
+        best_similarity: float,
+    ) -> float:
+        threshold = config.search.best_match_threshold
+
+        if best_similarity < threshold - 1e-6:
+            return 0.0
+
+        if threshold == 1:
+            return 1.0
+
+        norm = (best_similarity - threshold) / (1 - threshold)
+        norm = max(0.0, norm)
+
+        return norm**2
+
+    def _is_confident_match(
+        self,
+        questions: list[Question],
+        similarity_by_question_id: dict[int, float],
+    ) -> bool:
+        if not questions:
+            return False
+
+        best_similarity = similarity_by_question_id[questions[0].id]
+        second_similarity = (
+            similarity_by_question_id[questions[1].id] if len(questions) > 1 else 0.0
+        )
+
+        return (
+            best_similarity >= config.search.best_match_threshold - 1e-6
+            and best_similarity - second_similarity >= config.search.best_match_margin
+        )
 
     async def suggest_questions(
         self,
@@ -159,21 +212,44 @@ class QuestionsService:
             request.question_text,
             request.max_similar_amount + 1,
         )
-        similar = similar[: request.max_amount]
 
-        popular_amount = max(
-            0,
-            min(request.max_amount - len(similar), request.max_popular_amount),
+        if not similar:
+            popular = await self._get_most_popular_questions(request.max_popular_amount)
+            return QuestionSuggestionResponse(
+                questions=[self._to_response(q) for q in popular],
+                is_confident=False,
+            )
+
+        similarity_by_question_id = self._build_similarity_map(similar, similarities)
+
+        similar_reranked = await self._rerank(
+            request.question_text,
+            similar,
+            similarities,
         )
-        popular = []
-        if popular_amount > 0:
-            popular = await self._get_most_popular_questions(popular_amount, similar)
-        suggestions = similar + popular
-        
-        is_confident = (
-            len(similarities) != 0
-            and similarities[0] >= config.search.best_match_threshold
+
+        is_confident = self._is_confident_match(
+            similar_reranked,
+            similarity_by_question_id,
         )
+
+        if is_confident:
+            best_similarity = similarity_by_question_id[similar_reranked[0].id]
+            gain = self._calculate_rating_gain(best_similarity)
+            await self.repository.increment_ratings([similar_reranked[0]], [gain])
+        elif len(similar_reranked) > request.max_similar_amount:
+            similar_reranked = similar_reranked[:-1]
+
+        popular_amount = min(
+            request.max_amount - len(similar_reranked), request.max_popular_amount
+        )
+
+        popular = await self._get_most_popular_questions(
+            popular_amount,
+            similar_reranked,
+        )
+
+        suggestions = similar_reranked + popular
 
         return QuestionSuggestionResponse(
             questions=[self._to_response(question) for question in suggestions],

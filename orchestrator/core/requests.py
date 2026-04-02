@@ -1,13 +1,21 @@
+import json
+from copy import deepcopy
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from pydantic_settings import SettingsConfigDict
 
 from orchestrator.core.config import config
 from shared.utils.config import YamlSettings
 
 REQUESTS_PATH = Path("config/requests.yml")
+
+
+class RequestPath(BaseModel):
+    target: list[str | int]
+    source: list[str | int]
 
 
 class RequestTemplate(BaseModel):
@@ -17,9 +25,10 @@ class RequestTemplate(BaseModel):
     url: str
     headers: dict = Field(default_factory=dict)
     body: dict = Field(default_factory=dict)
+    path: RequestPath
 
+    @staticmethod
     def _format_template_value(
-        self,
         value: str,
         request_vars: dict[str, Any],
         section: str,
@@ -33,65 +42,103 @@ class RequestTemplate(BaseModel):
                 f"Unknown request variable '{missing}' in '{section}.{key}'. You have to specify this in the REQUESTS__{missing} enviroment variable."
             )
 
-    def model_post_init(self, __context) -> None:
+    @model_validator(mode="before")
+    @classmethod
+    def interpolate_template_variables(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return data
+
         request_vars = config.requests.model_dump()
 
-        headers = {}
-        for key, value in self.headers.items():
-            if isinstance(value, str):
-                headers[key] = self._format_template_value(
-                    value, request_vars, "headers", key
-                )
-            else:
-                headers[key] = value
+        for section in ("headers", "body"):
+            values = data.get(section)
+            if not isinstance(values, dict):
+                continue
 
-        body = {}
-        for key, value in self.body.items():
-            if isinstance(value, str):
-                body[key] = self._format_template_value(
-                    value, request_vars, "body", key
-                )
-            else:
-                body[key] = value
+            rendered: dict = {}
+            for key, value in values.items():
+                if isinstance(value, str):
+                    rendered[key] = cls._format_template_value(
+                        value, request_vars, section, str(key)
+                    )
+                else:
+                    rendered[key] = value
+            data[section] = rendered
 
-        object.__setattr__(self, "headers", headers)
-        object.__setattr__(self, "body", body)
+        return data
 
-
-class EmbeddingRequestPaths(BaseModel):
-    embedding: list[str | int]
-    text: list[str | int]
 
 class EmbeddingRequestTemplate(RequestTemplate):
-    path: EmbeddingRequestPaths
-
-    def build(self, text: str) -> dict:
-        body = dict(self.body)
-        tokens = self.path.text
+    def build(self, query: str) -> dict:
+        body = deepcopy(self.body)
+        tokens = self.path.target
 
         current = body
         for token in tokens[:-1]:
-            current = current.setdefault(token, {})
-        current[tokens[-1]] = text
+            current = current[token]
+        current[tokens[-1]] = query
 
         return body
 
-    def extract(self, data) -> Any:
+    def extract(self, data) -> list[float]:
         current = data
-        for token in self.path.embedding:
+        for token in self.path.source:
             try:
                 current = current[token]
             except (KeyError, IndexError, TypeError) as exc:
                 raise ValueError(
-                    f"Failed to extract embedding by '{self.path.embedding}' at token '{token}'"
+                    f"Failed to extract embedding from '{self.path.source}' at token '{token}'"
                 ) from exc
         return current
 
 
-class RequestTemplates(YamlSettings):
-    embedding: EmbeddingRequestTemplate
+@dataclass
+class RerankCandidate:
+    id: int
+    text: str
+    score: float
 
+
+class RerankRequestTemplate(RequestTemplate):
+    def build(self, query: str, candidates: list[RerankCandidate]) -> dict:
+        body = deepcopy(self.body)
+        tokens = self.path.target
+        candidates_str = json.dumps([asdict(candidate) for candidate in candidates])
+
+        current = body
+        for token in tokens[:-1]:
+            current = current[token]
+        current[tokens[-1]] = current[tokens[-1]].format(
+            query=query, candidates=candidates_str
+        )
+
+        return body
+
+    def extract(self, data) -> list[int]:
+        current = data
+        for token in self.path.source:
+            try:
+                current = current[token]
+            except (KeyError, IndexError, TypeError) as exc:
+                raise ValueError(
+                    f"Failed to extract ranking from '{self.path.source}' at token '{token}'"
+                ) from exc
+        return json.loads(current)
+
+
+class RequestTemplates(YamlSettings):
     model_config = SettingsConfigDict(yaml_file=REQUESTS_PATH, frozen=True)
+
+    embedding: EmbeddingRequestTemplate
+    rerank: RerankRequestTemplate | None = None
+
+    @model_validator(mode="after")
+    def validate_steps(self):
+        if config.suggestion.rerank and self.rerank is None:
+            raise ValueError(
+                "`rerank` template is required when SUGGESTION_RERANK=true"
+            )
+        return self
 
 
 request_templates = RequestTemplates()  # pyright: ignore[reportCallIssue]

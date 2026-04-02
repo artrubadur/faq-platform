@@ -40,6 +40,11 @@ class SearchConfig(BaseModel):
         ge=0.0,
         le=1.0,
     )
+    best_match_margin: float = Field(
+        default=0.1,
+        ge=0.0,
+        le=1.0,
+    )
     related_threshold: float = Field(
         default=0.4,
         ge=0.0,
@@ -48,6 +53,14 @@ class SearchConfig(BaseModel):
 
 
 class EmbeddingHttpConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    timeout: float = Field(default=5.0, gt=0)
+    retries: int = Field(default=2, ge=0)
+    retry_delay: float = Field(default=0.5, ge=0)
+
+
+class RerankHttpConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     timeout: float = Field(default=5.0, gt=0)
@@ -92,6 +105,12 @@ class AdminConfig(BaseModel):
         raise ValueError("ids must be int, list[int], or comma-separated string")
 
 
+class SuggestionConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    rerank: bool = True
+
+
 class Config(BaseSettings):
     model_config = SettingsConfigDict(
         env_file="env/orchestrator.env",
@@ -107,8 +126,12 @@ class Config(BaseSettings):
     search: SearchConfig = Field(
         default_factory=SearchConfig,
     )
+    suggestion: SuggestionConfig = Field(default_factory=SuggestionConfig)
     embedding_http: EmbeddingHttpConfig = Field(
         default_factory=EmbeddingHttpConfig,
+    )
+    rerank_http: RerankHttpConfig = Field(
+        default_factory=RerankHttpConfig,
     )
     admin: AdminConfig = Field(
         default_factory=AdminConfig,

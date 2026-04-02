@@ -6,11 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from orchestrator.core.config import config
 from orchestrator.db.session import async_session
-from orchestrator.integrations.embedding import embedding_provider
-from orchestrator.repositories.questions import QuestionsRepository
-from orchestrator.repositories.users import UsersRepository
-from orchestrator.services.question import QuestionsService
-from orchestrator.services.user import UsersService
+from orchestrator.integrations import embedding_provider, rerank_provider
+from orchestrator.repositories import QuestionsRepository, UsersRepository
+from orchestrator.services import QuestionsService, UsersService
 
 
 async def get_db_session() -> AsyncIterator[AsyncSession]:
@@ -52,6 +50,7 @@ def get_questions_service(
     return QuestionsService(
         repository,
         embedding_provider,
+        rerank_provider,
         config.search.best_match_threshold,
         config.search.related_threshold,
     )
