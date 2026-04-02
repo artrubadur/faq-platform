@@ -41,8 +41,8 @@ async def question_get_cb_handler(
     sent_message = await send_enter_id(
         callback.message,  # pyright: ignore[reportArgumentType]
         SendAction.EDIT,
-        DIR,
         PARENT_DIR,
+        DIR,
         found_question_id,
     )
     await last_message.set(sent_message, state)
