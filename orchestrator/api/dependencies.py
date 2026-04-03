@@ -6,7 +6,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from orchestrator.core.config import config
 from orchestrator.db.session import async_session
-from orchestrator.integrations import embedding_provider, rerank_provider
+from orchestrator.integrations import (
+    compose_provider,
+    embedding_provider,
+    rerank_provider,
+)
 from orchestrator.repositories import QuestionsRepository, UsersRepository
 from orchestrator.services import QuestionsService, UsersService
 
@@ -51,8 +55,9 @@ def get_questions_service(
         repository,
         embedding_provider,
         rerank_provider,
-        config.search.best_match_threshold,
-        config.search.related_threshold,
+        compose_provider,
+        config.suggestion.search.best_match_threshold,
+        config.suggestion.search.related_threshold,
     )
 
 

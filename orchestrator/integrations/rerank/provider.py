@@ -32,13 +32,15 @@ class RerankProvider:
         )
 
 
-if config.suggestion.rerank:
+if config.suggestion.rerank.enabled:
     template = request_templates.rerank
     client = rerank_http_client
     assert (
         template is not None
-    ), "rerank template must be set when SUGGESTION_RERANK=true"
-    assert client is not None, "rerank client must be set when SUGGESTION_RERANK=true"
+    ), "rerank template must be set when SUGGESTION__RERANK__ENABLED=true"
+    assert (
+        client is not None
+    ), "rerank client must be set when SUGGESTION__RERANK__ENABLED=true"
     rerank_provider: RerankProvider | None = RerankProvider(client, template)
 else:
     rerank_provider = None

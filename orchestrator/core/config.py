@@ -43,7 +43,7 @@ class SearchConfig(BaseModel):
         le=1.0,
     )
     best_match_margin: float = Field(
-        default=0.1,
+        default=0.05,
         ge=0.0,
         le=1.0,
     )
@@ -59,11 +59,38 @@ class SearchConfig(BaseModel):
     )
 
 
+class RerankConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = True
+
+
+class ComposeConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = True
+    supporting_margin: float = Field(
+        default=0.15,
+        ge=0.0,
+        le=1.0,
+    )
+    supporting_top_k: int = Field(default=2, ge=0)
+
+
 class SuggestionConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    rerank: bool = True
-    composition: bool = True
+    search: SearchConfig = Field(default_factory=SearchConfig)
+    rerank: RerankConfig = Field(default_factory=RerankConfig)
+    compose: ComposeConfig = Field(default_factory=ComposeConfig)
+
+
+class ClientsConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    embedding: ApiClientConfig = Field(default_factory=ApiClientConfig)
+    rerank: ApiClientConfig = Field(default_factory=ApiClientConfig)
+    compose: ApiClientConfig = Field(default_factory=ApiClientConfig)
 
 
 class ApiConfig(BaseModel):
@@ -115,12 +142,8 @@ class Config(BaseSettings):
     requests: RequestsConfig = Field(default_factory=RequestsConfig)
     db: DBConfig
     db_schema: DBSchemaConfig = Field(default_factory=DBSchemaConfig)
-    search: SearchConfig = Field(
-        default_factory=SearchConfig,
-    )
     suggestion: SuggestionConfig = Field(default_factory=SuggestionConfig)
-    embedding_client: ApiClientConfig = Field(default_factory=ApiClientConfig)
-    rerank_client: ApiClientConfig = Field(default_factory=ApiClientConfig)
+    clients: ClientsConfig = Field(default_factory=ClientsConfig)
     admin: AdminConfig = Field(
         default_factory=AdminConfig,
     )

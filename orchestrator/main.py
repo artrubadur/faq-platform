@@ -10,6 +10,7 @@ from orchestrator.core import requests_status
 from orchestrator.core.config import config
 from orchestrator.db.core import close_db, init_db
 from orchestrator.db.session import async_session
+from orchestrator.integrations.compose.http_client import close_compose_http_client
 from orchestrator.integrations.embedding.http_client import close_embedding_http_client
 from orchestrator.integrations.rerank.http_client import close_rerank_http_client
 from orchestrator.repositories.users import UsersRepository
@@ -31,6 +32,7 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     logger.info("Orchestrator stopped by user")
     await close_embedding_http_client()
     await close_rerank_http_client()
+    await close_compose_http_client()
     await close_db()
 
 

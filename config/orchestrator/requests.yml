@@ -13,6 +13,7 @@ embedding:
     target: ["text"]
     source: ["embedding"]
 
+
 rerank:
   method: "POST"
   url: "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
@@ -33,26 +34,76 @@ rerank:
           - Compare intent, not just shared words.
           - Prefer exact intent matches over broad thematic similarity.
           - The provided score is only a hint and must not dominate your decision.
-          - Do not omit IDs.
-          - Do not duplicate IDs.
-      - role: "user"
-        text: |
-          User query:
-          {query}
+          - Do not omit or duplicate IDs.
 
-          Candidates:
-          {candidates}
+      - role: "user"
+        text: '{{"query": {query}, "candidates": {candidates}}}'
 
     jsonSchema:
       schema:
-        type: "array"
-        items:
-          type: "integer"
+        type: "object"
+        properties:
+          result:
+            type: "array"
+            items:
+              type: "integer"
 
     completionOptions:
       stream: false
       temperature: 0
       maxTokens: 128
+
+  path:
+    target: ["messages", 1, "text"]
+    source: ["result", "alternatives", 0, "message", "text"]
+
+
+compose:
+  method: "POST"
+  url: "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
+
+  headers:
+    Authorization: "Bearer {iam_token}"
+    Content-Type: "application/json"
+
+  body:
+    modelUri: "gpt://{folder_id}/yandexgpt-5-lite/latest"
+    messages:
+      - role: "system"
+        text: |
+          Generate one final FAQ answer using only the provided content.
+
+          Rules:
+          - `best_candidate` is the primary source.
+          - Use `supporting_candidates` only if they match the same intent and improve clarity.
+          - Ignore conflicting or irrelevant supporting candidates.
+          - Do not add new facts or outside knowledge.
+          - Return one direct answer only.
+
+          Rewriting:
+          - Do not closely copy or quote the source unless required for accuracy.
+          - Prefer natural paraphrasing and different wording.
+          - Keep the meaning, conditions, and limits unchanged.
+          - Merge supporting details only if they fit and improve the answer.
+
+          Style:
+          - Clear, concise, natural.
+          - Simple HTML is allowed.
+
+      - role: "user"
+        text: '{{"query": {query}, "best_candidate": {best_candidate}, "supporting_candidates": {supporting_candidates}}}'
+
+    jsonSchema:
+      schema:
+        type: "object"
+        properties:
+          result:
+            type: "string"
+
+    completionOptions:
+      stream: false
+      temperature: 1
+      maxTokens: 384
 
   path:
     target: ["messages", 1, "text"]

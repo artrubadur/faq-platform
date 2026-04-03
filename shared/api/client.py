@@ -43,7 +43,7 @@ def raise_api_error(exc: httpx.HTTPStatusError) -> None:
         raise ValidationError(message, data) from exc
     if status == 502:
         raise BadGatewayError(message, data) from exc
-    if status in (502, 503, 504):
+    if status in (503, 504):
         raise TemporaryUnavailableError(message, data)
 
     raise InternalApiRequestError(message, data) from exc
@@ -54,8 +54,8 @@ class ApiClientConfig(BaseModel):
 
     base_url: str | None = None
     timeout: float = Field(default=5.0, gt=0)
-    retries: int = Field(default=2, ge=0)
-    retry_delay: float = Field(default=0.5, ge=0)
+    retries: int = Field(default=1, ge=0)
+    retry_delay: float = Field(default=0.2, ge=0)
 
 
 class ApiClient:

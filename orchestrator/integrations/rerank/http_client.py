@@ -1,8 +1,8 @@
 from orchestrator.core.config import config
 from shared.api.client import ApiClient
 
-if config.suggestion.rerank:
-    rerank_http_client: ApiClient | None = ApiClient(config.rerank_client)
+if config.suggestion.rerank.enabled:
+    rerank_http_client: ApiClient | None = ApiClient(config.clients.rerank)
 else:
     rerank_http_client = None
 
