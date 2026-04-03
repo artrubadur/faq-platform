@@ -10,7 +10,7 @@ environments.
 - PostgreSQL (with `pgvector` extension)
 - Redis
 - Telegram bot token
-- Embedding/rerank API credentials
+- Embedding/rerank/compose API credentials
 
 ## Local Setup
 
@@ -30,7 +30,8 @@ cp env/orchestrator.env.example env/orchestrator.env
 Set required values:
 
 - `env/bot.env`: `BOT__TOKEN`, Redis settings, orchestrator client settings
-- `env/orchestrator.env`: DB settings, `REQUESTS__*`, and `ADMIN__IDS`
+- `env/orchestrator.env`: DB settings, suggestion settings, `REQUESTS__*`,
+  and `ADMIN__IDS`
 
 ### 3. Prepare runtime YAML configs
 
@@ -134,8 +135,8 @@ Orchestrator API client:
 
 - `ORCHESTRATOR_CLIENT__BASE_URL` (required)
 - `ORCHESTRATOR_CLIENT__TIMEOUT` (default `5`)
-- `ORCHESTRATOR_CLIENT__RETRIES` (default `2`)
-- `ORCHESTRATOR_CLIENT__RETRY_DELAY` (default `0.5`)
+- `ORCHESTRATOR_CLIENT__RETRIES` (default `1`)
+- `ORCHESTRATOR_CLIENT__RETRY_DELAY` (default `0.2`)
 
 ### Orchestrator runtime (`env/orchestrator.env`)
 
@@ -146,35 +147,45 @@ Database:
 - `DB__PASSWORD` (required)
 - `DB__HOST` (required)
 
-Search thresholds:
+Suggestion search thresholds:
 
-- `SEARCH__BEST_MATCH_THRESHOLD` (default `0.7`)
-- `SEARCH__BEST_MATCH_MARGIN` (default `0.1`)
-- `SEARCH__RELATED_THRESHOLD` (default `0.6`)
-- `SEARCH__OBVIOUS_MARGIN` (default `0.3`)
+- `SUGGESTION__SEARCH__BEST_MATCH_THRESHOLD` (default `0.7`)
+- `SUGGESTION__SEARCH__BEST_MATCH_MARGIN` (default `0.05`)
+- `SUGGESTION__SEARCH__RELATED_THRESHOLD` (default `0.6`)
+- `SUGGESTION__SEARCH__OBVIOUS_MARGIN` (default `0.3`)
 
 Suggestion behavior:
 
-- `SUGGESTION__RERANK` (default `true`, enables/disables external reranking)
+- `SUGGESTION__RERANK__ENABLED` (default `true`)
+- `SUGGESTION__COMPOSE__ENABLED` (default `true`)
+- `SUGGESTION__COMPOSE__SUPPORTING_MARGIN` (default `0.15`)
+- `SUGGESTION__COMPOSE__SUPPORTING_TOP_K` (default `2`)
 
 Embedding provider API client:
 
-- `EMBEDDING_CLIENT__BASE_URL` (optional)
-- `EMBEDDING_CLIENT__TIMEOUT` (default `5`)
-- `EMBEDDING_CLIENT__RETRIES` (default `2`)
-- `EMBEDDING_CLIENT__RETRY_DELAY` (default `0.5`)
+- `CLIENTS__EMBEDDING__BASE_URL` (optional)
+- `CLIENTS__EMBEDDING__TIMEOUT` (default `5`)
+- `CLIENTS__EMBEDDING__RETRIES` (default `1`)
+- `CLIENTS__EMBEDDING__RETRY_DELAY` (default `0.2`)
 
 Rerank provider API client:
 
-- `RERANK_CLIENT__BASE_URL` (optional)
-- `RERANK_CLIENT__TIMEOUT` (default `5`)
-- `RERANK_CLIENT__RETRIES` (default `2`)
-- `RERANK_CLIENT__RETRY_DELAY` (default `0.5`)
+- `CLIENTS__RERANK__BASE_URL` (optional)
+- `CLIENTS__RERANK__TIMEOUT` (default `5`)
+- `CLIENTS__RERANK__RETRIES` (default `1`)
+- `CLIENTS__RERANK__RETRY_DELAY` (default `0.2`)
+
+Compose provider API client:
+
+- `CLIENTS__COMPOSE__BASE_URL` (optional)
+- `CLIENTS__COMPOSE__TIMEOUT` (default `5`)
+- `CLIENTS__COMPOSE__RETRIES` (default `1`)
+- `CLIENTS__COMPOSE__RETRY_DELAY` (default `0.2`)
 
 Request template variables:
 
-- `REQUESTS__FOLDER_ID` (required by Yandex embedding/rerank templates)
-- `REQUESTS__IAM_TOKEN` (required by Yandex embedding/rerank templates)
+- `REQUESTS__FOLDER_ID` (required by Yandex embedding/rerank/compose templates)
+- `REQUESTS__IAM_TOKEN` (required by Yandex embedding/rerank/compose templates)
 
 Schema constraints:
 
@@ -209,7 +220,7 @@ variables from `.env`.
 
 ### `config/requests.yml` (required)
 
-Defines how embedding and rerank requests are built/parsed:
+Defines how embedding, rerank, and compose requests are built/parsed:
 
 - HTTP method/url/headers/body template
 - `path.target`: where payload text is injected into request body
@@ -218,8 +229,10 @@ Defines how embedding and rerank requests are built/parsed:
 Sections:
 
 - `embedding` is required.
-- `rerank` is optional when `SUGGESTION__RERANK=false`.
-- `rerank` is required when `SUGGESTION__RERANK=true`.
+- `rerank` is optional when `SUGGESTION__RERANK__ENABLED=false`.
+- `rerank` is required when `SUGGESTION__RERANK__ENABLED=true`.
+- `compose` is optional when `SUGGESTION__COMPOSE__ENABLED=false`.
+- `compose` is required when `SUGGESTION__COMPOSE__ENABLED=true`.
 
 Reference with Yandex Cloud API template: `config/orchestrator/requests.yml`.
 
@@ -278,7 +291,8 @@ At bot boot (`bot/main.py`):
 ## Troubleshooting
 
 - Startup error about missing request templates/settings:
-  check `REQUESTS__*` env values, `SUGGESTION__RERANK`, and `config/requests.yml`.
+  check `REQUESTS__*` env values, `SUGGESTION__RERANK__ENABLED`,
+  `SUGGESTION__COMPOSE__ENABLED`, and `config/requests.yml`.
 - `vector` type errors:
   ensure `init.sql` ran and extension exists in PostgreSQL.
 - Admin commands not available:
