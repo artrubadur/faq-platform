@@ -130,7 +130,7 @@ Rate limiting:
 - `RATE_LIMIT__WINDOW` (default `10`)
 - `RATE_LIMIT__SKIP_ADMIN` (default `true`)
 
-Orchestrator HTTP client:
+Orchestrator API client:
 
 - `ORCHESTRATOR_CLIENT__BASE_URL` (required)
 - `ORCHESTRATOR_CLIENT__TIMEOUT` (default `5`)
@@ -150,7 +150,8 @@ Search thresholds:
 
 - `SEARCH__BEST_MATCH_THRESHOLD` (default `0.7`)
 - `SEARCH__BEST_MATCH_MARGIN` (default `0.1`)
-- `SEARCH__RELATED_THRESHOLD` (default `0.4`)
+- `SEARCH__RELATED_THRESHOLD` (default `0.6`)
+- `SEARCH__OBVIOUS_MARGIN` (default `0.3`)
 
 Suggestion behavior:
 

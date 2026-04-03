@@ -19,28 +19,37 @@
 
 1. User sends `/ask <text>` or plain text.
 2. Input is validated and normalized.
-3. Embedding is computed via configured request template.
-4. DB similarity search (`pgvector` cosine distance) fetches
+3. Bot calls orchestrator suggestion endpoint.
+4. Orchestrator returns either confident best match or suggestion list.
+5. Bot formats and sends response to user.
+
+### Suggestion Pipeline
+
+1. Embedding is computed via configured request template.
+2. DB similarity search (`pgvector` cosine distance) fetches
    `max_similar_amount + 1` candidates.
-5. Similar candidates may be reranked by an external LLM (`SUGGESTION__RERANK`).
-6. Confidence is computed from top similarity threshold plus margin from second
-   candidate (`SEARCH__BEST_MATCH_THRESHOLD` + `SEARCH__BEST_MATCH_MARGIN`).
-7. On confident match, the top question receives a rating increase.
-8. On non-confident match, the extra probe candidate is dropped and suggestions
-   are supplemented with popular questions.
-9. If no similar questions are found, only popular questions are returned.
+3. If the top match is obvious, rerank is skipped and the result is marked
+   confident immediately.
+4. Otherwise, similar candidates may be reranked by an external LLM
+   (`SUGGESTION__RERANK`) and then checked for confidence.
+5. On non-confident match, the extra probe candidate is dropped.
+6. Similar results are supplemented with popular questions (up to limits).
+7. If no similar questions are found, only popular questions are returned.
 
-Rating update details:
+### Rating Update Details
 
-- Rating is updated only when at least one similar question is found and the top
-  candidate is considered confident.
-- A confident match must satisfy both:
-  - top similarity >= `SEARCH__BEST_MATCH_THRESHOLD`
-  - `(top_similarity - second_similarity) >= SEARCH__BEST_MATCH_MARGIN`
-- If the threshold is exactly `1`, the top question receives `+1.0`.
-- Otherwise, gain is based on normalized confidence above threshold.
-- The final gain is `norm^2` and is applied only to the best match, where
-  `norm = (top_similarity - SEARCH__BEST_MATCH_THRESHOLD) / (1 - SEARCH__BEST_MATCH_THRESHOLD)`.
+1. Rating is updated only when at least one similar question is found and the
+   top candidate is considered confident.
+2. Obvious match is true when `top_similarity >= 1 - 1e-6`, or when both
+   conditions hold: `top_similarity >= SEARCH__BEST_MATCH_THRESHOLD` and
+   `(top_similarity - second_similarity) >= SEARCH__OBVIOUS_MARGIN`.
+3. Regular confident match (after optional rerank) requires both
+   `top_similarity >= SEARCH__BEST_MATCH_THRESHOLD` and
+   `(top_similarity - second_similarity) >= SEARCH__BEST_MATCH_MARGIN`.
+4. If the threshold is exactly `1`, the top question receives `+1.0`.
+5. Otherwise, gain is based on normalized confidence above threshold.
+6. The final gain is `norm^2` and is applied only to the best match, where
+   `norm = (top_similarity - SEARCH__BEST_MATCH_THRESHOLD) / (1 - SEARCH__BEST_MATCH_THRESHOLD)`.
 
 ### Admin Flow
 

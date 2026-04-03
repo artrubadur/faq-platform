@@ -169,6 +169,51 @@ class QuestionsService:
             for question, similarity in zip(questions, similarities)
         }
 
+    def _is_obvious_match(
+        self,
+        questions: list[Question],
+        similarity_by_question_id: dict[int, float],
+    ) -> bool:
+        best_similarity = similarity_by_question_id[questions[0].id]
+        second_similarity = (
+            similarity_by_question_id[questions[1].id] if len(questions) > 1 else 0.0
+        )
+
+        if best_similarity >= 1 - 1e-6:
+            return True
+
+        return (
+            best_similarity >= config.search.best_match_threshold - 1e-6
+            and best_similarity - second_similarity >= config.search.obvious_margin
+        )
+
+    def _is_confident_match(
+        self,
+        questions: list[Question],
+        similarity_by_question_id: dict[int, float],
+    ) -> bool:
+        best_similarity = similarity_by_question_id[questions[0].id]
+        second_similarity = (
+            similarity_by_question_id[questions[1].id] if len(questions) > 1 else 0.0
+        )
+
+        return (
+            best_similarity >= config.search.best_match_threshold - 1e-6
+            and best_similarity - second_similarity >= config.search.best_match_margin
+        )
+
+    async def _complite_with_popular_questions(
+        self, questions: list[Question], max_popular_amount: int, max_amount: int
+    ):
+        popular_amount = min(max_amount - len(questions), max_popular_amount)
+
+        popular = await self._get_most_popular_questions(
+            popular_amount,
+            questions,
+        )
+
+        return questions + popular
+
     def _calculate_rating_gain(
         self,
         best_similarity: float,
@@ -185,24 +230,6 @@ class QuestionsService:
         norm = max(0.0, norm)
 
         return norm**2
-
-    def _is_confident_match(
-        self,
-        questions: list[Question],
-        similarity_by_question_id: dict[int, float],
-    ) -> bool:
-        if not questions:
-            return False
-
-        best_similarity = similarity_by_question_id[questions[0].id]
-        second_similarity = (
-            similarity_by_question_id[questions[1].id] if len(questions) > 1 else 0.0
-        )
-
-        return (
-            best_similarity >= config.search.best_match_threshold - 1e-6
-            and best_similarity - second_similarity >= config.search.best_match_margin
-        )
 
     async def suggest_questions(
         self,
@@ -222,6 +249,22 @@ class QuestionsService:
 
         similarity_by_question_id = self._build_similarity_map(similar, similarities)
 
+        is_obvious = self._is_obvious_match(similar, similarity_by_question_id)
+
+        if is_obvious:
+            best_similarity = similarity_by_question_id[similar[0].id]
+            gain = self._calculate_rating_gain(best_similarity)
+            await self.repository.increment_ratings([similar[0]], [gain])
+
+            suggestions = await self._complite_with_popular_questions(
+                similar, request.max_popular_amount, request.max_amount
+            )
+
+            return QuestionSuggestionResponse(
+                questions=[self._to_response(question) for question in suggestions],
+                is_confident=True,
+            )
+
         similar_reranked = await self._rerank(
             request.question_text,
             similar,
@@ -240,16 +283,9 @@ class QuestionsService:
         elif len(similar_reranked) > request.max_similar_amount:
             similar_reranked = similar_reranked[:-1]
 
-        popular_amount = min(
-            request.max_amount - len(similar_reranked), request.max_popular_amount
+        suggestions = await self._complite_with_popular_questions(
+            similar_reranked, request.max_popular_amount, request.max_amount
         )
-
-        popular = await self._get_most_popular_questions(
-            popular_amount,
-            similar_reranked,
-        )
-
-        suggestions = similar_reranked + popular
 
         return QuestionSuggestionResponse(
             questions=[self._to_response(question) for question in suggestions],
