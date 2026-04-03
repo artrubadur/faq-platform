@@ -8,8 +8,8 @@ from bot.dialogs.actions import SendAction
 from bot.dialogs.send.public.start import send_start
 from bot.services.question.gateway import question_gateway
 from bot.services.user.gateway import user_gateway
+from shared.api.exceptions import ConflictError
 from shared.contracts.user.responses import Role
-from shared.http.exceptions import ConflictError
 
 router = Router()
 

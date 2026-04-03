@@ -11,6 +11,7 @@
 - `orchestrator/repositories`: SQLAlchemy-based DB access layer.
 - `orchestrator/db`: models, async session/engine, schema reconciliation.
 - `orchestrator/integrations`: external embedding/rerank provider clients and templates.
+- `shared/api`: reusable async HTTP API client and shared API exceptions.
 
 ## Request Flows
 

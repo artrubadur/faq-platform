@@ -13,8 +13,8 @@ from bot.dialogs.send.admin.misc import (
 from bot.dialogs.send.common import send_access_denied
 from bot.services.user.gateway import user_gateway
 from bot.utils.state.data import update_data
+from shared.api.exceptions import ForbiddenError, NotFoundError
 from shared.contracts.user.responses import Role
-from shared.http.exceptions import ForbiddenError, NotFoundError
 
 router = Router()
 

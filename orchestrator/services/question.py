@@ -6,6 +6,7 @@ from orchestrator.core.requests import RerankCandidate
 from orchestrator.db.models.question import Question
 from orchestrator.integrations import EmbeddingProvider, RerankProvider
 from orchestrator.repositories import QuestionsRepository
+from shared.api.exceptions import BadGatewayError, ConflictError, NotFoundError
 from shared.contracts.question.requests import (
     CreateQuestionRequest,
     ListQuestionsRequest,
@@ -17,7 +18,6 @@ from shared.contracts.question.responses import (
     QuestionsAmountResponse,
     QuestionSuggestionResponse,
 )
-from shared.http.exceptions import BadGatewayError, ConflictError, NotFoundError
 
 
 class QuestionsService:

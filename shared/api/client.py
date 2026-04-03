@@ -2,8 +2,9 @@ import asyncio
 from typing import TypeVar
 
 import httpx
+from pydantic import BaseModel, ConfigDict, Field
 
-from shared.http.exceptions import (
+from shared.api.exceptions import (
     BadGatewayError,
     ConflictError,
     ForbiddenError,
@@ -48,23 +49,29 @@ def raise_api_error(exc: httpx.HTTPStatusError) -> None:
     raise InternalApiRequestError(message, data) from exc
 
 
-class InternalApiClient:
+class ApiClientConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    base_url: str | None = None
+    timeout: float = Field(default=5.0, gt=0)
+    retries: int = Field(default=2, ge=0)
+    retry_delay: float = Field(default=0.5, ge=0)
+
+
+class ApiClient:
     def __init__(
         self,
-        base_url: str | None = None,
-        timeout: float = 5.0,
-        retries: int = 2,
-        retry_delay: float = 0.5,
+        config: ApiClientConfig,
     ) -> None:
         client_kwargs: dict = {
-            "timeout": httpx.Timeout(timeout),
+            "timeout": httpx.Timeout(config.timeout),
         }
-        if base_url is not None:
-            client_kwargs["base_url"] = base_url
+        if config.base_url is not None:
+            client_kwargs["base_url"] = config.base_url
 
         self._client = httpx.AsyncClient(**client_kwargs)
-        self._retries = retries
-        self._retry_delay = retry_delay
+        self._retries = config.retries
+        self._retry_delay = config.retry_delay
 
     async def close(self) -> None:
         await self._client.aclose()

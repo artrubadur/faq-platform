@@ -156,17 +156,19 @@ Suggestion behavior:
 
 - `SUGGESTION__RERANK` (default `true`, enables/disables external reranking)
 
-Embedding provider HTTP client:
+Embedding provider API client:
 
-- `EMBEDDING_HTTP__TIMEOUT` (default `5`)
-- `EMBEDDING_HTTP__RETRIES` (default `2`)
-- `EMBEDDING_HTTP__RETRY_DELAY` (default `0.5`)
+- `EMBEDDING_CLIENT__BASE_URL` (optional)
+- `EMBEDDING_CLIENT__TIMEOUT` (default `5`)
+- `EMBEDDING_CLIENT__RETRIES` (default `2`)
+- `EMBEDDING_CLIENT__RETRY_DELAY` (default `0.5`)
 
-Rerank provider HTTP client:
+Rerank provider API client:
 
-- `RERANK_HTTP__TIMEOUT` (default `5`)
-- `RERANK_HTTP__RETRIES` (default `2`)
-- `RERANK_HTTP__RETRY_DELAY` (default `0.5`)
+- `RERANK_CLIENT__BASE_URL` (optional)
+- `RERANK_CLIENT__TIMEOUT` (default `5`)
+- `RERANK_CLIENT__RETRIES` (default `2`)
+- `RERANK_CLIENT__RETRY_DELAY` (default `0.5`)
 
 Request template variables:
 

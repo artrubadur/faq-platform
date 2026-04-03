@@ -5,7 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from loguru import logger
 
-from shared.http.exceptions import (
+from shared.api.exceptions import (
     BadGatewayError,
     ConflictError,
     ForbiddenError,

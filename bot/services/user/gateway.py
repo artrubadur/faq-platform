@@ -1,4 +1,5 @@
 from bot.services.http_client import orchestrator_client
+from shared.api.client import ApiClient
 from shared.contracts.user.requests import (
     CreateUserRequest,
     ListUsersRequest,
@@ -7,7 +8,6 @@ from shared.contracts.user.requests import (
     UsersByRoleRequest,
 )
 from shared.contracts.user.responses import Role, UserResponse, UsersAmountResponse
-from shared.http.client import InternalApiClient
 
 _UNSET = object()
 
@@ -15,7 +15,7 @@ _UNSET = object()
 class UserGateway:
     def __init__(
         self,
-        client: InternalApiClient,
+        client: ApiClient,
     ) -> None:
         self.client = client
 

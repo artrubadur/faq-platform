@@ -4,8 +4,8 @@ from loguru import logger
 from bot.dispatch.handlers.common import banned_handler
 from bot.services.user.gateway import user_gateway
 from bot.utils.state.temp import TempContext
+from shared.api.exceptions import NotFoundError
 from shared.contracts.user.responses import Role
-from shared.http.exceptions import NotFoundError
 
 
 class AccessMiddleware(BaseMiddleware):

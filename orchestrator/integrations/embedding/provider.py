@@ -1,12 +1,12 @@
 from orchestrator.core.requests import EmbeddingRequestTemplate, request_templates
 from orchestrator.integrations.embedding.http_client import embedding_http_client
-from shared.http.client import InternalApiClient
+from shared.api.client import ApiClient
 
 
 class EmbeddingProvider:
     def __init__(
         self,
-        client: InternalApiClient,
+        client: ApiClient,
         template: EmbeddingRequestTemplate,
     ) -> None:
         self.template = template

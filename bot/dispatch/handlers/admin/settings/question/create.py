@@ -22,7 +22,7 @@ from bot.services.question.process import (
 )
 from bot.utils.state.history import LastMessage, is_expired
 from bot.utils.state.temp import TempContext
-from shared.http.exceptions import BadGatewayError, ConflictError
+from shared.api.exceptions import BadGatewayError, ConflictError
 
 router = Router()
 

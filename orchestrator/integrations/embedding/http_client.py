@@ -1,11 +1,7 @@
 from orchestrator.core.config import config
-from shared.http.client import InternalApiClient
+from shared.api.client import ApiClient
 
-embedding_http_client = InternalApiClient(
-    timeout=config.embedding_http.timeout,
-    retries=config.embedding_http.retries,
-    retry_delay=config.embedding_http.retry_delay,
-)
+embedding_http_client = ApiClient(config.embedding_client)
 
 
 async def close_embedding_http_client() -> None:

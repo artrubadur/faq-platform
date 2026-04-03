@@ -1,4 +1,5 @@
 from bot.services.http_client import orchestrator_client
+from shared.api.client import ApiClient
 from shared.contracts.question.requests import (
     CreateQuestionRequest,
     ListQuestionsRequest,
@@ -11,13 +12,12 @@ from shared.contracts.question.responses import (
     QuestionsAmountResponse,
     QuestionSuggestionResponse,
 )
-from shared.http.client import InternalApiClient
 
 
 class QuestionGateway:
     def __init__(
         self,
-        client: InternalApiClient,
+        client: ApiClient,
     ) -> None:
         self.client = client
 

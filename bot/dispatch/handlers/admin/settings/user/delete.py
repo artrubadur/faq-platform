@@ -18,7 +18,7 @@ from bot.services.user.gateway import user_gateway
 from bot.services.user.process import process_identity_msg
 from bot.utils.state.history import LastMessage, is_expired
 from bot.utils.state.temp import TempContext
-from shared.http.exceptions import ForbiddenError, NotFoundError
+from shared.api.exceptions import ForbiddenError, NotFoundError
 
 router = Router()
 

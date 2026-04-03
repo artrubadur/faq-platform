@@ -1,6 +1,8 @@
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from shared.api.client import ApiClientConfig
+
 
 class BotConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -47,15 +49,6 @@ class RateLimitConfig(BaseModel):
     skip_admin: bool = True
 
 
-class OrchestratorClientConfig(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    base_url: str
-    timeout: float = Field(default=5.0, gt=0)
-    retries: int = Field(default=2, ge=0)
-    retry_delay: float = Field(default=0.5, ge=0)
-
-
 class Config(BaseSettings):
     model_config = SettingsConfigDict(
         env_file="env/bot.env",
@@ -71,7 +64,7 @@ class Config(BaseSettings):
         default_factory=QuestionLimitsConfig,
     )
     rate_limit: RateLimitConfig = Field(default_factory=RateLimitConfig)
-    orchestrator_client: OrchestratorClientConfig
+    orchestrator_client: ApiClientConfig
 
 
 config = Config()  # pyright: ignore[reportCallIssue]

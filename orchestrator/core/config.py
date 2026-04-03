@@ -1,6 +1,8 @@
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from shared.api.client import ApiClientConfig
+
 
 class RequestsConfig(BaseModel):
     model_config = ConfigDict(extra="allow")
@@ -52,20 +54,11 @@ class SearchConfig(BaseModel):
     )
 
 
-class EmbeddingHttpConfig(BaseModel):
+class SuggestionConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    timeout: float = Field(default=5.0, gt=0)
-    retries: int = Field(default=2, ge=0)
-    retry_delay: float = Field(default=0.5, ge=0)
-
-
-class RerankHttpConfig(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    timeout: float = Field(default=5.0, gt=0)
-    retries: int = Field(default=2, ge=0)
-    retry_delay: float = Field(default=0.5, ge=0)
+    rerank: bool = True
+    composition: bool = True
 
 
 class ApiConfig(BaseModel):
@@ -105,12 +98,6 @@ class AdminConfig(BaseModel):
         raise ValueError("ids must be int, list[int], or comma-separated string")
 
 
-class SuggestionConfig(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    rerank: bool = True
-
-
 class Config(BaseSettings):
     model_config = SettingsConfigDict(
         env_file="env/orchestrator.env",
@@ -127,12 +114,8 @@ class Config(BaseSettings):
         default_factory=SearchConfig,
     )
     suggestion: SuggestionConfig = Field(default_factory=SuggestionConfig)
-    embedding_http: EmbeddingHttpConfig = Field(
-        default_factory=EmbeddingHttpConfig,
-    )
-    rerank_http: RerankHttpConfig = Field(
-        default_factory=RerankHttpConfig,
-    )
+    embedding_client: ApiClientConfig = Field(default_factory=ApiClientConfig)
+    rerank_client: ApiClientConfig = Field(default_factory=ApiClientConfig)
     admin: AdminConfig = Field(
         default_factory=AdminConfig,
     )

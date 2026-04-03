@@ -5,13 +5,13 @@ from orchestrator.core.requests import (
     request_templates,
 )
 from orchestrator.integrations.rerank.http_client import rerank_http_client
-from shared.http.client import InternalApiClient
+from shared.api.client import ApiClient
 
 
 class RerankProvider:
     def __init__(
         self,
-        client: InternalApiClient,
+        client: ApiClient,
         template: RerankRequestTemplate,
     ) -> None:
         self.template = template

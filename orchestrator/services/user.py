@@ -3,6 +3,7 @@ from sqlalchemy.exc import IntegrityError, NoResultFound
 
 from orchestrator.db.models.user import Role, User
 from orchestrator.repositories.users import UsersRepository
+from shared.api.exceptions import ConflictError, ForbiddenError, NotFoundError
 from shared.contracts.user.requests import (
     CreateUserRequest,
     ListUsersRequest,
@@ -10,7 +11,6 @@ from shared.contracts.user.requests import (
     UsersByRoleRequest,
 )
 from shared.contracts.user.responses import UserResponse, UsersAmountResponse
-from shared.http.exceptions import ConflictError, ForbiddenError, NotFoundError
 
 
 class UsersService:

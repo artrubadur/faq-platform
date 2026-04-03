@@ -1,12 +1,8 @@
 from orchestrator.core.config import config
-from shared.http.client import InternalApiClient
+from shared.api.client import ApiClient
 
 if config.suggestion.rerank:
-    rerank_http_client: InternalApiClient | None = InternalApiClient(
-        timeout=config.rerank_http.timeout,
-        retries=config.rerank_http.retries,
-        retry_delay=config.rerank_http.retry_delay,
-    )
+    rerank_http_client: ApiClient | None = ApiClient(config.rerank_client)
 else:
     rerank_http_client = None
 

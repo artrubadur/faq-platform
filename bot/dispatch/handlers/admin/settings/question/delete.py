@@ -18,7 +18,7 @@ from bot.services.question.gateway import question_gateway
 from bot.services.question.process import process_id_msg
 from bot.utils.state.history import LastMessage, is_expired
 from bot.utils.state.temp import TempContext
-from shared.http.exceptions import NotFoundError
+from shared.api.exceptions import NotFoundError
 
 router = Router()
 

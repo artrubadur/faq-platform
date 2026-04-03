@@ -4,7 +4,7 @@ from loguru import logger
 
 from bot.dialogs.actions import SendAction
 from bot.dialogs.send.common import send_unexcepted_error
-from shared.http.exceptions import InternalApiError
+from shared.api.exceptions import InternalApiError
 
 router = Router()
 

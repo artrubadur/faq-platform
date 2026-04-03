@@ -1,12 +1,7 @@
 from bot.core.config import config
-from shared.http.client import InternalApiClient
+from shared.api.client import ApiClient
 
-orchestrator_client = InternalApiClient(
-    base_url=config.orchestrator_client.base_url,
-    timeout=config.orchestrator_client.timeout,
-    retries=config.orchestrator_client.retries,
-    retry_delay=config.orchestrator_client.retry_delay,
-)
+orchestrator_client = ApiClient(config.orchestrator_client)
 
 
 async def close_orchestrator_client() -> None:

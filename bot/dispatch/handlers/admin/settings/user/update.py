@@ -33,8 +33,8 @@ from bot.services.user.process import (
 from bot.utils.state.data import update_data
 from bot.utils.state.history import LastMessage, is_expired
 from bot.utils.state.temp import TempContext
+from shared.api.exceptions import ConflictError, ForbiddenError, NotFoundError
 from shared.contracts.user.responses import Role
-from shared.http.exceptions import ConflictError, ForbiddenError, NotFoundError
 
 router = Router()
 

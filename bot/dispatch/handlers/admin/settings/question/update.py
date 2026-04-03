@@ -35,7 +35,7 @@ from bot.services.question.process import (
 )
 from bot.utils.state.history import LastMessage, is_expired
 from bot.utils.state.temp import TempContext
-from shared.http.exceptions import BadGatewayError, NotFoundError
+from shared.api.exceptions import BadGatewayError, NotFoundError
 
 router = Router()
 
