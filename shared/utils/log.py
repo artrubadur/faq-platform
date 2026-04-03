@@ -22,4 +22,5 @@ def serialize_json(record: dict[str, Any]) -> str:
     if repeat:
         payload["repeat"] = repeat
 
-    return f"{{{json.dumps(payload, ensure_ascii=False)}}}\n"
+    record["extra"]["serialized"] = json.dumps(payload, ensure_ascii=False)
+    return "{extra[serialized]}\n"
