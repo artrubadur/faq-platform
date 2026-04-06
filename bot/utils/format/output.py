@@ -86,38 +86,44 @@ def format_edited_user(
     is_username_changed = username != edited_username
     is_role_changed = role != edited_role
 
-    result = [format_id(id)]
+    result = [messages.format.user.id.format(id=format_id(id))]
 
     result += [
-        (
-            messages.format.edit.edited.format(
-                old=format_user_link(id, username),
-                new=format_user_link(id, edited_username),
-            )
-            if is_username_changed
-            else messages.format.edit.unedited.format(
-                old=format_user_link(id, username)
+        messages.format.user.user_link.format(
+            user_link=(
+                messages.format.edit.edited.format(
+                    old=format_user_link(id, username),
+                    new=format_user_link(id, edited_username),
+                )
+                if is_username_changed
+                else messages.format.edit.unedited.format(
+                    old=format_user_link(id, username)
+                )
             )
         )
     ]
 
     result += [
-        (
-            messages.format.edit.edited.format(
-                old=format_username(username), new=format_username(edited_username)
+        messages.format.user.username.format(
+            username=(
+                messages.format.edit.edited.format(
+                    old=format_username(username), new=format_username(edited_username)
+                )
+                if is_username_changed
+                else messages.format.edit.unedited.format(old=format_username(username))
             )
-            if is_username_changed
-            else messages.format.edit.unedited.format(old=format_username(username))
         )
     ]
 
     result += [
-        (
-            messages.format.edit.edited.format(
-                old=format_user_role(role), new=format_user_role(edited_role)
+        messages.format.user.user_role.format(
+            user_role=(
+                messages.format.edit.edited.format(
+                    old=format_user_role(role), new=format_user_role(edited_role)
+                )
+                if is_role_changed
+                else messages.format.edit.unedited.format(old=format_user_role(role))
             )
-            if is_role_changed
-            else messages.format.edit.unedited.format(old=format_user_role(role))
         )
     ]
 
@@ -171,34 +177,48 @@ def format_edited_question(
     is_answer_text_changed = answer_text != edited_answer_text
     is_rating_changed = rating != edited_rating
 
-    result = [format_id(id)]
+    result = [messages.format.question.id.format(id=format_id(id))]
 
     result.append(
-        messages.format.edit.edited.format(
-            old=format_question_text(question_text),
-            new=format_question_text(edited_question_text),
-        )
-        if is_question_text_changed
-        else messages.format.edit.unedited.format(
-            old=format_question_text(question_text)
+        messages.format.question.question_text.format(
+            question_text=(
+                messages.format.edit.edited.format(
+                    old=format_question_text(question_text),
+                    new=format_question_text(edited_question_text),
+                )
+                if is_question_text_changed
+                else messages.format.edit.unedited.format(
+                    old=format_question_text(question_text)
+                )
+            )
         )
     )
 
     result.append(
-        messages.format.edit.edited.format(
-            old=format_answer_text(answer_text),
-            new=format_answer_text(edited_answer_text),
+        messages.format.question.answer_text.format(
+            answer_text=(
+                messages.format.edit.edited.format(
+                    old=format_answer_text(answer_text),
+                    new=format_answer_text(edited_answer_text),
+                )
+                if is_answer_text_changed
+                else messages.format.edit.unedited.format(
+                    old=format_answer_text(answer_text)
+                )
+            )
         )
-        if is_answer_text_changed
-        else messages.format.edit.unedited.format(old=format_answer_text(answer_text))
     )
 
     result.append(
-        messages.format.edit.edited.format(
-            old=format_rating(rating), new=format_rating(edited_rating)
+        messages.format.question.rating.format(
+            rating=(
+                messages.format.edit.edited.format(
+                    old=format_rating(rating), new=format_rating(edited_rating)
+                )
+                if is_rating_changed
+                else messages.format.edit.unedited.format(old=format_rating(rating))
+            )
         )
-        if is_rating_changed
-        else messages.format.edit.unedited.format(old=format_rating(rating))
     )
 
     result.append(
