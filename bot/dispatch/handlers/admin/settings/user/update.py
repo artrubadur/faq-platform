@@ -155,10 +155,10 @@ async def process_fields_handler(
 
     id: int = data["orig_id"]
     username: str | None = data["orig_username"]
-    role: Role = data["orig_role"]
+    role: Role = Role(data["orig_role"])
 
     edited_username: str | None = data.get("edited_username", username)
-    edited_role: Role = data.get("edited_role", role)
+    edited_role: Role = Role(data.get("edited_role", role))
 
     await send_changes(
         message,
@@ -341,19 +341,13 @@ async def user_update_cb_save_handler(
 
     id: int = data["orig_id"]
     username: str | None = data["orig_username"]
-    role: Role = data["orig_role"]
+    role: Role = Role(data["orig_role"])
 
     edited_username: str | None = data.get("edited_username", username)
-    edited_role: Role = data.get("edited_role", role)
-
-    payload = {}
-    if username != edited_username:
-        payload["username"] = edited_username
-    if role != edited_role:
-        payload["role"] = edited_role
+    edited_role: Role = Role(data.get("edited_role", role))
 
     try:
-        user = await user_gateway.update_user(id, **payload)
+        user = await user_gateway.update_user(id, edited_role, edited_username)
     except NotFoundError:
         await state.clear()
         return await send_not_found(

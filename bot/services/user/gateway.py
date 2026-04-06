@@ -9,8 +9,6 @@ from shared.contracts.user.requests import (
 )
 from shared.contracts.user.responses import Role, UserResponse, UsersAmountResponse
 
-_UNSET = object()
-
 
 class UserGateway:
     def __init__(
@@ -78,16 +76,10 @@ class UserGateway:
     async def update_user(
         self,
         id: int,
-        role: Role | None = None,
-        username: str | None | object = _UNSET,
+        role: Role,
+        username: str | None = None,
     ) -> UserResponse:
-        payload = {}
-
-        if username is not _UNSET:
-            payload["username"] = username
-        if role is not None:
-            payload["role"] = role
-
+        payload = {"username": username, "role": role}
         request = UpdateUserRequest.model_validate(payload)
         data = await self.client.patch(
             f"/users/{id}",

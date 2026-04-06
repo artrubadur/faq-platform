@@ -75,9 +75,9 @@ async def process_identity_handler(
             "long",
         )
         logger.debug("User partially obtained", id=input_id)
-        return
-
-    await send_partially_found(message, send_action, input_id, input_username)
+        return await send_partially_found(
+            message, send_action, input_id, input_username
+        )
 
     await state.storage.update_data(
         state.key,

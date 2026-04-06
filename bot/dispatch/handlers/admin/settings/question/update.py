@@ -380,7 +380,7 @@ async def question_update_cb_save_handler(callback: CallbackQuery, state: TempCo
     if answer_text != edited_answer_text:
         payload["answer_text"] = edited_answer_text
     if rating != edited_rating:
-        payload["edited_rating"] = edited_rating
+        payload["rating"] = edited_rating
 
     try:
         question = await question_gateway.update_question(id, **payload)
