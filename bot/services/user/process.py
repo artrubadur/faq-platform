@@ -10,7 +10,7 @@ def process_identity_msg(message: Message):
         input_id, input_username = message.contact.user_id, None
         if input_id is None:
             raise ValueError(messages.process.user.contact_invalid)
-    elif isinstance(message.w, MessageOriginUser):
+    elif isinstance(message.forward_origin, MessageOriginUser):
         input_id = message.forward_origin.sender_user.id
         input_username = message.forward_origin.sender_user.username
     elif message.forward_origin is not None:
