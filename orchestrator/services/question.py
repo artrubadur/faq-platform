@@ -343,7 +343,9 @@ class QuestionsService:
             await self.repository.increment_ratings([similar[0]], [gain])
 
             suggestions = await self._complete_with_popular_questions(
-                similar[:request.max_similar_amount], request.max_popular_amount, request.max_amount
+                similar[: request.max_similar_amount],
+                request.max_popular_amount,
+                request.max_amount,
             )
 
             return QuestionSuggestionResponse(
@@ -376,7 +378,7 @@ class QuestionsService:
                 request.question_text, similar_reranked, similarity_by_question_id
             )
         else:
-            similar_reranked = similar_reranked[:request.max_similar_amount]
+            similar_reranked = similar_reranked[: request.max_similar_amount]
 
         suggestions = await self._complete_with_popular_questions(
             similar_reranked, request.max_popular_amount, request.max_amount

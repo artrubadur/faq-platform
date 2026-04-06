@@ -88,6 +88,11 @@ The compose stack includes:
 - `orchestrator` (from `orchestrator/Dockerfile`)
 - `bot` (from `bot/Dockerfile`)
 
+## Database Migrations (Alembic)
+
+Migration workflows (local and Docker), template `-x` revisions, downgrade, and
+troubleshooting are documented in [docs/migrations.md](migrations.md).
+
 ## Environment Variables
 
 ### Compose interpolation (`.env`)

@@ -24,7 +24,8 @@ Minimal Docker start:
 cp env/bot.env.example env/bot.env
 cp env/orchestrator.env.example env/orchestrator.env
 cp .env.example .env
-cp config/orchestrator/requests.yml config/requests.yml
+docker compose up -d db
+docker compose run --build --rm orchestrator alembic upgrade head
 docker compose up --build
 ```
 
@@ -33,6 +34,7 @@ This starts `db`, `redis`, `orchestrator`, and `bot`.
 ## Documentation
 
 - [Setup and Configuration](docs/setup.md)
+- [Database Migrations](docs/migrations.md)
 - [Architecture](docs/architecture.md)
 - [Messages Customization](docs/messages.md)
 - [Custom Commands](docs/commands.md)

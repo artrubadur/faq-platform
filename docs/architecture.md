@@ -157,12 +157,13 @@ YAML-driven runtime customization:
 
 ## Schema Synchronization
 
-On startup, DB schema is reconciled with env-defined constraints:
+Schema changes are managed by Alembic revisions.
 
-- adjusts `question_text` and `answer_text` column lengths
-- validates shrink operations against existing row lengths
-- reconciles embedding vector dimension
-- recomputes embeddings if dimension changed and table is not empty
+On orchestrator startup:
+
+- checks that DB revision matches current Alembic head
+- validates runtime `DB_SCHEMA__*` constraints against actual DB types
+- fails fast with migration instructions if schema/revision is out of date
 
 ## Logging and Notifications
 
@@ -170,7 +171,6 @@ Logging is configured from YAML and supports:
 
 - stdout/file sinks
 - duplicate suppression with repeat counters
-- throttled Telegram notifications to admins for warning/error logs
 
 ## Notable Commands
 

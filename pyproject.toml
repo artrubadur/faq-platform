@@ -18,6 +18,7 @@ pgvector = "^0.4.2"
 asyncpg = "^0.31.0"
 fastapi = "^0.135.2"
 uvicorn = "^0.42.0"
+alembic = "^1.18.4"
 
 [tool.poetry.group.shared.dependencies]
 pydantic = "^2.12.5"

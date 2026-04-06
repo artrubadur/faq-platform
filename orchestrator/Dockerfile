@@ -10,7 +10,7 @@ ENV PYTHONUNBUFFERED=1 \
 
 RUN python -m pip install "poetry==${POETRY_VERSION}"
 
-COPY pyproject.toml poetry.lock ./
+COPY pyproject.toml poetry.lock alembic.ini ./
 
 RUN poetry config virtualenvs.create false \
     && poetry install --only main,orchestrator,shared --no-root --no-cache
