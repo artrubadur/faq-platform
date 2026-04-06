@@ -6,8 +6,8 @@ from loguru import logger
 
 from orchestrator.api import questions_router, users_router
 from orchestrator.api.errors import register_exception_handlers
-from orchestrator.core import requests_status
 from orchestrator.core.config import config
+from orchestrator.core.requests import status as requests_status
 from orchestrator.db.core import close_db, init_db
 from orchestrator.db.session import async_session
 from orchestrator.integrations.compose.http_client import close_compose_http_client

@@ -10,10 +10,14 @@ def _read_column_type_attr(
     column_name: str,
     type_attr: str,
 ):
+    inspector = inspect(sync_conn)
+    if not inspector.has_table(table_name):
+        return None
+
     db_col = next(
         (
             c
-            for c in inspect(sync_conn).get_columns(table_name)
+            for c in inspector.get_columns(table_name)
             if c["name"] == column_name
         ),
         None,

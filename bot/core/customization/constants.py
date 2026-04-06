@@ -4,7 +4,7 @@ from pydantic_settings import SettingsConfigDict
 
 from shared.utils.config import DynamicSettings
 
-BOT_SYSTEM_KEYS = [
+_BOT_SYSTEM_KEYS = [
     "identity",
     "id",
     "user",
@@ -26,20 +26,20 @@ BOT_SYSTEM_KEYS = [
     "content",
     "exception",
 ]
-CONSTANTS_PATH = Path("config/constants.yml")
+_CONSTANTS_PATH = Path("config/constants.yml")
 
 
 class CustomConstants(DynamicSettings):
-    model_config = SettingsConfigDict(yaml_file=CONSTANTS_PATH)
+    model_config = SettingsConfigDict(yaml_file=_CONSTANTS_PATH)
 
 
-constants = CustomConstants(reserved=BOT_SYSTEM_KEYS)
+constants = CustomConstants(reserved=_BOT_SYSTEM_KEYS)
 
 
 status = "Failed to check the status of constants"
-if not CONSTANTS_PATH.exists() or not CONSTANTS_PATH.is_file():
-    status = f"No constanst loaded: File {str(CONSTANTS_PATH)} does not exists."
+if not _CONSTANTS_PATH.exists() or not _CONSTANTS_PATH.is_file():
+    status = f"No constants loaded: File {str(_CONSTANTS_PATH)} does not exist."
 elif len(constants.model_fields_set) == 1:  # reserved
-    status = f"No constanst loaded: File {str(CONSTANTS_PATH)} is empty."
+    status = f"No constants loaded: File {str(_CONSTANTS_PATH)} is empty."
 else:
-    status = f"Constants has been loaded from {str(CONSTANTS_PATH)}"
+    status = f"Constants have been loaded from {str(_CONSTANTS_PATH)}"

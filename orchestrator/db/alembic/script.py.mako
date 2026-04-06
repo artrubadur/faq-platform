@@ -8,7 +8,9 @@ Create Date: ${create_date}
 from typing import Sequence, Union
 
 from alembic import op
+% if not (embedding_not_null and new_q_len is None and new_a_len is None and new_dim is None):
 import sqlalchemy as sa
+% endif
 % if new_dim is not None:
 from pgvector.sqlalchemy import Vector
 % endif

@@ -4,11 +4,11 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field, field_validator, model_validator
 from pydantic_settings import SettingsConfigDict
 
-from bot.core.customization.constants import BOT_SYSTEM_KEYS, constants
+from bot.core.customization.constants import _BOT_SYSTEM_KEYS, constants
 from bot.core.customization.formatter import SafeFormatter
 from shared.utils.config import YamlSettings
 
-MESSAGES_PATH = Path("config/messages.yml")
+_MESSAGES_PATH = Path("config/messages.yml")
 
 
 # Responses
@@ -365,7 +365,7 @@ class Format(BaseModel):
 
 
 class Messages(YamlSettings):
-    model_config = SettingsConfigDict(yaml_file=MESSAGES_PATH, frozen=False)
+    model_config = SettingsConfigDict(yaml_file=_MESSAGES_PATH, frozen=False)
 
     parse_mode: Literal["html", "markdown", None] = "html"
 
@@ -386,7 +386,7 @@ class Messages(YamlSettings):
 
     @model_validator(mode="before")
     def apply_constants(cls, data: dict[str, Any]) -> dict[str, Any]:
-        formatter = SafeFormatter(BOT_SYSTEM_KEYS)
+        formatter = SafeFormatter(_BOT_SYSTEM_KEYS)
 
         def recursive_apply(obj: Any) -> Any:
             if isinstance(obj, str):
@@ -413,9 +413,9 @@ messages: Messages = Messages()
 
 
 status = "Failed to check the status of messages"
-if not MESSAGES_PATH.exists() or not MESSAGES_PATH.is_file():
-    status = f"No messages loaded: File {str(MESSAGES_PATH)} does not exists."
+if not _MESSAGES_PATH.exists() or not _MESSAGES_PATH.is_file():
+    status = f"No messages loaded: File {str(_MESSAGES_PATH)} does not exist."
 elif len(messages.model_fields_set) == 0:
-    status = f"No messages loaded: File {str(MESSAGES_PATH)} is empty."
+    status = f"No messages loaded: File {str(_MESSAGES_PATH)} is empty."
 else:
-    status = f"Messages has been loaded from {str(MESSAGES_PATH)}"
+    status = f"Messages have been loaded from {str(_MESSAGES_PATH)}"

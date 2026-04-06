@@ -1,7 +1,9 @@
 from loguru import logger
 
-from bot.core import commands_status, constants_status, messages_status
 from bot.core.config import config
+from bot.core.customization.commands import status as commands_status
+from bot.core.customization.constants import status as constants_status
+from bot.core.customization.messages import status as messages_status
 from bot.dispatch.handlers import admin_router, common_router, public_router
 from bot.dispatch.instance import bot, dp, redis_client
 from bot.dispatch.middlewares import (
