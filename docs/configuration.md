@@ -9,16 +9,18 @@ Compose.
 - `env/bot.env`: bot runtime settings
 - `env/orchestrator.env`: orchestrator runtime settings
 - `config/logging.yml`: shared logging config
-- `config/requests.yml`: orchestrator request templates
-- `config/messages.yml`: bot message texts and formatting
-- `config/constants.yml`: bot placeholders/constants
-- `config/commands.yml`: bot custom public commands
+- `config/orchestrator/redis.conf`: Redis runtime config
+- `config/orchestrator/requests.yml`: orchestrator request templates
+- `config/bot/messages.yml`: bot message texts and formatting
+- `config/bot/constants.yml`: bot placeholders/constants
+- `config/bot/commands.yml`: bot custom public commands
 
 ## Docker Compose interpolation (`.env`)
 
 Use `.env` only for mount source overrides:
 
 - `COMPOSE__LOGGING_PATH`
+- `COMPOSE__REDIS_CONFIG_PATH`
 - `COMPOSE__ORCHESTRATOR_REQUESTS_PATH`
 - `COMPOSE__BOT_CONSTANTS_PATH`
 - `COMPOSE__BOT_MESSAGES_PATH`

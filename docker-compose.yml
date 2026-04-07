@@ -3,9 +3,10 @@ services:
     image: redis:7.4-alpine
     container_name: redis_server
     restart: unless-stopped
-    command: sh -c 'redis-server --requirepass "$$REDIS__PASSWORD" --appendonly yes'
+    command: sh -c 'redis-server /usr/local/etc/redis/redis.conf --requirepass "$$REDIS__PASSWORD"'
     volumes:
       - redis_data:/data
+      - ${COMPOSE__REDIS_CONFIG_PATH:-./config/orchestrator/redis.conf}:/usr/local/etc/redis/redis.conf:ro
     env_file:
       - env/bot.env
 

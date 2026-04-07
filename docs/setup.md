@@ -28,10 +28,11 @@ cp config/orchestrator/requests.yml config/requests.yml
 Runtime files used by services:
 
 - `config/logging.yml`
-- `config/requests.yml`
-- `config/messages.yml`
-- `config/constants.yml`
-- `config/commands.yml`
+- `config/orchestrator/redis.conf`
+- `config/orchestrator/requests.yml`
+- `config/bot/messages.yml`
+- `config/bot/constants.yml`
+- `config/bot/commands.yml`
 
 ## 2. Install dependencies (local run)
 
