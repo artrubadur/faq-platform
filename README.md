@@ -1,37 +1,45 @@
-# FAQ Bot
+# FAQ Platform: Telegram FAQ Bot with Semantic Search 🤖
 
-Telegram FAQ bot with semantic search, pgvector-backed similarity lookup, and an
-admin UI for managing users and questions.
+> Smart FAQ answers for Telegram, powered by vector search, optional LLM reranking, and a FastAPI orchestrator.
 
-## Features
+---
 
-- Semantic question search using external embeddings.
-- Optional LLM-based reranking and answer composition for confident matches.
-- PostgreSQL + pgvector storage for questions and embeddings.
-- Redis-backed temporary state with separate short and long TTL scopes.
-- Admin workflows for question/user CRUD, pagination, bans, and diagnostics.
-- Runtime text customization via YAML (`messages`, `constants`, `commands`).
-- Configurable rate limiting middleware.
+## ✨ What This Project Is
 
-## Quick Start
+`faq-platform` is a production-oriented FAQ automation stack for Telegram.
+It combines:
 
-For full setup and runtime configuration details, see
-[docs/setup.md](docs/setup.md) and [docs/configuration.md](docs/configuration.md).
+- a Telegram bot for user/admin interactions,
+- an orchestrator service for business logic and API workflows,
+- PostgreSQL + `pgvector` for semantic similarity search,
+- Redis for short/long-lived runtime state.
 
-Minimal Docker start:
+If you want your FAQ bot to handle real language (not only exact keyword matches), this project is built for that.
 
-```bash
-cp env/bot.env.example env/bot.env
-cp env/orchestrator.env.example env/orchestrator.env
-cp .env.example .env
-docker compose up -d db
-docker compose run --build --rm orchestrator alembic upgrade head
-docker compose up --build
-```
+---
 
-This starts `db`, `redis`, `orchestrator`, and `bot`.
+## 🚀 Core Features
 
-## Documentation
+- 🔎 Semantic question search using external embeddings.
+- 🧠 Optional LLM reranking and answer composition for high-confidence replies.
+- 🗄️ PostgreSQL + `pgvector` storage for questions and embeddings.
+- ⚡ Redis-backed state with separate short and long TTL scopes.
+- 🛠️ Admin workflows for question/user CRUD, pagination, bans, and diagnostics.
+- 📝 Runtime text customization via YAML (`messages`, `constants`, `commands`).
+- 🧱 Configurable rate limiting middleware.
+
+---
+
+## ⚡ High-level flow
+
+1. User asks a question in Telegram.
+2. The system embeds the query and retrieves semantically similar FAQ entries.
+3. Optional reranking/composition improves answer quality.
+4. Bot returns the best available response.
+
+---
+
+## 📚 Documentation
 
 - [Setup Guide](docs/setup.md)
 - [Configuration Reference](docs/configuration.md)
