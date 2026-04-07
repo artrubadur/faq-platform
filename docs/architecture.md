@@ -175,5 +175,5 @@ Logging is configured from YAML and supports:
 ## Notable Commands
 
 - Public: `/start`, `/ask`, plain text question handling
-- Admin: `/settings`, `/ban`, `/unban`, `/state`, `/goto`, `/error`
+- Admin: `/settings`, `/ban`, `/unban`, `/state`
 - Dynamic commands: loaded from `config/commands.yml`

@@ -2,7 +2,7 @@ services:
   redis:
     image: redis:7.4-alpine
     container_name: redis_server
-    restart: always
+    restart: unless-stopped
     command: sh -c 'redis-server --requirepass "$$REDIS__PASSWORD" --appendonly yes'
     volumes:
       - redis_data:/data
@@ -12,7 +12,7 @@ services:
   db:
     image: pgvector/pgvector:pg17
     container_name: database_server
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_DB: faq_bot_db
       POSTGRES_USER: postgres
@@ -26,7 +26,7 @@ services:
       context: .
       dockerfile: orchestrator/Dockerfile
     container_name: orchestrator_server
-    restart: always
+    restart: unless-stopped
     depends_on:
       - db
     environment:
@@ -42,7 +42,7 @@ services:
       context: .
       dockerfile: bot/Dockerfile
     container_name: bot_server
-    restart: always
+    restart: unless-stopped
     depends_on:
       - orchestrator
       - redis
@@ -51,6 +51,8 @@ services:
       ORCHESTRATOR_CLIENT__BASE_URL: http://orchestrator:8000
     env_file:
       - env/bot.env
+    ports:
+      - "8080:8080"
     volumes:
       - ${COMPOSE__LOGGING_PATH:-./config/logging.yml}:/app/config/logging.yml:ro
       - ${COMPOSE__BOT_CONSTANTS_PATH:-./config/bot/constants.example.yml}:/app/config/constants.yml:ro

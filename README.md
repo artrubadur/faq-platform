@@ -15,8 +15,8 @@ admin UI for managing users and questions.
 
 ## Quick Start
 
-For full setup, environment variables, and runtime config details, see
-[docs/setup.md](docs/setup.md).
+For full setup and runtime configuration details, see
+[docs/setup.md](docs/setup.md) and [docs/configuration.md](docs/configuration.md).
 
 Minimal Docker start:
 
@@ -33,7 +33,8 @@ This starts `db`, `redis`, `orchestrator`, and `bot`.
 
 ## Documentation
 
-- [Setup and Configuration](docs/setup.md)
+- [Setup Guide](docs/setup.md)
+- [Configuration Reference](docs/configuration.md)
 - [Database Migrations](docs/migrations.md)
 - [Architecture](docs/architecture.md)
 - [Messages Customization](docs/messages.md)

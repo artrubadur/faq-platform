@@ -1,3 +1,8 @@
+import asyncio
+
+from aiogram.methods import DeleteWebhook
+from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
+from aiohttp import web
 from loguru import logger
 
 from bot.core.config import config
@@ -16,7 +21,7 @@ from bot.dispatch.middlewares import (
 from bot.services.http_client import close_orchestrator_client
 
 
-async def startup():
+def configure_pipeline() -> None:
     logger.info(messages_status)
     logger.info(constants_status)
     logger.info(commands_status)
@@ -51,11 +56,65 @@ async def startup():
     dp.include_router(common_router)
     dp.include_router(public_router)
 
-    logger.info("Bot is starting")
+    dp.startup.register(on_startup)
+    dp.shutdown.register(on_shutdown)
+
+
+async def on_startup() -> None:
+    if config.bot.mode == "webhook":
+        await bot.set_webhook(
+            url=config.bot.webhook.url,
+            secret_token=config.bot.webhook.secret_token,
+            drop_pending_updates=config.bot.webhook.drop_pending_updates,
+        )
+        logger.info(f"Webhook configured at {config.bot.webhook.url}")
+        return
+
+    await bot(
+        DeleteWebhook(drop_pending_updates=config.bot.webhook.drop_pending_updates)
+    )
+
+
+async def on_shutdown() -> None:
+    if config.bot.mode == "webhook":
+        await bot(DeleteWebhook())
+
+    await close_orchestrator_client()
+    logger.info("Bot stopped")
+
+
+async def run_polling() -> None:
+    logger.info("Starting bot in polling mode")
     await dp.start_polling(bot)
 
 
-@dp.shutdown()
-async def shutdown():
-    logger.info("Bot stopped by user")
-    await close_orchestrator_client()
+def run_webhook() -> None:
+    logger.info(
+        f"Starting bot in webhook mode at 0.0.0.0:8080{config.bot.webhook.path}",
+    )
+    app = web.Application()
+
+    webhook_requests_handler = SimpleRequestHandler(
+        dispatcher=dp,
+        bot=bot,
+        secret_token=config.bot.webhook.secret_token,
+    )
+    webhook_requests_handler.register(app, path=config.bot.webhook.path)
+    setup_application(app, dp, bot=bot)
+
+    web.run_app(
+        app,
+        host="0.0.0.0",
+        port=8080,
+        print=None,
+    )
+
+
+def run() -> None:
+    configure_pipeline()
+
+    if config.bot.mode == "webhook":
+        run_webhook()
+        return
+
+    asyncio.run(run_polling())

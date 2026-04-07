@@ -1,218 +1,31 @@
-# Setup and Configuration
+# Setup Guide
 
-This guide documents how to run and configure the FAQ bot in local and Docker
-environments.
+This guide focuses on launch steps.
+
+For environment variables and YAML details, see
+[configuration.md](configuration.md).
+
+For migration workflows and advanced revision tasks, see
+[migrations.md](migrations.md).
 
 ## Prerequisites
 
 - Python 3.12
 - Poetry
-- PostgreSQL (with `pgvector` extension)
-- Redis
+- Docker and Docker Compose
 - Telegram bot token
-- Embedding/rerank/compose API credentials
+- Credentials for embedding/rerank/compose providers
 
-## Local Setup
-
-### 1. Install dependencies
-
-```bash
-poetry install
-```
-
-### 2. Prepare local env files
-
-```bash
-cp env/bot.env.example env/bot.env
-cp env/orchestrator.env.example env/orchestrator.env
-```
-
-Set required values:
-
-- `env/bot.env`: `BOT__TOKEN`, Redis settings, orchestrator client settings
-- `env/orchestrator.env`: DB settings, suggestion settings, `REQUESTS__*`,
-  and `ADMIN__IDS`
-
-### 3. Prepare runtime YAML configs
-
-Create orchestrator request config at runtime path:
-
-```bash
-cp config/orchestrator/requests.yml config/requests.yml
-```
-
-Runtime files:
-
-- `config/logging.yml` (already present)
-- `config/requests.yml` (required by orchestrator)
-
-Reference template:
-
-- `config/orchestrator/requests.yml`
-
-### 4. Start infra
-
-Option A: use local services.
-
-Option B: start infra only with Docker:
-
-```bash
-docker compose up -d db redis
-```
-
-### 5. Run orchestrator
-
-```bash
-poetry run python -m orchestrator
-```
-
-### 6. Run bot
-
-```bash
-poetry run python -m bot
-```
-
-## Docker Setup (Full Stack)
+## 1. Prepare files
 
 ```bash
 cp env/bot.env.example env/bot.env
 cp env/orchestrator.env.example env/orchestrator.env
 cp .env.example .env
-docker compose up --build
+cp config/orchestrator/requests.yml config/requests.yml
 ```
 
-The compose stack includes:
-
-- `db` (`pgvector/pgvector:pg17`)
-- `redis` (`redis:7.4-alpine`)
-- `orchestrator` (from `orchestrator/Dockerfile`)
-- `bot` (from `bot/Dockerfile`)
-
-## Database Migrations (Alembic)
-
-Migration workflows (local and Docker), template `-x` revisions, downgrade, and
-troubleshooting are documented in [docs/migrations.md](migrations.md).
-
-## Environment Variables
-
-### Compose interpolation (`.env`)
-
-Use `.env` only for Docker Compose interpolation (volume source overrides):
-
-- `COMPOSE__LOGGING_PATH`
-- `COMPOSE__ORCHESTRATOR_REQUESTS_PATH`
-- `COMPOSE__BOT_CONSTANTS_PATH`
-- `COMPOSE__BOT_MESSAGES_PATH`
-- `COMPOSE__BOT_COMMANDS_PATH`
-
-### Bot runtime (`env/bot.env`)
-
-- `BOT__TOKEN` (required)
-
-Redis:
-
-- `REDIS__HOST` (required)
-- `REDIS__PASSWORD` (required)
-- `REDIS__LONG_TTL` (default `86400`)
-- `REDIS__SHORT_TTL` (default `300`)
-
-Question limits:
-
-- `QUESTION_LIMITS__MAX_QUESTION_TEXT_LEN` (default `384`)
-- `QUESTION_LIMITS__MAX_ANSWER_TEXT_LEN` (default `384`)
-- `QUESTION_LIMITS__MAX_SIMILAR_AMOUNT` (default `7`)
-- `QUESTION_LIMITS__MAX_POPULAR_AMOUNT` (default `7`)
-- `QUESTION_LIMITS__MAX_AMOUNT` (default `7`)
-
-Validation rule:
-
-- `MAX_SIMILAR_AMOUNT <= MAX_AMOUNT`
-- `MAX_POPULAR_AMOUNT <= MAX_AMOUNT`
-
-Rate limiting:
-
-- `RATE_LIMIT__ENABLED` (default `true`)
-- `RATE_LIMIT__MAX_REQUESTS` (default `5`)
-- `RATE_LIMIT__WINDOW` (default `10`)
-- `RATE_LIMIT__SKIP_ADMIN` (default `true`)
-
-Orchestrator API client:
-
-- `ORCHESTRATOR_CLIENT__BASE_URL` (required)
-- `ORCHESTRATOR_CLIENT__TIMEOUT` (default `5`)
-- `ORCHESTRATOR_CLIENT__RETRIES` (default `1`)
-- `ORCHESTRATOR_CLIENT__RETRY_DELAY` (default `0.2`)
-
-### Orchestrator runtime (`env/orchestrator.env`)
-
-Database:
-
-- `DB__NAME` (required)
-- `DB__USER` (required)
-- `DB__PASSWORD` (required)
-- `DB__HOST` (required)
-
-Suggestion search thresholds:
-
-- `SUGGESTION__SEARCH__BEST_MATCH_THRESHOLD` (default `0.7`)
-- `SUGGESTION__SEARCH__BEST_MATCH_MARGIN` (default `0.05`)
-- `SUGGESTION__SEARCH__RELATED_THRESHOLD` (default `0.6`)
-- `SUGGESTION__SEARCH__OBVIOUS_MARGIN` (default `0.3`)
-
-Suggestion behavior:
-
-- `SUGGESTION__RERANK__ENABLED` (default `true`)
-- `SUGGESTION__COMPOSE__ENABLED` (default `true`)
-- `SUGGESTION__COMPOSE__SUPPORTING_MARGIN` (default `0.15`)
-- `SUGGESTION__COMPOSE__SUPPORTING_TOP_K` (default `2`)
-
-Embedding provider API client:
-
-- `CLIENTS__EMBEDDING__BASE_URL` (optional)
-- `CLIENTS__EMBEDDING__TIMEOUT` (default `5`)
-- `CLIENTS__EMBEDDING__RETRIES` (default `1`)
-- `CLIENTS__EMBEDDING__RETRY_DELAY` (default `0.2`)
-
-Rerank provider API client:
-
-- `CLIENTS__RERANK__BASE_URL` (optional)
-- `CLIENTS__RERANK__TIMEOUT` (default `5`)
-- `CLIENTS__RERANK__RETRIES` (default `1`)
-- `CLIENTS__RERANK__RETRY_DELAY` (default `0.2`)
-
-Compose provider API client:
-
-- `CLIENTS__COMPOSE__BASE_URL` (optional)
-- `CLIENTS__COMPOSE__TIMEOUT` (default `5`)
-- `CLIENTS__COMPOSE__RETRIES` (default `1`)
-- `CLIENTS__COMPOSE__RETRY_DELAY` (default `0.2`)
-
-Request template variables:
-
-- `REQUESTS__FOLDER_ID` (required by Yandex embedding/rerank/compose templates)
-- `REQUESTS__IAM_TOKEN` (required by Yandex embedding/rerank/compose templates)
-
-Schema constraints:
-
-- `DB_SCHEMA__QUESTION_TEXT_MAX_LEN` (default `384`)
-- `DB_SCHEMA__ANSWER_TEXT_MAX_LEN` (default `384`)
-- `DB_SCHEMA__QUESTION_EMBEDDING_DIM` (default `256`)
-
-Admin sync:
-
-- `ADMIN__IDS` (default `[]`)
-
-API:
-
-- `API__HOST` (default `0.0.0.0`)
-- `API__PORT` (default `8000`)
-
-## YAML Configuration Files
-
-Files with the `.example.yml` suffix match the built-in defaults and can be used
-as templates.
-
-Runtime YAML paths inside the apps are fixed:
+Runtime files used by services:
 
 - `config/logging.yml`
 - `config/requests.yml`
@@ -220,85 +33,133 @@ Runtime YAML paths inside the apps are fixed:
 - `config/constants.yml`
 - `config/commands.yml`
 
-In Docker Compose, host files are mounted into these paths via `COMPOSE__*`
-variables from `.env`.
+## 2. Install dependencies (local run)
 
-### `config/requests.yml` (required)
+```bash
+poetry install
+```
 
-Defines how embedding, rerank, and compose requests are built/parsed:
+## 3. Run database migrations
 
-- HTTP method/url/headers/body template
-- `path.target`: where payload text is injected into request body
-- `path.source`: where response value is extracted from response payload
+Local:
 
-Sections:
+```bash
+poetry run alembic upgrade head
+```
 
-- `embedding` is required.
-- `rerank` is optional when `SUGGESTION__RERANK__ENABLED=false`.
-- `rerank` is required when `SUGGESTION__RERANK__ENABLED=true`.
-- `compose` is optional when `SUGGESTION__COMPOSE__ENABLED=false`.
-- `compose` is required when `SUGGESTION__COMPOSE__ENABLED=true`.
+Docker:
 
-Reference with Yandex Cloud API template: `config/orchestrator/requests.yml`.
+```bash
+docker compose up -d db
+docker compose run --rm orchestrator alembic upgrade head
+```
 
-### `config/messages.yml` (optional)
+## 4. Launch pipeline
 
-Overrides user/admin texts, parse mode, formatting, and button labels.
+Choose infrastructure mode before starting services:
 
-See [messages.md](messages.md).
+- Option A: use local infrastructure services.
+- Option B: run only infrastructure in Docker:
 
-Reference defaults: `config/bot/messages.example.yml`
+```bash
+docker compose up -d db redis
+```
 
-### `config/constants.yml` (optional)
+### Polling mode
 
-Provides constant placeholders used in messages and commands.
+Set `BOT__MODE="polling"` and `BOT__TOKEN` in `env/bot.env`.
 
-Reference defaults: `config/bot/constants.example.yml`
+Local:
 
-### `config/commands.yml` (optional)
+```bash
+docker compose up -d db redis
+poetry run python -m orchestrator
+poetry run python -m bot
+```
 
-Adds dynamic public commands.
+Docker:
 
-See [commands.md](commands.md).
+```bash
+docker compose up --build
+```
 
-Reference defaults: `config/bot/commands.example.yml`
+### Webhook mode
 
-### Logging config (`config/logging.yml`)
+Set these values in `env/bot.env`:
 
-Supports stdout/file/telegram sinks, duplicate suppression, and throttling.
+- `BOT__MODE="webhook"`
+- `BOT__TOKEN`
+- `BOT__WEBHOOK__BASE_URL` as your public HTTPS base URL
+- `BOT__WEBHOOK__PATH` as incoming webhook path
+- `BOT__WEBHOOK__SECRET_TOKEN` for request verification
+- `BOT__WEBHOOK__DROP_PENDING_UPDATES` if you need pending updates cleanup
 
-## Startup Sequence
+Local:
 
-At orchestrator boot (`orchestrator/main.py`):
+```bash
+docker compose up -d db redis
+poetry run python -m orchestrator
+poetry run python -m bot
+```
+
+Docker:
+
+```bash
+docker compose up --build
+```
+
+Notes:
+
+- Effective webhook URL is `BOT__WEBHOOK__BASE_URL + BOT__WEBHOOK__PATH`.
+- The bot listens on `0.0.0.0:8080` in webhook mode.
+- Docker publishes `8080:8080` for the bot service.
+- Telegram requires HTTPS on the public endpoint.
+
+## 5. Manual webhook checks
+
+Set webhook:
+
+```bash
+curl -X POST "https://api.telegram.org/bot<BOT__TOKEN>/setWebhook" \
+  -d "url=<BOT__WEBHOOK__BASE_URL><BOT__WEBHOOK__PATH>" \
+  -d "secret_token=<BOT__WEBHOOK__SECRET_TOKEN>"
+```
+
+Get webhook info:
+
+```bash
+curl -X GET "https://api.telegram.org/bot<BOT__TOKEN>/getWebhookInfo"
+```
+
+Optional reset before switching to polling:
+
+```bash
+curl -X POST "https://api.telegram.org/bot<BOT__TOKEN>/deleteWebhook" \
+  -d "drop_pending_updates=true"
+```
+
+## 6. Troubleshooting
+
+- Startup fails with missing request templates or missing request credentials:
+  check `config/requests.yml`, `REQUESTS__FOLDER_ID`, and `REQUESTS__IAM_TOKEN`.
+- Database startup has vector-related errors:
+  ensure `init.sql` was applied and extension exists in PostgreSQL.
+- Admin commands are unavailable:
+  verify `ADMIN__IDS`, ensure user has started the bot, and restart orchestrator.
+
+## 7. Startup sequence reference
+
+Orchestrator startup order:
 
 1. Logging setup
-2. Table creation (`Base.metadata.create_all`)
+2. Table creation
 3. Schema constraint reconciliation
-4. Admin role sync from `ADMIN__IDS`
+4. Admin role synchronization
 5. API startup
 
-At bot boot (`bot/main.py`):
+Bot startup order:
 
 1. Logging setup
 2. Middleware registration
 3. Router registration
-4. Polling start
-
-## Important Operational Notes
-
-- Admin sync promotes users already present in DB; new admins usually need to
-  run `/start` first, then orchestrator restart/sync.
-- Reducing question/answer varchar limits fails if existing rows exceed limits.
-- Changing embedding dimension triggers automatic vector migration:
-  - empty `questions` table: direct type change
-  - non-empty table: embeddings are recomputed for all rows
-
-## Troubleshooting
-
-- Startup error about missing request templates/settings:
-  check `REQUESTS__*` env values, `SUGGESTION__RERANK__ENABLED`,
-  `SUGGESTION__COMPOSE__ENABLED`, and `config/requests.yml`.
-- `vector` type errors:
-  ensure `init.sql` ran and extension exists in PostgreSQL.
-- Admin commands not available:
-  verify `ADMIN__IDS`, user presence in DB, and role sync.
+4. Mode-specific launch: polling or webhook server

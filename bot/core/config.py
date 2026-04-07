@@ -1,13 +1,58 @@
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from shared.api.client import ApiClientConfig
 
 
+class WebhookConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    base_url: str | None = None
+    path: str = "/telegram/webhook"
+    secret_token: str | None = None
+    drop_pending_updates: bool = False
+
+    @field_validator("base_url", mode="before")
+    @classmethod
+    def normalize_base_url(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        value = value.strip()
+        return value or None
+
+    @field_validator("path", mode="before")
+    @classmethod
+    def normalize_path(cls, value: str) -> str:
+        path = value.strip()
+        if not path:
+            raise ValueError("'path' cannot be empty")
+        if not path.startswith("/"):
+            path = f"/{path}"
+        return path
+
+    @property
+    def url(self) -> str:
+        if self.base_url is None:
+            raise ValueError("'base_url' is required when launching in webhook mode")
+        return f"{self.base_url.rstrip('/')}{self.path}"
+
+
 class BotConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
+    mode: Literal["polling", "webhook"] = "polling"
     token: str
+    webhook: WebhookConfig = Field(default_factory=WebhookConfig)
+
+    @model_validator(mode="after")
+    def validate_webhook_mode(self) -> "BotConfig":
+        if self.mode == "webhook" and self.webhook.base_url is None:
+            raise ValueError(
+                "'webhook.base_url' is required when 'bot.mode' is set to 'webhook'"
+            )
+        return self
 
 
 class RedisConfig(BaseModel):
