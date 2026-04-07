@@ -15,11 +15,7 @@ def _read_column_type_attr(
         return None
 
     db_col = next(
-        (
-            c
-            for c in inspector.get_columns(table_name)
-            if c["name"] == column_name
-        ),
+        (c for c in inspector.get_columns(table_name) if c["name"] == column_name),
         None,
     )
     return getattr(db_col["type"], type_attr, None) if db_col else None
