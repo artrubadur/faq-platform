@@ -44,7 +44,20 @@ class BotConfig(BaseModel):
 
     mode: Literal["polling", "webhook"] = "polling"
     token: str
+    proxy: str | None = None
     webhook: WebhookConfig = Field(default_factory=WebhookConfig)
+
+    @field_validator("proxy", mode="before")
+    @classmethod
+    def normalize_proxy(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        value = value.strip()
+        if not value:
+            return None
+        if value.lower().startswith("socks5h://"):
+            return f"socks5://{value[10:]}"
+        return value
 
     @model_validator(mode="after")
     def validate_webhook_mode(self) -> "BotConfig":

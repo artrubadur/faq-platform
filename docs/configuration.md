@@ -34,6 +34,7 @@ Core:
 
 - `BOT__TOKEN` required
 - `BOT__MODE` supports `polling` or `webhook` (default `polling`)
+- `BOT__PROXY` optional outbound proxy URL for Telegram API calls
 
 Webhook:
 
@@ -51,6 +52,10 @@ Webhook behavior subtleties:
 - When mode is `webhook`, missing base URL causes startup validation error.
 - Webhook server binds to `0.0.0.0:8080`.
 - Certificate is only uploaded to Telegram during `setWebhook`; TLS termination must be handled by your HTTPS endpoint.
+- Proxy applies to all Telegram API requests in both polling and webhook modes.
+- Example SOCKS proxy URL:
+  `socks5://<username>:<password>@<host>:<port>`
+- `socks5h://...` is accepted and normalized to `socks5://...`.
 
 Redis:
 

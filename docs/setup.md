@@ -70,6 +70,7 @@ docker compose up -d db redis
 ### Polling mode
 
 Set `BOT__MODE="polling"` and `BOT__TOKEN` in `env/bot.env`.
+If outbound access to Telegram is restricted, also set `BOT__PROXY`.
 
 Local:
 
@@ -91,10 +92,17 @@ Set these values in `env/bot.env`:
 
 - `BOT__MODE="webhook"`
 - `BOT__TOKEN`
+- `BOT__PROXY` (optional, used for outgoing Telegram API calls)
 - `BOT__WEBHOOK__BASE_URL` as your public HTTPS base URL
 - `BOT__WEBHOOK__PATH` as incoming webhook path
 - `BOT__WEBHOOK__SECRET_TOKEN` for request verification
 - `BOT__WEBHOOK__DROP_PENDING_UPDATES` if you need pending updates cleanup
+
+Proxy URL examples:
+
+- `BOT__PROXY="socks5://<username>:<password>@<host>:<port>"`
+- `BOT__PROXY="http://<username>:<password>@<host>:<port>"`
+- `BOT__PROXY="socks5h://..."` is accepted and normalized to `socks5://...`
 
 Local:
 
