@@ -5,6 +5,8 @@ from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_applicati
 from aiohttp import web
 from loguru import logger
 
+from bot.core.certificate import certificate
+from bot.core.certificate import status as certificate_status
 from bot.core.config import config
 from bot.core.customization.commands import status as commands_status
 from bot.core.customization.constants import status as constants_status
@@ -62,8 +64,10 @@ def configure_pipeline() -> None:
 
 async def on_startup() -> None:
     if config.bot.mode == "webhook":
+        logger.info(certificate_status)
         await bot.set_webhook(
             url=config.bot.webhook.url,
+            certificate=certificate,
             secret_token=config.bot.webhook.secret_token,
             drop_pending_updates=config.bot.webhook.drop_pending_updates,
         )

@@ -9,11 +9,12 @@ Compose.
 - `env/bot.env`: bot runtime settings
 - `env/orchestrator.env`: orchestrator runtime settings
 - `config/logging.yml`: shared logging config
-- `config/orchestrator/redis.conf`: Redis runtime config
+- `config/bot/redis.conf`: Redis runtime config
 - `config/orchestrator/requests.yml`: orchestrator request templates
 - `config/bot/messages.yml`: bot message texts and formatting
 - `config/bot/constants.yml`: bot placeholders/constants
 - `config/bot/commands.yml`: bot custom public commands
+- `config/bot/webhook.pem`: optional public certificate for webhook registration
 
 ## Docker Compose interpolation (`.env`)
 
@@ -25,6 +26,7 @@ Use `.env` only for mount source overrides:
 - `COMPOSE__BOT_CONSTANTS_PATH`
 - `COMPOSE__BOT_MESSAGES_PATH`
 - `COMPOSE__BOT_COMMANDS_PATH`
+- `COMPOSE__BOT_CERTIFICATE_PATH`
 
 ## Bot runtime (`env/bot.env`)
 
@@ -47,6 +49,8 @@ Webhook behavior subtleties:
 - If path does not start with `/`, it is normalized automatically.
 - Effective webhook URL is `BOT__WEBHOOK__BASE_URL + BOT__WEBHOOK__PATH`.
 - When mode is `webhook`, missing base URL causes startup validation error.
+- Webhook server binds to `0.0.0.0:8080`.
+- Certificate is only uploaded to Telegram during `setWebhook`; TLS termination must be handled by your HTTPS endpoint.
 
 Redis:
 

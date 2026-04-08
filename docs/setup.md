@@ -28,11 +28,12 @@ cp config/orchestrator/requests.yml config/requests.yml
 Runtime files used by services:
 
 - `config/logging.yml`
-- `config/orchestrator/redis.conf`
+- `config/bot/redis.conf`
 - `config/orchestrator/requests.yml`
 - `config/bot/messages.yml`
 - `config/bot/constants.yml`
 - `config/bot/commands.yml`
+- `config/bot/webhook.pem` (optional, webhook mode only)
 
 ## 2. Install dependencies (local run)
 
@@ -109,12 +110,29 @@ Docker:
 docker compose up --build
 ```
 
+Optional self-signed certificate (simple mode):
+
+- Put your public PEM certificate at `config/bot/webhook.pem`.
+- For Docker mount override, set `COMPOSE__BOT_CERTIFICATE_PATH` in `.env`.
+- If certificate file is missing, bot still starts and sets webhook without `certificate`.
+
+Example generation:
+
+```bash
+openssl req -x509 -newkey rsa:2048 -sha256 -days 365 -nodes \
+  -keyout /tmp/webhook.key \
+  -out config/bot/webhook.pem \
+  -subj "/CN=<your-public-domain>"
+```
+
 Notes:
 
 - Effective webhook URL is `BOT__WEBHOOK__BASE_URL + BOT__WEBHOOK__PATH`.
 - The bot listens on `0.0.0.0:8080` in webhook mode.
 - Docker publishes `8080:8080` for the bot service.
+- Certificate file is loaded from `config/webhook.pem` inside the bot container.
 - Telegram requires HTTPS on the public endpoint.
+- Bot process does not terminate TLS itself; use HTTPS termination in front of it.
 
 ## 5. Manual webhook checks
 
@@ -124,6 +142,15 @@ Set webhook:
 curl -X POST "https://api.telegram.org/bot<BOT__TOKEN>/setWebhook" \
   -d "url=<BOT__WEBHOOK__BASE_URL><BOT__WEBHOOK__PATH>" \
   -d "secret_token=<BOT__WEBHOOK__SECRET_TOKEN>"
+```
+
+Set webhook with self-signed certificate:
+
+```bash
+curl -X POST "https://api.telegram.org/bot<BOT__TOKEN>/setWebhook" \
+  -F "url=<BOT__WEBHOOK__BASE_URL><BOT__WEBHOOK__PATH>" \
+  -F "secret_token=<BOT__WEBHOOK__SECRET_TOKEN>" \
+  -F "certificate=@config/bot/webhook.pem"
 ```
 
 Get webhook info:
