@@ -156,8 +156,8 @@ process: # Messages shown during input processing
 
   question: # Invalid question input formats
     id_invalid: "Please send a simple text message with ID"
-    msg_question_text_invalid: "Please send a simple text message with the question" # + -(app.handlers.public)
-    cmd_question_text_invalid: "Please specify the question text after the command" # -(app.handlers.public)
+    msg_question_text_invalid: "Please send a simple text message with the question"
+    cmd_question_text_invalid: "Please specify the question text after the command"
     answer_text_invalid: "Please send a simple text message with the answer to the question"
     rating_invalid: "Please send a simple text message with the rating"
 
