@@ -1,11 +1,13 @@
 from pathlib import Path
 from typing import Any, Literal
 
+from aiogram.types import LinkPreviewOptions
 from pydantic import BaseModel, Field, field_validator, model_validator
 from pydantic_settings import SettingsConfigDict
 
 from bot.core.customization.constants import constants
-from bot.core.customization.formatter import SafeFormatter
+from bot.utils.config.formatter import SafeFormatter
+from bot.utils.config.send_text import SendText, parse_link_preview
 from shared.utils.config import YamlSettings
 
 _MESSAGES_PATH = Path("config/messages.yml")
@@ -13,16 +15,36 @@ _MESSAGES_PATH = Path("config/messages.yml")
 
 # Responses
 class PublicRsp(BaseModel):
-    start: str = (
-        "Hello, {first_name}! I will help you find the answer — just send a question"
-        "or choose one of the most popular ones below!"
+    start: SendText = Field(
+        default_factory=lambda: SendText(
+            text=(
+                "Hello, {first_name}! I will help you find the answer — just send a "
+                "question or choose one of the most popular ones below!"
+            )
+        )
     )
-    failed: str = "{exception}. Try to reformulate it and ask again"
-    error: str = "❌ Unexcepted internal error! We are already fixing it. Try to retry"
-    banned: str = (
-        "❌ You have been added to the blacklist and can no longer use this bot."
+    failed: SendText = Field(
+        default_factory=lambda: SendText(
+            text="{exception}. Try to reformulate it and ask again"
+        )
     )
-    rate_limited: str = "Too many requests. Please try again a bit later."
+    error: SendText = Field(
+        default_factory=lambda: SendText(
+            text="❌ Unexcepted internal error! We are already fixing it. Try to retry"
+        )
+    )
+    banned: SendText = Field(
+        default_factory=lambda: SendText(
+            text=(
+                "❌ You have been added to the blacklist and can no longer use this bot."
+            )
+        )
+    )
+    rate_limited: SendText = Field(
+        default_factory=lambda: SendText(
+            text="Too many requests. Please try again a bit later."
+        )
+    )
 
 
 class UserAdmEnterRsp(BaseModel):
@@ -368,12 +390,17 @@ class Messages(YamlSettings):
     model_config = SettingsConfigDict(yaml_file=_MESSAGES_PATH, frozen=False)
 
     parse_mode: Literal["html", "markdown", "markdownv2", None] = "html"
+    link_preview: LinkPreviewOptions | None = None
 
     @field_validator("parse_mode", mode="before")
     def validate_parse_mode(cls, v):
         if isinstance(v, str):
             return v.lower()
         return v
+
+    @field_validator("link_preview", mode="before")
+    def validate_link_preview(cls, v):
+        return parse_link_preview(v)
 
     responses: Responses = Field(default_factory=Responses)
 
@@ -388,26 +415,52 @@ class Messages(YamlSettings):
     def apply_constants(cls, data: dict[str, Any]) -> dict[str, Any]:
         formatter = SafeFormatter()
 
-        def recursive_apply(obj: Any) -> Any:
-            if isinstance(obj, str):
-                try:
-                    return formatter.format(
-                        obj,
-                        constants=constants.constants,
-                    )  # pyright: ignore[reportCallIssue]
-                except AttributeError as exc:
-                    raise ValueError(
-                        f"Attempt to access a non-existent constant: {obj}"
-                    ) from exc
-            for field, value in obj.items():
-                obj[field] = recursive_apply(value)
+        def _format(text: str) -> str:
+            try:
+                return formatter.format(text, constants=constants.constants)
+            except (AttributeError, ValueError) as exc:
+                raise ValueError(
+                    "Attempt to access a non-existent constant in messages config"
+                ) from exc
 
-            return obj
+        def _apply_constants_recursive(value: Any) -> Any:
+            if isinstance(value, str):
+                return _format(value)
 
-        for field, value in data.items():
-            data[field] = recursive_apply(value)
+            if isinstance(value, dict):
+                return {
+                    field: _apply_constants_recursive(obj)
+                    for field, obj in value.items()
+                }
 
-        return data
+            return value
+
+        return _apply_constants_recursive(data)
+
+    @field_validator("responses", mode="before")
+    def apply_link_preview(
+        cls, responses: Responses | dict[str, Any]
+    ) -> Responses | dict[str, Any]:
+        if not isinstance(responses, dict):
+            return responses
+
+        public = responses.get("public")
+        if not isinstance(public, dict):
+            return responses
+
+        responses["public"] = {
+            field: SendText.from_config(value) for field, value in public.items()
+        }
+        return responses
+
+    @model_validator(mode="after")
+    def apply_default_link_preview(self) -> "Messages":
+        for field in PublicRsp.model_fields:
+            getattr(self.responses.public, field).apply_global_link_preview(
+                self.link_preview
+            )
+
+        return self
 
 
 messages: Messages = Messages()

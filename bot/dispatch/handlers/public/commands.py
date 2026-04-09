@@ -12,5 +12,5 @@ if len(commands.commands) > 0:
 
     @router.message(Command(commands=list(commands.commands.keys())))
     async def dynamic_cmd_handler(message: Message, command: CommandObject):
-        text = commands.commands[command.command]
-        await send_command(message, SendAction.ANSWER, message, text)
+        response = commands.commands[command.command]
+        await send_command(message, SendAction.ANSWER, message, response)

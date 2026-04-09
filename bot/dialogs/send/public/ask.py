@@ -44,8 +44,9 @@ async def send_failed(
 
     return await send(
         text=format_response(
-            messages.responses.public.failed, message, exception=exception
+            messages.responses.public.failed.text, message, exception=exception
         ),
         parse_mode=messages.parse_mode,
         reply_markup=reply_markup,
+        link_preview_options=messages.responses.public.failed.link_preview_options,
     )

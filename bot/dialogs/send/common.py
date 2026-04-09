@@ -13,8 +13,9 @@ async def send_unexcepted_error(
     send: Callable[..., Awaitable[Message]], message: Message
 ) -> Message:
     return await send(
-        text=format_response(messages.responses.public.error, message),
+        text=format_response(messages.responses.public.error.text, message),
         parse_mode=messages.parse_mode,
+        link_preview_options=messages.responses.public.error.link_preview_options,
     )
 
 
@@ -23,8 +24,9 @@ async def send_banned(
     send: Callable[..., Awaitable[Message]], message: Message
 ) -> Message:
     return await send(
-        text=format_response(messages.responses.public.banned, message),
+        text=format_response(messages.responses.public.banned.text, message),
         parse_mode=messages.parse_mode,
+        link_preview_options=messages.responses.public.banned.link_preview_options,
     )
 
 
@@ -33,8 +35,9 @@ async def send_rate_limit(
     send: Callable[..., Awaitable[Message]], message: Message
 ) -> Message:
     return await send(
-        text=format_response(messages.responses.public.rate_limited, message),
+        text=format_response(messages.responses.public.rate_limited.text, message),
         parse_mode=messages.parse_mode,
+        link_preview_options=messages.responses.public.rate_limited.link_preview_options,
     )
 
 

@@ -1,4 +1,5 @@
 parse_mode: html # / markdown / markdownv2 / null
+link_preview: null # null / false / {is_disabled, url, media_size, show_above_text}
 
 responses: # Messages sent to regular users
   public:

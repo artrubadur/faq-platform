@@ -25,7 +25,8 @@ async def send_start(
         reply_markup = ReplyKeyboardRemove()
 
     return await send(
-        text=format_response(messages.responses.public.start, message),
+        text=format_response(messages.responses.public.start.text, message),
         parse_mode=messages.parse_mode,
         reply_markup=reply_markup,
+        link_preview_options=messages.responses.public.start.link_preview_options,
     )

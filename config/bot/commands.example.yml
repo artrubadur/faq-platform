@@ -1,6 +1,12 @@
 parse_mode: html # / markdown / markdownv2 / null
+link_preview: null # null / false / {is_disabled, url, media_size, show_above_text}
 
 commands:
   example: You can create your own simple commands!
-  credits: By @artrubadur
   ping: Pong!
+  credits:
+    text: >
+      <a href="https://github.com/artrubadur/faq-platform">faq-platform</a> —
+      made by <a href="https://github.com/artrubadur">@artrubadur</a>
+    link_preview:
+      is_disabled: true
