@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from pydantic import Field, model_validator
+from pydantic import Field
 from pydantic_settings import SettingsConfigDict
 
 from shared.utils.config import DynamicNode, YamlSettings

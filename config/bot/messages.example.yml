@@ -1,5 +1,4 @@
-parse_mode: html # / markdown / null
-
+parse_mode: html # / markdown / markdownv2 / null
 
 responses: # Messages sent to regular users
   public:

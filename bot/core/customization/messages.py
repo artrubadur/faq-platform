@@ -367,7 +367,7 @@ class Format(BaseModel):
 class Messages(YamlSettings):
     model_config = SettingsConfigDict(yaml_file=_MESSAGES_PATH, frozen=False)
 
-    parse_mode: Literal["html", "markdown", None] = "html"
+    parse_mode: Literal["html", "markdown", "markdownv2", None] = "html"
 
     @field_validator("parse_mode", mode="before")
     def validate_parse_mode(cls, v):

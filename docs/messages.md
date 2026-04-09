@@ -15,16 +15,24 @@ Reference schema and default examples:
   used.
 - Existing values override defaults selectively.
 
+## File Format
+
+```yaml
+parse_mode: html # html / markdown / markdownv2 / null
+
+responses:
+  public:
+    start: "Hello, {first_name}!"
+```
+
 ## Parse Mode
 
-Top-level `parse_mode` affects most outgoing messages:
+Top-level `parse_mode` affects outgoing messages:
 
 - `html`
 - `markdown`
+- `markdownv2`
 - `null`
-
-This parse mode is also used by dynamic custom commands (see
-[commands.md](commands.md)).
 
 ## Variable Sources
 
@@ -42,6 +50,16 @@ responses:
   public:
     start: "Hello, {first_name}. Date: {date}"
 ```
+
+## Primary Public Messages
+
+- `responses.public.start`: welcome message on `/start`.
+- `responses.public.failed`: generic failed-answer wrapper (`{exception}` is usually `validation.question.question_text_long`).
+- `exceptions.search.not_found`: text used when the bot cannot understand a
+  question.
+- `responses.public.error`: fallback text for unexpected internal errors.
+- `responses.public.banned`: shown to blacklisted users.
+- `responses.public.rate_limited`: shown when request rate limit is exceeded.
 
 ## Constants
 
@@ -75,9 +93,14 @@ Many templates accept extra placeholders (for example `user`, `question`,
 
 Use those comments as contract hints when editing text templates.
 
-## Error and Validation Routing
+## Validation and Errors
 
-Common routing behavior in the current implementation:
+On startup, messages config validation checks:
+
+- invalid placeholder references
+- invalid parse mode values
+
+At runtime, common routing behavior in the current implementation:
 
 - Public search failures use `responses.public.failed` with
   `exceptions.search.not_found`.
