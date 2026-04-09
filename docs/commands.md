@@ -59,7 +59,8 @@ Top-level `parse_mode` comes from `messages.yml` (`html`, `markdown`, or
 ## Constants Support
 
 Placeholders from `constants.yml` are resolved during startup (same behavior as
-message templates). This is useful for static labels and symbols.
+message templates). Use the `constants` namespace, for example
+`{constants.emoji.status.successful}`.
 
 ## Multiline Tips
 

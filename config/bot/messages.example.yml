@@ -9,120 +9,120 @@ responses: # Messages sent to regular users
     # When question processing fails < message
     failed: "{exception}. Try to reformulate it and ask again"
     error: > # < Internal error notification < message
-      {emoji.status.failed} Unexcepted internal error!
+      {constants.emoji.status.failed} Unexcepted internal error!
       We are already fixing it. Try to retry
-    banned: "{emoji.status.failed} You have been added to the blacklist and can no longer use this bot." #  < message
+    banned: "{constants.emoji.status.failed} You have been added to the blacklist and can no longer use this bot." #  < message
     rate_limited: "Too many requests. Please try again a bit later." #  < message
     # "message" variable representes id (user id), first_name,
     # last_name, username, full_name, date
 
   admin: # Messages sent to administrators, organized by entity:
-    invalid: "{emoji.status.warning} {exception}. Retry or back" # < exception
+    invalid: "{constants.emoji.status.warning} {exception}. Retry or back" # < exception
     expired: "The time for the operation has expired. Start over"
     access_denied: "Access denied: {exception}" # < exception
     ban: # < id, username
-      banned: "{emoji.status.successful} User {identity} has been banned."
-      unbanned: "{emoji.status.successful} User {identity} has been unbanned."
+      banned: "{constants.emoji.status.successful} User {identity} has been banned."
+      unbanned: "{constants.emoji.status.successful} User {identity} has been unbanned."
     user: # User flows
       enter: 
-        identity: "{emoji.action.enter} Enter the telegram id, share contact or forward a message"
-        username: "{emoji.action.enter} Enter a username"
-        role: "{emoji.action.select} Select a role:"
+        identity: "{constants.emoji.action.enter} Enter the telegram id, share contact or forward a message"
+        username: "{constants.emoji.action.enter} Enter a username"
+        role: "{constants.emoji.action.select} Select a role:"
       creation: 
         confirm: | # < user
-          {emoji.action.select} Confirm creation?
+          {constants.emoji.action.select} Confirm creation?
           {user}
         successful: | # < user
-          {emoji.status.successful} User has been successfully created:
+          {constants.emoji.status.successful} User has been successfully created:
           {user}
         access_denied: "You can’t create an admin user."
       finding:
         successful: | # < user
-          {emoji.status.successful} The user has been successfully found in the database:
+          {constants.emoji.status.successful} The user has been successfully found in the database:
           {user}
         partially_found: | # < user
-          {emoji.status.warning} The user has been partially found but missing in the database:
+          {constants.emoji.status.warning} The user has been partially found but missing in the database:
           {user}
       update:
         confirm: | # < user
-          {emoji.action.select} Update this user?
+          {constants.emoji.action.select} Update this user?
           {user}
         select_field: | # < user
           {user}
-          {emoji.action.select} Select the field to edit:
+          {constants.emoji.action.select} Select the field to edit:
         successful: | # < user
-          {emoji.status.successful} The user has been successfully updated:
+          {constants.emoji.status.successful} The user has been successfully updated:
           {user}
         access_denied: "You can’t update an admin user."
       deletion:
         confirm: | # < user 
-          {emoji.action.select} Confirm deletion?
+          {constants.emoji.action.select} Confirm deletion?
           {user}
         successful: | # < user
-          {emoji.status.successful} Next user has been successfully deleted:
+          {constants.emoji.status.successful} Next user has been successfully deleted:
           {user}
         access_denied: "You can’t delete an admin user."
       listing:
           successful: | # < content - table of users
-            {emoji.action.list} User list: {page}/{max_page}
+            {constants.emoji.action.list} User list: {page}/{max_page}
             <pre>{content}</pre>
-          not_found: "{emoji.action.list} No users found in the system"
+          not_found: "{constants.emoji.action.list} No users found in the system"
 
     question: # Question flows
       enter:
-        id: "{emoji.action.enter} Enter the question id"
-        question_text: "{emoji.action.enter} Enter a question text"
-        answer_text: "{emoji.action.enter} Enter a answer text"
-        rating: "{emoji.action.enter} Enter a rating"
+        id: "{constants.emoji.action.enter} Enter the question id"
+        question_text: "{constants.emoji.action.enter} Enter a question text"
+        answer_text: "{constants.emoji.action.enter} Enter a answer text"
+        rating: "{constants.emoji.action.enter} Enter a rating"
       creation:
         confirm: | # < question
-          {emoji.action.select} Confirm creation?
+          {constants.emoji.action.select} Confirm creation?
           {question}
         successful: | # < question
-          {emoji.status.successful} Question has been successfully created:
+          {constants.emoji.status.successful} Question has been successfully created:
           {question}
         similar: | # When similar question exists < question
-          {emoji.status.warning} A similar question already exists:
+          {constants.emoji.status.warning} A similar question already exists:
           {question}
-          {emoji.action.select} Confirm creation?
+          {constants.emoji.action.select} Confirm creation?
       finding:
         successful: | # < question
-          {emoji.status.successful} The question has been successfully found:
+          {constants.emoji.status.successful} The question has been successfully found:
           {question}
       update:
         confirm: | # < question
-          {emoji.action.select} Update this question?
+          {constants.emoji.action.select} Update this question?
           {question}
         select_field: | # < question
           {question}
-          {emoji.action.select} Select the field to edit:
+          {constants.emoji.action.select} Select the field to edit:
         # For embedding recalculation
-        confirm_recompute: "{emoji.action.select} Recompute embedding?"
+        confirm_recompute: "{constants.emoji.action.select} Recompute embedding?"
         successful: |
-          {emoji.status.successful} The question has been successfully updated:
+          {constants.emoji.status.successful} The question has been successfully updated:
           {question}
       deletion:
         confirm: | # < question
-          {emoji.action.select} Confirm deletion?
+          {constants.emoji.action.select} Confirm deletion?
           {question}
         successful: | # < question
-          {emoji.status.successful} Next question has been successfully deleted:
+          {constants.emoji.status.successful} Next question has been successfully deleted:
           {question}
       listing:
         successful: | # < content - table of question
-          {emoji.action.list} Question list: {page}/{max_page}
+          {constants.emoji.action.list} Question list: {page}/{max_page}
           <pre>{content}</pre>
-        not_found: "{emoji.action.list} No questions found in the system"
+        not_found: "{constants.emoji.action.list} No questions found in the system"
 
     settings:
-      main: "{emoji.menu.settings} Settings"
-      user: "{emoji.menu.user} User"
-      question: "{emoji.menu.question} Question"
+      main: "{constants.emoji.menu.settings} Settings"
+      user: "{constants.emoji.menu.user} User"
+      question: "{constants.emoji.menu.question} Question"
 
     misc:
       goto:
         go: "Go!"
-        confirm: "{emoji.action.select} Go to <code>{content}</code>?" # < content - path
+        confirm: "{constants.emoji.action.select} Go to <code>{content}</code>?" # < content - path
       state:
         serialization: '<pre><code class="json">{content}</code></pre>' # < content - state
         argument: "<code>{content}</code>" # < content - argument formatting
@@ -132,11 +132,11 @@ exceptions: # Error messages shown to user
     not_found: "It seems that we failed to understand the question"
 
   user:
-    not_found: "{emoji.status.failed} User {identity} not found" # < identity
+    not_found: "{constants.emoji.status.failed} User {identity} not found" # < identity
     already_exists: "A user with the ID {id} or the username {username} already exists" # < id, username
 
   question:
-    not_found: "{emoji.status.failed} Question {id} not found" # < id
+    not_found: "{constants.emoji.status.failed} Question {id} not found" # < id
     embedding_failed: "Failed to compute vector representation of question"
 
   misc:
@@ -182,7 +182,7 @@ validation: # Messages for data integrity validation
 format: # Templates for consistent data presentation
   field:
     id: "<code>{id}</code>" # < id
-    exception: "{emoji.status.failed} {exception}" # < exception
+    exception: "{constants.emoji.status.failed} {exception}" # < exception
     question_text: "{question_text}" # < question_text
     answer_text: "{answer_text}" # < answer_text
     rating: "{rating}" # < rating
@@ -203,20 +203,20 @@ format: # Templates for consistent data presentation
       user_role: "Role: {user_role}" # < user_role
       
   question: # Complete question representation
-    id: "{emoji.symbol.index} {id} Question:" # < id
-    question_text: "{emoji.symbol.question} Text: {question_text}" # < question_text
-    answer_text: "{emoji.symbol.answer} Answer: {answer_text}" # < answer_text
-    rating: "{emoji.symbol.rating} Rating: {rating}" # < rating
-    recomputed: "{emoji.symbol.embedding} Embedding will be recomputed" 
-    not_recomputed: "{emoji.symbol.embedding} Embedding will NOT be recomputed"
+    id: "{constants.emoji.symbol.index} {id} Question:" # < id
+    question_text: "{constants.emoji.symbol.question} Text: {question_text}" # < question_text
+    answer_text: "{constants.emoji.symbol.answer} Answer: {answer_text}" # < answer_text
+    rating: "{constants.emoji.symbol.rating} Rating: {rating}" # < rating
+    recomputed: "{constants.emoji.symbol.embedding} Embedding will be recomputed" 
+    not_recomputed: "{constants.emoji.symbol.embedding} Embedding will NOT be recomputed"
 
   edit: # Shows changes during edit operations
     unedited: "{old}" # < old - original value
-    edited: "{old} {emoji.symbol.change} {new}" # < old, new - original and new values
+    edited: "{old} {constants.emoji.symbol.change} {new}" # < old, new - original and new values
 
   canceled: | # < old - original of the canceled message
       {old}
-      {emoji.nav.cancel} CANCELED {emoji.nav.cancel}
+      {constants.emoji.nav.cancel} CANCELED {constants.emoji.nav.cancel}
 
 button:
   question: 
@@ -232,24 +232,24 @@ button:
     you: "You ({identity})" # < identity
 
   settings:
-    user: "{emoji.menu.user} Users"
-    question: "{emoji.menu.question} Questions"
+    user: "{constants.emoji.menu.user} Users"
+    question: "{constants.emoji.menu.question} Questions"
 
   common:
-    close: "{emoji.nav.close} Close"
-    back: "{emoji.nav.back} Back"
-    cancel: "{emoji.nav.cancel} Cancel"
-    create: "{emoji.action.create} Create"
-    get: "{emoji.action.get} Get"
-    update: "{emoji.action.update} Update"
-    delete: "{emoji.action.delete} Delete"
-    list: "{emoji.action.list} List"
-    confirm: "{emoji.action.confirm}"
-    reject: "{emoji.action.reject}"
-    save: "{emoji.action.save}"
-    discard: "{emoji.action.discard}"
-    previous: "{emoji.nav.left} Previous"
-    next: "Next {emoji.nav.right}"
-    ascending: "{emoji.nav.up}"
-    descending: "{emoji.nav.down}"
-    empty: "{emoji.action.empty} Empty"
+    close: "{constants.emoji.nav.close} Close"
+    back: "{constants.emoji.nav.back} Back"
+    cancel: "{constants.emoji.nav.cancel} Cancel"
+    create: "{constants.emoji.action.create} Create"
+    get: "{constants.emoji.action.get} Get"
+    update: "{constants.emoji.action.update} Update"
+    delete: "{constants.emoji.action.delete} Delete"
+    list: "{constants.emoji.action.list} List"
+    confirm: "{constants.emoji.action.confirm}"
+    reject: "{constants.emoji.action.reject}"
+    save: "{constants.emoji.action.save}"
+    discard: "{constants.emoji.action.discard}"
+    previous: "{constants.emoji.nav.left} Previous"
+    next: "Next {constants.emoji.nav.right}"
+    ascending: "{constants.emoji.nav.up}"
+    descending: "{constants.emoji.nav.down}"
+    empty: "{constants.emoji.action.empty} Empty"

@@ -171,6 +171,14 @@ Overrides user/admin texts, formatting, and labels.
 ### `config/constants.yml` (optional)
 
 Provides placeholders used in messages and command text.
+Expected shape:
+
+```yaml
+constants:
+  emoji:
+    status:
+      successful: "✅"
+```
 
 ### `config/commands.yml` (optional)
 

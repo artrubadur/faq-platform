@@ -1,8 +1,31 @@
 from string import Formatter
 
+_RUNTIME_TEMPLATE_FIELDS = [
+    "identity",
+    "id",
+    "user",
+    "first_name",
+    "last_name",
+    "username",
+    "full_name",
+    "date",
+    "user_link",
+    "user_role",
+    "question",
+    "question_text",
+    "answer_text",
+    "rating",
+    "old",
+    "new",
+    "page",
+    "max_page",
+    "content",
+    "exception",
+]
+
 
 class SafeFormatter(Formatter):
-    def __init__(self, allowed_extra: list[str] = []):
+    def __init__(self, allowed_extra: list[str] = _RUNTIME_TEMPLATE_FIELDS):
         super().__init__()
         self.allowed_extra = allowed_extra
 

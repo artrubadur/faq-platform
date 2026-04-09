@@ -146,7 +146,7 @@ def setup_logging():
     )
 
     handlers = config.get("handlers", [])
-    _prepare_handlers(handlers, _combine_filters(duplicate_filter, activation_filter)) # type: ignore
+    _prepare_handlers(handlers, _combine_filters(duplicate_filter, activation_filter))  # type: ignore
 
     config["handlers"] = handlers
     if duplicate_filter is not None:

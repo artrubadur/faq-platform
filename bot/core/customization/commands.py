@@ -3,7 +3,7 @@ from pathlib import Path
 from pydantic import Field, field_validator
 from pydantic_settings import SettingsConfigDict
 
-from bot.core.customization.constants import _BOT_SYSTEM_KEYS, constants
+from bot.core.customization.constants import constants
 from bot.core.customization.formatter import SafeFormatter
 from shared.utils.config import YamlSettings
 
@@ -16,12 +16,13 @@ class Commands(YamlSettings):
 
     @field_validator("commands", mode="before")
     def apply_constants(cls, commands: dict[str, str]) -> dict[str, str]:
-        formatter = SafeFormatter(_BOT_SYSTEM_KEYS)
+        formatter = SafeFormatter()
 
         for command, value in commands.items():
             try:
                 commands[command] = formatter.format(
-                    value, **constants.model_extra
+                    value,
+                    constants=constants.constants,
                 )  # pyright: ignore[reportCallIssue]
             except AttributeError as exc:
                 raise ValueError(

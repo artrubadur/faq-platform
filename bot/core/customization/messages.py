@@ -4,7 +4,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field, field_validator, model_validator
 from pydantic_settings import SettingsConfigDict
 
-from bot.core.customization.constants import _BOT_SYSTEM_KEYS, constants
+from bot.core.customization.constants import constants
 from bot.core.customization.formatter import SafeFormatter
 from shared.utils.config import YamlSettings
 
@@ -386,13 +386,14 @@ class Messages(YamlSettings):
 
     @model_validator(mode="before")
     def apply_constants(cls, data: dict[str, Any]) -> dict[str, Any]:
-        formatter = SafeFormatter(_BOT_SYSTEM_KEYS)
+        formatter = SafeFormatter()
 
         def recursive_apply(obj: Any) -> Any:
             if isinstance(obj, str):
                 try:
                     return formatter.format(
-                        obj, **constants.model_extra
+                        obj,
+                        constants=constants.constants,
                     )  # pyright: ignore[reportCallIssue]
                 except AttributeError as exc:
                     raise ValueError(

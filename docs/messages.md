@@ -43,19 +43,16 @@ responses:
     start: "Hello, {first_name}. Date: {date}"
 ```
 
-## Constants and Reserved Keys
+## Constants
 
-Constants can be used with dot-path placeholders, for example:
+Constants are read from the top-level `constants` object in `constants.yml`.
+Use dot-path placeholders from that namespace, for example:
 
-- `{emoji.status.successful}`
-- `{brand.name}`
+- `{constants.emoji.status.successful}`
+- `{constants.brand.name}`
 
-First-level constant keys cannot use reserved runtime names such as:
-
-- `id`, `identity`, `user`, `question`, `exception`, `date`, `content`, `old`,
-  `new`, `page`, `max_page`, `rating`, `question_text`, `answer_text`
-
-If a template references an unknown non-reserved field, startup validation fails.
+If a template references an unknown field (outside runtime context variables),
+startup validation fails.
 
 ## Formatting Blocks
 
