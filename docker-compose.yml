@@ -56,9 +56,9 @@ services:
       - "8080:8080"
     volumes:
       - ${COMPOSE__LOGGING_PATH:-./config/logging.yml}:/app/config/logging.yml:ro
-      - ${COMPOSE__BOT_CONSTANTS_PATH:-./config/bot/constants.example.yml}:/app/config/constants.yml:ro
-      - ${COMPOSE__BOT_MESSAGES_PATH:-./config/bot/messages.example.yml}:/app/config/messages.yml:ro
-      - ${COMPOSE__BOT_COMMANDS_PATH:-./config/bot/commands.example.yml}:/app/config/commands.yml:ro
+      - ${COMPOSE__BOT_CONSTANTS_PATH:-./config/bot/constants.yml}:/app/config/constants.yml:ro
+      - ${COMPOSE__BOT_MESSAGES_PATH:-./config/bot/messages.yml}:/app/config/messages.yml:ro
+      - ${COMPOSE__BOT_COMMANDS_PATH:-./config/bot/commands.yml}:/app/config/commands.yml:ro
       - ${COMPOSE__BOT_CERTIFICATE_PATH:-./config/bot/webhook.pem}:/app/config/webhook.pem:ro
 
 volumes:
