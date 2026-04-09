@@ -135,7 +135,7 @@ class QuestionsService:
         amount: int,
         exclude_questions: list[Question] = [],
     ) -> list[Question]:
-        if amount == 0:
+        if amount <= 0:
             return []
         exclude_ids = [q.id for q in exclude_questions]
         return await self.repository.get_most_popular(amount, exclude_ids)
