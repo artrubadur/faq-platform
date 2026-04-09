@@ -166,7 +166,14 @@ Reference template: `config/orchestrator/requests.yml`
 
 ### `config/messages.yml` (optional)
 
-Overrides user/admin texts, formatting, and labels.
+Overrides user/admin texts, formatting, labels, and public message link-preview
+behavior.
+
+- Supports top-level `parse_mode`
+- Supports top-level `link_preview` default
+- `responses.public.*` supports string or `{text, link_preview}` object format
+
+See: [Messages Customization](messages.md)
 
 ### `config/constants.yml` (optional)
 
@@ -183,3 +190,9 @@ constants:
 ### `config/commands.yml` (optional)
 
 Adds custom public commands.
+
+- Supports top-level `parse_mode` (commands only)
+- Supports top-level `link_preview` default
+- Each command value supports string or `{text, link_preview}` object format
+
+See: [Custom Commands](commands.md)
