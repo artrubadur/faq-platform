@@ -14,7 +14,8 @@ handlers:
     retention: 5
 
 activation:
-  - ["aiogram.event", "WARNING"]
-  - ["aiogram.dispatcher", "INFO"]
-  - ["uvicorn.error", "INFO"]
-  - ["uvicorn.access", "WARNING"]
+  aiogram.event: WARNING
+  aiogram.dispatcher: INFO
+  uvicorn.error: INFO
+  uvicorn.access: WARNING
+  httpx: WARNING
