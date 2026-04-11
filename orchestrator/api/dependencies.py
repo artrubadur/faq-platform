@@ -11,8 +11,12 @@ from orchestrator.integrations import (
     embedding_provider,
     rerank_provider,
 )
-from orchestrator.repositories import QuestionsRepository, UsersRepository
-from orchestrator.services import QuestionsService, UsersService
+from orchestrator.repositories import (
+    FormulationsRepository,
+    QuestionsRepository,
+    UsersRepository,
+)
+from orchestrator.services import FormulationsService, QuestionsService, UsersService
 
 
 async def get_db_session() -> AsyncIterator[AsyncSession]:
@@ -48,11 +52,29 @@ QuestionsRepositoryDep = Annotated[
 ]
 
 
+def get_formulations_repository(
+    session: SessionDep,
+) -> FormulationsRepository:
+    return FormulationsRepository(session)
+
+
+FormulationsRepositoryDep = Annotated[
+    FormulationsRepository,
+    Depends(get_formulations_repository),
+]
+
+
 def get_questions_service(
-    repository: Annotated[QuestionsRepository, Depends(get_questions_repository)],
+    questions_repository: Annotated[
+        QuestionsRepository, Depends(get_questions_repository)
+    ],
+    formulations_repository: Annotated[
+        FormulationsRepository, Depends(get_formulations_repository)
+    ],
 ) -> QuestionsService:
     return QuestionsService(
-        repository,
+        questions_repository,
+        formulations_repository,
         embedding_provider,
         rerank_provider,
         compose_provider,
@@ -62,3 +84,21 @@ def get_questions_service(
 
 
 QuestionsServiceDep = Annotated[QuestionsService, Depends(get_questions_service)]
+
+
+def get_formulations_service(
+    repository: Annotated[FormulationsRepository, Depends(get_formulations_repository)],
+    questions_repository: Annotated[
+        QuestionsRepository, Depends(get_questions_repository)
+    ],
+) -> FormulationsService:
+    return FormulationsService(
+        repository,
+        questions_repository,
+        embedding_provider,
+    )
+
+
+FormulationsServiceDep = Annotated[
+    FormulationsService, Depends(get_formulations_service)
+]

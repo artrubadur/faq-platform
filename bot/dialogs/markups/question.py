@@ -36,11 +36,11 @@ confirm_update = InlineKeyboardMarkup(
     inline_keyboard=rows.confirm_row(QUESTIONS_UPDATE[1], QUESTIONS[1], "update")
 )
 
-confirm_recompute = InlineKeyboardMarkup(
-    inline_keyboard=rows.confirm_row(
-        QUESTIONS_UPDATE[1], QUESTIONS_UPDATE[1], "recompute"
-    )
-)
+# confirm_recompute = InlineKeyboardMarkup(
+#     inline_keyboard=rows.confirm_row(
+#         QUESTIONS_UPDATE[1], QUESTIONS_UPDATE[1], "recompute"
+#     )
+# )
 
 field_save_update = InlineKeyboardMarkup(
     inline_keyboard=rows.field_rows(

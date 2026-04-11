@@ -6,16 +6,16 @@ from sqlalchemy import select, update
 
 from orchestrator.core.config import config
 from orchestrator.db.migrations.utils import get_vector_dimension
-from orchestrator.db.models.question import Question
+from orchestrator.db.models.formulation import Formulation
 from orchestrator.db.session import engine
 from shared.logging.setup import setup_logging
 
 
 async def _fetch_questions_batch(last_id: int, limit: int) -> list[tuple[int, str]]:
     query = (
-        select(Question.id, Question.question_text)
-        .where(Question.id > last_id)
-        .order_by(Question.id)
+        select(Formulation.id, Formulation.question_text)
+        .where(Formulation.id > last_id)
+        .order_by(Formulation.id)
         .limit(limit)
     )
 
@@ -31,10 +31,10 @@ async def _update_embeddings_batch(updates: list[tuple[int, list[float]]]) -> No
         return
 
     async with engine.begin() as conn:
-        for question_id, embedding in updates:
+        for formulation_id, embedding in updates:
             await conn.execute(
-                update(Question)
-                .where(Question.id == question_id)
+                update(Formulation)
+                .where(Formulation.id == formulation_id)
                 .values(embedding=embedding)
             )
 
@@ -43,11 +43,11 @@ async def recompute_all_embeddings(batch_size: int, start_id: int) -> None:
     from orchestrator.integrations.embedding import embedding_provider
 
     embedding_dim = config.db_schema.question_embedding_dim
-    current_embedding_dim = await get_vector_dimension(Question.embedding)
+    current_embedding_dim = await get_vector_dimension(Formulation.embedding)
 
     if current_embedding_dim is None:
         raise RuntimeError(
-            "questions.embedding: column/type missing in DB, "
+            "formulations.embedding: column/type missing in DB, "
             f"expected vector({embedding_dim})"
         )
     if current_embedding_dim != embedding_dim:
@@ -58,7 +58,7 @@ async def recompute_all_embeddings(batch_size: int, start_id: int) -> None:
         )
 
     logger.info(
-        "Recomputing all embeddings in questions.embedding",
+        "Recomputing all embeddings in formulations.embedding",
         batch_size=batch_size,
         start_id=start_id,
         embedding_dim=embedding_dim,
@@ -73,16 +73,17 @@ async def recompute_all_embeddings(batch_size: int, start_id: int) -> None:
             break
 
         updates: list[tuple[int, list[float]]] = []
-        for question_id, question_text in batch:
+        for formulation_id, question_text in batch:
             embedding = await embedding_provider.compute_embedding(question_text)
             if len(embedding) != embedding_dim:
                 raise RuntimeError(
                     "Embedding provider returned invalid vector length during recompute. "
-                    f"Expected {embedding_dim}, got {len(embedding)} for question id={question_id}."
+                    "Expected "
+                    f"{embedding_dim}, got {len(embedding)} for formulation id={formulation_id}."
                 )
 
-            updates.append((question_id, embedding))
-            last_id = question_id
+            updates.append((formulation_id, embedding))
+            last_id = formulation_id
             processed += 1
 
         await _update_embeddings_batch(updates)
@@ -95,7 +96,7 @@ async def recompute_all_embeddings(batch_size: int, start_id: int) -> None:
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Recompute all question embeddings in questions.embedding."
+        description="Recompute all question embeddings in formulations.embedding."
     )
     parser.add_argument(
         "--batch-size",
@@ -107,7 +108,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "--start-id",
         type=int,
         default=0,
-        help="Start from questions with id > value (default: 0).",
+        help="Start from formulations with id > value (default: 0).",
     )
     return parser
 

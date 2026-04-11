@@ -226,7 +226,7 @@ async def send_changes(
     edited_answer_text: str,
     rating: float,
     edited_rating: float,
-    recompute_embedding: bool,
+    # recompute_embedding: bool,
 ) -> Message:
     changes_text = format_edited_question(
         id,
@@ -236,7 +236,7 @@ async def send_changes(
         edited_answer_text,
         rating,
         edited_rating,
-        recompute_embedding,
+        # recompute_embedding,
     )
     return await send(
         text=messages.responses.admin.question.update.select_field.format(
@@ -247,15 +247,15 @@ async def send_changes(
     )
 
 
-@with_message_action
-async def send_confirm_recompute(
-    send: Callable[..., Awaitable[Message]],
-) -> Message:
-    return await send(
-        text=messages.responses.admin.question.update.confirm_recompute,
-        parse_mode=messages.parse_mode,
-        reply_markup=mu.confirm_recompute,
-    )
+# @with_message_action
+# async def send_confirm_recompute(
+#     send: Callable[..., Awaitable[Message]],
+# ) -> Message:
+#     return await send(
+#         text=messages.responses.admin.question.update.confirm_recompute,
+#         parse_mode=messages.parse_mode,
+#         reply_markup=mu.confirm_recompute,
+#     )
 
 
 @with_message_action

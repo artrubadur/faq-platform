@@ -48,13 +48,11 @@ class QuestionGateway:
         question_text: str | None = None,
         answer_text: str | None = None,
         rating: float | None = None,
-        recompute_embedding: bool = False,
     ) -> QuestionResponse:
         request = UpdateQuestionRequest(
             question_text=question_text,
             answer_text=answer_text,
             rating=rating,
-            recompute_embedding=recompute_embedding,
         )
         data = await self.client.patch(
             f"/questions/{id}",

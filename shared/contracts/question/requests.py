@@ -1,24 +1,29 @@
 from typing import Literal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 QuestionFields = Literal["id", "question_text", "answer_text", "rating"]
 
 
 class CreateQuestionRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     question_text: str
     answer_text: str
     check_similarity: bool
 
 
 class UpdateQuestionRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     question_text: str | None = None
     answer_text: str | None = None
     rating: float | None = None
-    recompute_embedding: bool = False
 
 
 class ListQuestionsRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     page: int = Field(ge=1)
     page_size: int = Field(ge=1)
     order_by: QuestionFields
@@ -26,6 +31,8 @@ class ListQuestionsRequest(BaseModel):
 
 
 class SuggestQuestionsRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     question_text: str
     max_similar_amount: int = Field(ge=0)
     max_popular_amount: int = Field(ge=0)

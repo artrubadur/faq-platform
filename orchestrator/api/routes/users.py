@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Path
 
 from orchestrator.api.dependencies import UsersServiceDep
 from shared.contracts.user.requests import (
@@ -45,7 +45,7 @@ async def get_users_by_role(
 
 @router.get("/{id}", response_model=UserResponse)
 async def get_user(
-    id: int,
+    id: Annotated[int, Path(ge=1)],
     service: UsersServiceDep,
 ) -> UserResponse:
     return await service.get_user(id)
@@ -53,7 +53,7 @@ async def get_user(
 
 @router.patch("/{id}", response_model=UserResponse)
 async def update_user(
-    id: int,
+    id: Annotated[int, Path(ge=1)],
     request: UpdateUserRequest,
     service: UsersServiceDep,
 ) -> UserResponse:
@@ -62,7 +62,7 @@ async def update_user(
 
 @router.delete("/{id}", response_model=UserResponse)
 async def delete_user(
-    id: int,
+    id: Annotated[int, Path(ge=1)],
     service: UsersServiceDep,
 ) -> UserResponse:
     return await service.delete_user(id)

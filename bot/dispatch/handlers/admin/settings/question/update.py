@@ -15,7 +15,6 @@ from bot.dialogs.rows.common import (
 from bot.dialogs.rows.question import IdCallback
 from bot.dialogs.send.admin.question import (
     send_changes,
-    send_confirm_recompute,
     send_confirm_update,
     send_embedding_failed,
     send_enter_answer_text,
@@ -157,8 +156,6 @@ async def process_fields_handler(
     edited_answer_text: str = data.get("edited_answer_text", answer_text)
     edited_rating: float = data.get("edited_rating", rating)
 
-    recompute_embedding: bool = data.get("recompute_embedding", False)
-
     await send_changes(
         message,
         send_action,
@@ -169,7 +166,6 @@ async def process_fields_handler(
         edited_answer_text,
         rating,
         edited_rating,
-        recompute_embedding,
     )
 
 
@@ -241,41 +237,41 @@ async def question_update_msg_edited_question_text_handler(
 
     await state.update_data(edited_question_text=input_question_text)
 
-    await send_confirm_recompute(message, SendAction.ANSWER)
+    await process_fields_handler(message, state, send_action=SendAction.ANSWER)
 
     await state.set_state(None)
 
 
-@router.callback_query(ConfirmCallback.filter((F.dir == DIR) & (F.step == "recompute")))
-async def question_update_cb_confirm_recompute_handler(
-    callback: CallbackQuery, state: TempContext
-):
-    await callback.answer("")
-    await callback.message.edit_reply_markup(reply_markup=None)
+# @router.callback_query(ConfirmCallback.filter((F.dir == DIR) & (F.step == "recompute")))
+# async def question_update_cb_confirm_recompute_handler(
+#     callback: CallbackQuery, state: TempContext
+# ):
+#     await callback.answer("")
+#     await callback.message.edit_reply_markup(reply_markup=None)
 
-    await state.update_data(recompute_embedding=True)
+#     await state.update_data(recompute_embedding=True)
 
-    await process_fields_handler(
-        callback.message,  # pyright: ignore[reportArgumentType]
-        state,
-        send_action=SendAction.EDIT,
-    )
+#     await process_fields_handler(
+#         callback.message,  # pyright: ignore[reportArgumentType]
+#         state,
+#         send_action=SendAction.EDIT,
+#     )
 
 
-@router.callback_query(CancelCallback.filter(F.dir == DIR))
-async def question_update_cb_cancel_recompute_handler(
-    callback: CallbackQuery, state: TempContext
-):
-    await callback.answer("")
-    await callback.message.edit_reply_markup(reply_markup=None)
+# @router.callback_query(CancelCallback.filter(F.dir == DIR))
+# async def question_update_cb_cancel_recompute_handler(
+#     callback: CallbackQuery, state: TempContext
+# ):
+#     await callback.answer("")
+#     await callback.message.edit_reply_markup(reply_markup=None)
 
-    await state.update_data(recompute_embedding=False)
+#     await state.update_data(recompute_embedding=False)
 
-    await process_fields_handler(
-        callback.message,  # pyright: ignore[reportArgumentType]
-        state,
-        send_action=SendAction.EDIT,
-    )
+#     await process_fields_handler(
+#         callback.message,  # pyright: ignore[reportArgumentType]
+#         state,
+#         send_action=SendAction.EDIT,
+#     )
 
 
 @router.callback_query(EditCallback.filter((F.dir == DIR) & (F.field == "answer_text")))
@@ -372,9 +368,7 @@ async def question_update_cb_save_handler(callback: CallbackQuery, state: TempCo
     edited_answer_text: str = data.get("edited_answer_text", answer_text)
     edited_rating: float = data.get("edited_rating", rating)
 
-    recompute_embedding: bool = data.get("recompute_embedding", False)
-
-    payload: dict = {"recompute_embedding": recompute_embedding}
+    payload: dict = {}
     if question_text != edited_question_text:
         payload["question_text"] = edited_question_text
     if answer_text != edited_answer_text:

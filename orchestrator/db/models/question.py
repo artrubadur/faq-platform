@@ -1,4 +1,3 @@
-from pgvector.sqlalchemy import Vector
 from sqlalchemy import Float, Integer, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -17,6 +16,3 @@ class Question(Base):
         String(config.db_schema.answer_text_max_len)
     )
     rating: Mapped[float] = mapped_column(Float, server_default=text("0.0"))
-    embedding: Mapped[list[float]] = mapped_column(
-        Vector(config.db_schema.question_embedding_dim)
-    )

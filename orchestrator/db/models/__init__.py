@@ -1,4 +1,5 @@
+from .formulation import Formulation
 from .question import Question
 from .user import User
 
-__all__ = ["User", "Question"]
+__all__ = ["User", "Question", "Formulation"]

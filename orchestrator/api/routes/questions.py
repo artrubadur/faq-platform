@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Path, Query
 
 from orchestrator.api.dependencies import QuestionsServiceDep
 from shared.contracts.question.requests import (
@@ -57,7 +57,7 @@ async def get_popular_questions(
 
 @router.get("/{question_id}", response_model=QuestionResponse)
 async def get_question(
-    question_id: int,
+    question_id: Annotated[int, Path(ge=1)],
     service: QuestionsServiceDep,
 ) -> QuestionResponse:
     return await service.get_question(question_id)
@@ -65,7 +65,7 @@ async def get_question(
 
 @router.patch("/{question_id}", response_model=QuestionResponse)
 async def update_question(
-    question_id: int,
+    question_id: Annotated[int, Path(ge=1)],
     request: UpdateQuestionRequest,
     service: QuestionsServiceDep,
 ) -> QuestionResponse:
@@ -74,7 +74,7 @@ async def update_question(
 
 @router.delete("/{question_id}", response_model=QuestionResponse)
 async def delete_question(
-    question_id: int,
+    question_id: Annotated[int, Path(ge=1)],
     service: QuestionsServiceDep,
 ) -> QuestionResponse:
     return await service.delete_question(question_id)

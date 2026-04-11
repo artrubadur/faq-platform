@@ -133,7 +133,9 @@ async def question_create_cb_create_confirm_handler(
 
     try:
         question = await question_gateway.create_question(
-            input_question_text, input_answer_text, True
+            input_question_text,
+            input_answer_text,
+            True,
         )
     except ConflictError as exc:
         return await send_found_similar(
@@ -180,7 +182,9 @@ async def question_create_cb_similar_confirm_handler(
 
     try:
         question = await question_gateway.create_question(
-            input_question_text, input_answer_text, False
+            input_question_text,
+            input_answer_text,
+            False,
         )
     except BadGatewayError:
         await state.clear()

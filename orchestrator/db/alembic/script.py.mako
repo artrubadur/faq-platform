@@ -58,15 +58,15 @@ def upgrade() -> None:
 % if new_dim is not None:
     # Recreate embedding column for the new vector dimension.
     # Then run recompute script and set NOT NULL in a follow-up migration.
-    op.drop_column("questions", "embedding")
+    op.drop_column("formulations", "embedding")
     op.add_column(
-        "questions",
+        "formulations",
         sa.Column("embedding", Vector(dim=NEW_DIM), nullable=True),
     )
 % endif
 % if embedding_not_null:
     op.alter_column(
-        "questions",
+        "formulations",
         "embedding",
         nullable=False,
     )

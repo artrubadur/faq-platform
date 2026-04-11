@@ -361,8 +361,8 @@ class QuestionFmt(BaseModel):
     question_text: str = "🔍 Text: {question_text}"
     answer_text: str = "💡 Answer: {answer_text}"
     rating: str = "🚀 Rating: {rating}"
-    recomputed: str = "🧬 Embedding will be recomputed"
-    not_recomputed: str = "🧬 Embedding will NOT be recomputed"
+    # recomputed: str = "🧬 Embedding will be recomputed"
+    # not_recomputed: str = "🧬 Embedding will NOT be recomputed"
 
 
 class UserFmt(BaseModel):

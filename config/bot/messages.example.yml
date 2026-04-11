@@ -207,8 +207,8 @@ format: # Templates for consistent data presentation
     question_text: "{constants.emoji.symbol.question} Text: {question_text}" # < question_text
     answer_text: "{constants.emoji.symbol.answer} Answer: {answer_text}" # < answer_text
     rating: "{constants.emoji.symbol.rating} Rating: {rating}" # < rating
-    recomputed: "{constants.emoji.symbol.embedding} Embedding will be recomputed" 
-    not_recomputed: "{constants.emoji.symbol.embedding} Embedding will NOT be recomputed"
+    # recomputed: "{constants.emoji.symbol.embedding} Embedding will be recomputed" 
+    # not_recomputed: "{constants.emoji.symbol.embedding} Embedding will NOT be recomputed"
 
   edit: # Shows changes during edit operations
     unedited: "{old}" # < old - original value

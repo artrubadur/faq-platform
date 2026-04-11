@@ -171,7 +171,6 @@ def format_edited_question(
     edited_answer_text: str,
     rating: float,
     edited_rating: float,
-    recompute_embedding: bool,
 ):
     is_question_text_changed = question_text != edited_question_text
     is_answer_text_changed = answer_text != edited_answer_text
@@ -219,12 +218,6 @@ def format_edited_question(
                 else messages.format.edit.unedited.format(old=format_rating(rating))
             )
         )
-    )
-
-    result.append(
-        messages.format.question.recomputed
-        if recompute_embedding
-        else messages.format.question.not_recomputed
     )
 
     return "\n".join(result)

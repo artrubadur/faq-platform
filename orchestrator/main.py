@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from loguru import logger
 
-from orchestrator.api import questions_router, users_router
+from orchestrator.api import formulations_router, questions_router, users_router
 from orchestrator.api.errors import register_exception_handlers
 from orchestrator.core.config import config
 from orchestrator.core.requests import status as requests_status
@@ -45,5 +45,6 @@ app = FastAPI(
 
 app.include_router(users_router)
 app.include_router(questions_router)
+app.include_router(formulations_router)
 
 register_exception_handlers(app)

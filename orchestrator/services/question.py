@@ -5,7 +5,7 @@ from orchestrator.core.config import config
 from orchestrator.core.requests import ComposeCandidate, RerankCandidate
 from orchestrator.db.models.question import Question
 from orchestrator.integrations import ComposeProvider, EmbeddingProvider, RerankProvider
-from orchestrator.repositories import QuestionsRepository
+from orchestrator.repositories import FormulationsRepository, QuestionsRepository
 from shared.api.exceptions import BadGatewayError, ConflictError, NotFoundError
 from shared.contracts.question.requests import (
     CreateQuestionRequest,
@@ -23,14 +23,16 @@ from shared.contracts.question.responses import (
 class QuestionsService:
     def __init__(
         self,
-        repository: QuestionsRepository,
+        questions_repository: QuestionsRepository,
+        formulations_repository: FormulationsRepository,
         embedding_provider: EmbeddingProvider,
         rerank_provider: RerankProvider | None,
         compose_provider: ComposeProvider | None,
         best_match_threshold: float,
         related_threshold: float,
     ):
-        self.repository = repository
+        self.questions_repository = questions_repository
+        self.formulations_repository = formulations_repository
         self.embedding_provider = embedding_provider
         self.rerank_provider = rerank_provider
         self.compose_provider = compose_provider
@@ -49,7 +51,7 @@ class QuestionsService:
 
     async def _get_existing_question(self, id: int) -> Question:
         try:
-            return await self.repository.get_by_id(id)
+            return await self.questions_repository.get_by_id(id)
         except NoResultFound as exc:
             raise NotFoundError(f"Question {id} not found") from exc
 
@@ -57,7 +59,7 @@ class QuestionsService:
         embedding = await self._compute_embedding(request.question_text)
 
         if request.check_similarity:
-            rows = await self.repository.get_similar(
+            rows = await self.formulations_repository.get_similar_questions(
                 embedding=embedding,
                 limit=1,
                 max_distance=self.best_match_distance,
@@ -70,9 +72,13 @@ class QuestionsService:
                     {"id": similar.id, "question_text": similar.question_text},
                 )
 
-        question = await self.repository.create(
+        question = await self.questions_repository.create(
             request.question_text,
             request.answer_text,
+        )
+        await self.formulations_repository.create(
+            question.id,
+            request.question_text,
             embedding,
         )
         return self._to_response(question)
@@ -92,15 +98,11 @@ class QuestionsService:
         if request.rating is not None:
             update_fields["rating"] = request.rating
 
-        if request.recompute_embedding:
-            question_text = request.question_text or existing.question_text
-            update_fields["embedding"] = await self._compute_embedding(question_text)
-
         if not update_fields:
             return self._to_response(existing)
 
         try:
-            question = await self.repository.update(id, **update_fields)
+            question = await self.questions_repository.update(id, **update_fields)
         except NoResultFound as exc:
             raise NotFoundError(f"Question {id} not found") from exc
         return self._to_response(question)
@@ -110,7 +112,7 @@ class QuestionsService:
         return self._to_response(question)
 
     async def get_questions_amount(self) -> QuestionsAmountResponse:
-        amount = await self.repository.get_amount()
+        amount = await self.questions_repository.get_amount()
         return QuestionsAmountResponse(amount=amount)
 
     async def get_paginated_questions(
@@ -118,14 +120,14 @@ class QuestionsService:
         request: ListQuestionsRequest,
     ) -> list[QuestionResponse]:
         offset = (request.page - 1) * request.page_size
-        questions = await self.repository.get_slice(
+        questions = await self.questions_repository.get_slice(
             offset, request.page_size, request.order_by, request.ascending
         )
         return [self._to_response(question) for question in questions]
 
     async def delete_question(self, id: int) -> QuestionResponse:
         try:
-            question = await self.repository.delete(id)
+            question = await self.questions_repository.delete(id)
         except NoResultFound as exc:
             raise NotFoundError(f"Question {id} not found") from exc
         return self._to_response(question)
@@ -138,7 +140,7 @@ class QuestionsService:
         if amount <= 0:
             return []
         exclude_ids = [q.id for q in exclude_questions]
-        return await self.repository.get_most_popular(amount, exclude_ids)
+        return await self.questions_repository.get_most_popular(amount, exclude_ids)
 
     async def get_popular_questions(
         self,
@@ -165,14 +167,14 @@ class QuestionsService:
         amount: int,
     ) -> tuple[list[Question], list[float]]:
         embedding = await self._compute_embedding(question_text)
-        rows = await self.repository.get_similar(
+        rows = await self.formulations_repository.get_similar_questions(
             embedding=embedding,
             limit=amount,
             max_distance=self.related_distance,
         )
 
         questions: list[Question] = [row[0] for row in rows]
-        similarities: list[float] = [1 - row[1] for row in rows]
+        similarities: list[float] = [row[1] for row in rows]
 
         return questions, similarities
 
@@ -340,7 +342,7 @@ class QuestionsService:
                 similarity=best_similarity,
             )
             gain = self._calculate_rating_gain(best_similarity)
-            await self.repository.increment_ratings([similar[0]], [gain])
+            await self.questions_repository.increment_ratings([similar[0]], [gain])
 
             suggestions = await self._complete_with_popular_questions(
                 similar[: request.max_similar_amount],
@@ -372,7 +374,9 @@ class QuestionsService:
                 similarity=best_similarity,
             )
             gain = self._calculate_rating_gain(best_similarity)
-            await self.repository.increment_ratings([similar_reranked[0]], [gain])
+            await self.questions_repository.increment_ratings(
+                [similar_reranked[0]], [gain]
+            )
 
             similar_reranked[0].answer_text = await self._compose(
                 request.question_text, similar_reranked, similarity_by_question_id

@@ -1,3 +1,11 @@
+from shared.contracts.formulation import (
+    CreateFormulationRequest,
+    FormulationFields,
+    FormulationResponse,
+    FormulationsAmountResponse,
+    ListFormulationsRequest,
+    UpdateFormulationRequest,
+)
 from shared.contracts.question import (
     CreateQuestionRequest,
     ListQuestionsRequest,
@@ -18,6 +26,12 @@ from shared.contracts.user import (
 )
 
 __all__ = [
+    "FormulationFields",
+    "FormulationResponse",
+    "FormulationsAmountResponse",
+    "CreateFormulationRequest",
+    "ListFormulationsRequest",
+    "UpdateFormulationRequest",
     "CreateQuestionRequest",
     "ListQuestionsRequest",
     "QuestionResponse",
