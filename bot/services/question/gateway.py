@@ -9,9 +9,9 @@ from shared.contracts.question.requests import (
 )
 from shared.contracts.question.responses import (
     QuestionResponse,
-    QuestionWithFormulationsResponse,
     QuestionsAmountResponse,
     QuestionSuggestionResponse,
+    QuestionWithFormulationsResponse,
 )
 
 

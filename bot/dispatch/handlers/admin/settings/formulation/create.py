@@ -133,7 +133,7 @@ async def formulation_create_cb_confirm_handler(
             SendAction.ANSWER,
             PARENT_DIR,
         )
-    
+
     input_question_id: int = data["input_question_id"]
     input_question_text: str = data["input_question_text"]
 

@@ -147,7 +147,7 @@ async def process_fields_handler(
             PARENT_DIR,
         )
     await state.set_data(data)
-    
+
     id: int = data["orig_id"]
     question_id: int = data["orig_question_id"]
     question_text: str = data["orig_question_text"]
