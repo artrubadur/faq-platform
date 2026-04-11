@@ -4,6 +4,7 @@ constants:
       settings: "⚙"
       user: "👤"
       question: "📚"
+      formulation: "🧩"
 
     nav:
       back: "◀️"

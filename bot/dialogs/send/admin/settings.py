@@ -2,6 +2,7 @@ from typing import Awaitable, Callable
 
 from aiogram.types import InlineKeyboardMarkup, Message
 
+import bot.dialogs.markups.formulation as fmu
 import bot.dialogs.markups.question as qmu
 import bot.dialogs.markups.user as umu
 import bot.dialogs.rows.common as brows
@@ -42,4 +43,15 @@ async def send_questions_menu(
         text=messages.responses.admin.settings.question,
         parse_mode=messages.parse_mode,
         reply_markup=qmu.main,
+    )
+
+
+@with_message_action
+async def send_formulations_menu(
+    send: Callable[..., Awaitable[Message]],
+) -> Message:
+    return await send(
+        text=messages.responses.admin.settings.formulation,
+        parse_mode=messages.parse_mode,
+        reply_markup=fmu.main,
     )

@@ -6,6 +6,7 @@ from shared.contracts.question.requests import (
 )
 from shared.contracts.question.responses import (
     QuestionResponse,
+    QuestionWithFormulationsResponse,
     QuestionsAmountResponse,
     QuestionSuggestionResponse,
 )
@@ -16,6 +17,7 @@ __all__ = [
     "SuggestQuestionsRequest",
     "UpdateQuestionRequest",
     "QuestionResponse",
+    "QuestionWithFormulationsResponse",
     "QuestionsAmountResponse",
     "QuestionSuggestionResponse",
 ]

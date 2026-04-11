@@ -112,6 +112,9 @@ class CreationQstAdmRsp(BaseModel):
 
 class DeletionQstAdmRsp(BaseModel):
     confirm: str = "⏩ Confirm deletion?\n" "{question}"
+    formulations_warning: str = (
+        "⚠ Together with this question, {amount} formulations will be deleted: {ids}"
+    )
     successful: str = "✅ Next question has been successfully deleted:\n" "{question}"
 
 
@@ -140,10 +143,63 @@ class QuestionAdmRsp(BaseModel):
     listing: ListingQstAdmRsp = Field(default_factory=ListingQstAdmRsp)
 
 
+class EnterFrmAdmRsp(BaseModel):
+    id: str = "📝 Enter the formulation id"
+    question_id: str = "📝 Enter the question id"
+    question_text: str = "📝 Enter the formulation text"
+    filter_question_id: str = "📝 Enter the question id to filter formulations"
+
+
+class CreationFrmAdmRsp(BaseModel):
+    confirm: str = "⏩ Confirm creation?\n {formulation}"
+    successful: str = "✅ Formulation has been successfully created:\n" "{formulation}"
+
+
+class DeletionFrmAdmRsp(BaseModel):
+    confirm: str = "⏩ Confirm deletion?\n" "{formulation}"
+    successful: str = (
+        "✅ Next formulation has been successfully deleted:\n" "{formulation}"
+    )
+
+
+class UpdateFrmAdmRsp(BaseModel):
+    confirm: str = "⏩ Update this formulation?\n" "{formulation}"
+    select_field: str = "{formulation}\n" "⏩ Select the field to edit:"
+    confirm_recompute: str = "⏩ Recompute embedding?"
+    successful: str = (
+        "✅ The formulation has been successfully updated:\n" "{formulation}"
+    )
+
+
+class FindingFrmAdmRsp(BaseModel):
+    successful: str = (
+        "✅ The formulation has been successfully found:\n" "{formulation}"
+    )
+
+
+class ListingFrmAdmRsp(BaseModel):
+    successful: str = (
+        "🗂 Formulation list: {page}/{max_page}{scope}\n" "<pre>{content}</pre>"
+    )
+    scope: str = "\n🔎 Filtered by question {question_id}"
+    not_found: str = "🗂 No formulations found in the system"
+    not_found_scoped: str = "🗂 No formulations found for question {question_id}"
+
+
+class FormulationAdmRsp(BaseModel):
+    enter: EnterFrmAdmRsp = Field(default_factory=EnterFrmAdmRsp)
+    creation: CreationFrmAdmRsp = Field(default_factory=CreationFrmAdmRsp)
+    deletion: DeletionFrmAdmRsp = Field(default_factory=DeletionFrmAdmRsp)
+    update: UpdateFrmAdmRsp = Field(default_factory=UpdateFrmAdmRsp)
+    finding: FindingFrmAdmRsp = Field(default_factory=FindingFrmAdmRsp)
+    listing: ListingFrmAdmRsp = Field(default_factory=ListingFrmAdmRsp)
+
+
 class SettingsAdmRsp(BaseModel):
     main: str = "⚙ Settings"
     user: str = "👤 User"
     question: str = "📚 Question"
+    formulation: str = "🧩 Formulation"
 
 
 class GotoMscAdmRsp(BaseModel):
@@ -172,6 +228,7 @@ class AdminRsp(BaseModel):
     access_denied: str = "Access denied: {exception}"
     user: UserAdmRsp = Field(default_factory=UserAdmRsp)
     question: QuestionAdmRsp = Field(default_factory=QuestionAdmRsp)
+    formulation: FormulationAdmRsp = Field(default_factory=FormulationAdmRsp)
     settings: SettingsAdmRsp = Field(default_factory=SettingsAdmRsp)
     misc: MiscAdmRsp = Field(default_factory=MiscAdmRsp)
     ban: BanAdmRsp = Field(default_factory=BanAdmRsp)
@@ -201,6 +258,11 @@ class QuestionExc(BaseModel):
     embedding_failed: str = "Failed to compute vector representation of question"
 
 
+class FormulationExc(BaseModel):
+    not_found: str = "Formulation {id} not found"
+    embedding_failed: str = "Failed to compute vector representation of formulation"
+
+
 class MiscExc(BaseModel):
     invalid_changes: str = "Pass changes with the <code>key=value</code> format"
     invalid_argument: str = "Invalid argument: {exception}"
@@ -211,6 +273,7 @@ class Exceptions(BaseModel):
     search: SearchExc = Field(default_factory=SearchExc)
     user: UserExc = Field(default_factory=UserExc)
     question: QuestionExc = Field(default_factory=QuestionExc)
+    formulation: FormulationExc = Field(default_factory=FormulationExc)
     misc: MiscExc = Field(default_factory=MiscExc)
 
 
@@ -246,10 +309,19 @@ class QuestionPrc(BaseModel):
     rating_invalid: str = "Please send a simple text message with the rating"
 
 
+class FormulationPrc(BaseModel):
+    id_invalid: str = "Please send a simple text message with formulation ID"
+    question_id_invalid: str = "Please send a simple text message with question ID"
+    question_text_invalid: str = (
+        "Please send a simple text message with the formulation text"
+    )
+
+
 class Process(BaseModel):
     common: CommonPrc = Field(default_factory=CommonPrc)
     user: UserPrc = Field(default_factory=UserPrc)
     question: QuestionPrc = Field(default_factory=QuestionPrc)
+    formulation: FormulationPrc = Field(default_factory=FormulationPrc)
 
 
 # Validation
@@ -275,10 +347,17 @@ class QuestionVal(BaseModel):
     rating_incorrect: str = "Rating is incorrect"
 
 
+class FormulationVal(BaseModel):
+    id_invalid: str = "Formulation ID is invalid"
+    question_id_invalid: str = "Question ID is invalid"
+    question_text_long: str = "The formulation text is too long"
+
+
 class Validation(BaseModel):
     common: CommonVal = Field(default_factory=CommonVal)
     user: UserVal = Field(default_factory=UserVal)
     question: QuestionVal = Field(default_factory=QuestionVal)
+    formulation: FormulationVal = Field(default_factory=FormulationVal)
 
 
 # Settings
@@ -292,6 +371,15 @@ class QuestionSet(BaseModel):
     found: str = "Found ({id})"
 
 
+class FormulationSet(BaseModel):
+    question_text: str = "Formulation Text"
+    question_id: str = "Question ID"
+
+    found: str = "Found ({id})"
+    filter_by_question: str = "🔎 Filter by question"
+    cancel_scope: str = "✖️ Cancel scope"
+
+
 class UserSet(BaseModel):
     username: str = "Username"
     role: str = "Role"
@@ -303,6 +391,7 @@ class UserSet(BaseModel):
 class SettingsSet(BaseModel):
     user: str = "👤 Users"
     question: str = "📚 Questions"
+    formulation: str = "🧩 Formulations"
 
 
 class CommonSet(BaseModel):
@@ -327,6 +416,7 @@ class CommonSet(BaseModel):
 
 class Button(BaseModel):
     question: QuestionSet = Field(default_factory=QuestionSet)
+    formulation: FormulationSet = Field(default_factory=FormulationSet)
     user: UserSet = Field(default_factory=UserSet)
     settings: SettingsSet = Field(default_factory=SettingsSet)
     common: CommonSet = Field(default_factory=CommonSet)
@@ -361,8 +451,17 @@ class QuestionFmt(BaseModel):
     question_text: str = "🔍 Text: {question_text}"
     answer_text: str = "💡 Answer: {answer_text}"
     rating: str = "🚀 Rating: {rating}"
-    # recomputed: str = "🧬 Embedding will be recomputed"
-    # not_recomputed: str = "🧬 Embedding will NOT be recomputed"
+    formulations_amount: str = "🧩 Formulations: {amount}"
+    formulation_ids: str = "🧾 Formulation IDs: {ids}"
+
+
+class FormulationFmt(BaseModel):
+    id: str = "#️⃣ {id} Formulation:"
+    question_id: str = "🧭 Question ID: {question_id}"
+    question_text: str = "🔍 Text: {question_text}"
+    recompute_embedding: str = "🧬 Recompute embedding: {recompute_embedding}"
+    recompute_true: str = "YES"
+    recompute_false: str = "NO"
 
 
 class UserFmt(BaseModel):
@@ -381,6 +480,7 @@ class Format(BaseModel):
     field: FieldFmt = Field(default_factory=FieldFmt)
     fallback: FallbackFmt = Field(default_factory=FallbackFmt)
     question: QuestionFmt = Field(default_factory=QuestionFmt)
+    formulation: FormulationFmt = Field(default_factory=FormulationFmt)
     user: UserFmt = Field(default_factory=UserFmt)
     edit: EditFmt = Field(default_factory=EditFmt)
     canceled: str = "{old}\n✖️ CANCELED ✖️"

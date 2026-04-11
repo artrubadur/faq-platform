@@ -11,6 +11,7 @@ from shared.contracts.question.requests import (
 )
 from shared.contracts.question.responses import (
     QuestionResponse,
+    QuestionWithFormulationsResponse,
     QuestionsAmountResponse,
     QuestionSuggestionResponse,
 )
@@ -55,11 +56,11 @@ async def get_popular_questions(
     return await service.get_popular_questions(amount)
 
 
-@router.get("/{question_id}", response_model=QuestionResponse)
+@router.get("/{question_id}", response_model=QuestionWithFormulationsResponse)
 async def get_question(
     question_id: Annotated[int, Path(ge=1)],
     service: QuestionsServiceDep,
-) -> QuestionResponse:
+) -> QuestionWithFormulationsResponse:
     return await service.get_question(question_id)
 
 

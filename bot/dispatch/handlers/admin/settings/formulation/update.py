@@ -3,7 +3,7 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
 from loguru import logger
 
-from bot.core.dirs import QUESTIONS_UPDATE
+from bot.core.dirs import FORMULATIONS_UPDATE
 from bot.dialogs import SendAction
 from bot.dialogs.rows.common import (
     BackCallback,
@@ -12,52 +12,50 @@ from bot.dialogs.rows.common import (
     EditCallback,
     SaveCallback,
 )
-from bot.dialogs.rows.question import IdCallback
-from bot.dialogs.send.admin.question import (
+from bot.dialogs.rows.formulation import IdCallback
+from bot.dialogs.send.admin.formulation import (
     send_changes,
+    send_confirm_recompute,
     send_confirm_update,
     send_embedding_failed,
-    send_enter_answer_text,
     send_enter_id,
+    send_enter_question_id,
     send_enter_question_text,
-    send_enter_rating,
     send_not_found,
     send_successfully_updated,
 )
 from bot.dialogs.send.common import send_expired, send_invalid
-from bot.services.question.gateway import question_gateway
-from bot.services.question.process import (
-    process_answer_text_msg,
+from bot.services.formulation.gateway import formulation_gateway
+from bot.services.formulation.process import (
     process_id_msg,
+    process_question_id_msg,
     process_question_text_msg,
-    process_rating_msg,
 )
 from bot.utils.state.history import LastMessage, is_expired
 from bot.utils.state.temp import TempContext
 from shared.api.exceptions import BadGatewayError, NotFoundError
-from shared.contracts.question.requests import UpdateQuestionRequest
+from shared.contracts.formulation.requests import UpdateFormulationRequest
 
 router = Router()
 
-PARENT_DIR, DIR = QUESTIONS_UPDATE
+PARENT_DIR, DIR = FORMULATIONS_UPDATE
 
 
-class QuestionUpdate(StatesGroup):
+class FormulationUpdate(StatesGroup):
     waiting_for_id = State()
     waiting_for_question_text = State()
-    waiting_for_answer_text = State()
-    waiting_for_rating = State()
+    waiting_for_question_id = State()
 
 
 @router.callback_query(F.data == DIR)
-async def question_update_cb_handler(
+async def formulation_update_cb_handler(
     callback: CallbackQuery, last_message: LastMessage, state: TempContext
 ):
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    found_question_id: int | None = await state.storage.get_value(
-        state.key, "found_question_id", None, "long"
+    found_formulation_id: int | None = await state.storage.get_value(
+        state.key, "found_formulation_id", None, "long"
     )
 
     sent_message = await send_enter_id(
@@ -65,43 +63,43 @@ async def question_update_cb_handler(
         SendAction.EDIT,
         PARENT_DIR,
         DIR,
-        found_question_id,
+        found_formulation_id,
     )
     await last_message.set(sent_message, state)
 
-    await state.update_data({"in_operation": True})
-    await state.set_state(QuestionUpdate.waiting_for_id)
+    await state.set_data({"in_operation": True})
+    await state.set_state(FormulationUpdate.waiting_for_id)
 
 
 async def process_id_handler(
     message: Message, state: TempContext, input_id: int, *, send_action: SendAction
 ):
     try:
-        question = await question_gateway.get_question(input_id)
+        formulation = await formulation_gateway.get_formulation(input_id)
     except NotFoundError:
         await send_not_found(message, send_action, input_id)
         await state.set_state(None)
         return
 
     await state.update_data(
-        orig_id=question.id,
-        orig_question_text=question.question_text,
-        orig_answer_text=question.answer_text,
-        orig_rating=question.rating,
+        orig_id=formulation.id,
+        orig_question_id=formulation.question_id,
+        orig_question_text=formulation.question_text,
+        recompute_embedding=False,
     )
     await send_confirm_update(
         message,
         send_action,
-        question.id,
-        question.question_text,
-        question.answer_text,
+        formulation.id,
+        formulation.question_id,
+        formulation.question_text,
     )
 
     await state.set_state(None)
 
 
-@router.message(QuestionUpdate.waiting_for_id)
-async def question_update_msg_id_handler(
+@router.message(FormulationUpdate.waiting_for_id)
+async def formulation_update_msg_id_handler(
     message: Message, last_message: LastMessage, state: TempContext
 ):
     await last_message.edit_reply_markup(message, state)
@@ -119,8 +117,10 @@ async def question_update_msg_id_handler(
 
 
 @router.callback_query(IdCallback.filter(F.dir == DIR))
-async def question_update_cb_id_handler(
-    callback: CallbackQuery, callback_data: IdCallback, state: TempContext
+async def formulation_update_cb_id_handler(
+    callback: CallbackQuery,
+    callback_data: IdCallback,
+    state: TempContext,
 ):
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
@@ -147,32 +147,31 @@ async def process_fields_handler(
             PARENT_DIR,
         )
     await state.set_data(data)
-
+    
     id: int = data["orig_id"]
+    question_id: int = data["orig_question_id"]
     question_text: str = data["orig_question_text"]
-    answer_text: str = data["orig_answer_text"]
-    rating: float = data["orig_rating"]
 
+    edited_question_id: int = data.get("edited_question_id", question_id)
     edited_question_text: str = data.get("edited_question_text", question_text)
-    edited_answer_text: str = data.get("edited_answer_text", answer_text)
-    edited_rating: float = data.get("edited_rating", rating)
+    recompute_embedding: bool = data.get("recompute_embedding", False)
 
     await send_changes(
         message,
         send_action,
         id,
+        question_id,
+        edited_question_id,
         question_text,
         edited_question_text,
-        answer_text,
-        edited_answer_text,
-        rating,
-        edited_rating,
+        recompute_embedding,
     )
 
 
 @router.callback_query(ConfirmCallback.filter((F.dir == DIR) & (F.step == "update")))
-async def question_update_confirm_cb_fields_handler(
-    callback: CallbackQuery, state: TempContext
+async def formulation_update_confirm_cb_fields_handler(
+    callback: CallbackQuery,
+    state: TempContext,
 ):
     await callback.answer()
     await process_fields_handler(
@@ -183,8 +182,9 @@ async def question_update_confirm_cb_fields_handler(
 
 
 @router.callback_query(CancelCallback.filter(F.dir == PARENT_DIR))
-async def question_update_cancel_cb_fields_handler(
-    callback: CallbackQuery, state: TempContext
+async def formulation_update_cancel_cb_fields_handler(
+    callback: CallbackQuery,
+    state: TempContext,
 ):
     await callback.answer()
     await process_fields_handler(
@@ -195,8 +195,9 @@ async def question_update_cancel_cb_fields_handler(
 
 
 @router.callback_query(BackCallback.filter(F.dir == DIR))
-async def question_update_back_cb_fields_handler(
-    callback: CallbackQuery, state: TempContext
+async def formulation_update_back_cb_fields_handler(
+    callback: CallbackQuery,
+    state: TempContext,
 ):
     await callback.answer()
     await process_fields_handler(
@@ -209,23 +210,29 @@ async def question_update_back_cb_fields_handler(
 @router.callback_query(
     EditCallback.filter((F.dir == DIR) & (F.field == "question_text"))
 )
-async def question_update_cb_edit_question_text_handler(
-    callback: CallbackQuery, last_message: LastMessage, state: TempContext
+async def formulation_update_cb_edit_question_text_handler(
+    callback: CallbackQuery,
+    last_message: LastMessage,
+    state: TempContext,
 ):
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
 
     sent_message = await send_enter_question_text(
-        callback.message, SendAction.EDIT, DIR  # pyright: ignore[reportArgumentType]
+        callback.message,  # pyright: ignore[reportArgumentType]
+        SendAction.EDIT,
+        DIR,
     )
     await last_message.set(sent_message, state)
 
-    await state.set_state(QuestionUpdate.waiting_for_question_text)
+    await state.set_state(FormulationUpdate.waiting_for_question_text)
 
 
-@router.message(QuestionUpdate.waiting_for_question_text)
-async def question_update_msg_edited_question_text_handler(
-    message: Message, last_message: LastMessage, state: TempContext
+@router.message(FormulationUpdate.waiting_for_question_text)
+async def formulation_update_msg_edited_question_text_handler(
+    message: Message,
+    last_message: LastMessage,
+    state: TempContext,
 ):
     await last_message.edit_reply_markup(message, state)
 
@@ -236,77 +243,92 @@ async def question_update_msg_edited_question_text_handler(
         await last_message.set(sent_message, state)
         return
 
+    data = await state.get_data()
+    question_text: str = data["orig_question_text"]
+
     await state.update_data(edited_question_text=input_question_text)
 
-    await process_fields_handler(message, state, send_action=SendAction.ANSWER)
+    if question_text == input_question_text:
+        await state.update_data(recompute_embedding=False)
+        await process_fields_handler(message, state, send_action=SendAction.ANSWER)
+        await state.set_state(None)
+        return
+
+    sent_message = await send_confirm_recompute(message, SendAction.ANSWER)
+    await last_message.set(sent_message, state)
 
     await state.set_state(None)
 
 
-@router.callback_query(EditCallback.filter((F.dir == DIR) & (F.field == "answer_text")))
-async def question_update_cb_edit_answer_text_handler(
-    callback: CallbackQuery, last_message: LastMessage, state: TempContext
+@router.callback_query(ConfirmCallback.filter((F.dir == DIR) & (F.step == "recompute")))
+async def formulation_update_cb_confirm_recompute_handler(
+    callback: CallbackQuery,
+    state: TempContext,
 ):
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    sent_message = await send_enter_answer_text(
-        callback.message, SendAction.EDIT, DIR  # pyright: ignore[reportArgumentType]
+    await state.update_data(recompute_embedding=True)
+
+    await process_fields_handler(
+        callback.message,  # pyright: ignore[reportArgumentType]
+        state,
+        send_action=SendAction.EDIT,
+    )
+
+
+@router.callback_query(CancelCallback.filter(F.dir == DIR))
+async def formulation_update_cb_cancel_recompute_handler(
+    callback: CallbackQuery,
+    state: TempContext,
+):
+    await callback.answer("")
+    await callback.message.edit_reply_markup(reply_markup=None)
+
+    await state.update_data(recompute_embedding=False)
+
+    await process_fields_handler(
+        callback.message,  # pyright: ignore[reportArgumentType]
+        state,
+        send_action=SendAction.EDIT,
+    )
+
+
+@router.callback_query(EditCallback.filter((F.dir == DIR) & (F.field == "question_id")))
+async def formulation_update_cb_edit_question_id_handler(
+    callback: CallbackQuery,
+    last_message: LastMessage,
+    state: TempContext,
+):
+    await callback.answer("")
+    await callback.message.edit_reply_markup(reply_markup=None)
+
+    sent_message = await send_enter_question_id(
+        callback.message,  # pyright: ignore[reportArgumentType]
+        SendAction.EDIT,
+        DIR,
     )
     await last_message.set(sent_message, state)
 
-    await state.set_state(QuestionUpdate.waiting_for_answer_text)
+    await state.set_state(FormulationUpdate.waiting_for_question_id)
 
 
-@router.message(QuestionUpdate.waiting_for_answer_text)
-async def question_update_msg_edited_answer_text_handler(
-    message: Message, last_message: LastMessage, state: TempContext
+@router.message(FormulationUpdate.waiting_for_question_id)
+async def formulation_update_msg_edited_question_id_handler(
+    message: Message,
+    last_message: LastMessage,
+    state: TempContext,
 ):
     await last_message.edit_reply_markup(message, state)
 
     try:
-        input_answer_text = process_answer_text_msg(message)
+        input_question_id = process_question_id_msg(message)
     except ValueError as exc:
         sent_message = await send_invalid(message, SendAction.ANSWER, DIR, str(exc))
         await last_message.set(sent_message, state)
         return
 
-    await state.update_data(edited_answer_text=input_answer_text)
-
-    await process_fields_handler(message, state, send_action=SendAction.ANSWER)
-
-    await state.set_state(None)
-
-
-@router.callback_query(EditCallback.filter((F.dir == DIR) & (F.field == "rating")))
-async def question_update_cb_edit_rating_handler(
-    callback: CallbackQuery, last_message: LastMessage, state: TempContext
-):
-    await callback.answer("")
-    await callback.message.edit_reply_markup(reply_markup=None)
-
-    sent_message = await send_enter_rating(
-        callback.message, SendAction.EDIT, DIR  # pyright: ignore[reportArgumentType]
-    )
-    await last_message.set(sent_message, state)
-
-    await state.set_state(QuestionUpdate.waiting_for_rating)
-
-
-@router.message(QuestionUpdate.waiting_for_rating)
-async def question_update_msg_edited_rating_handler(
-    message: Message, last_message: LastMessage, state: TempContext
-):
-    await last_message.edit_reply_markup(message, state)
-
-    try:
-        input_rating = process_rating_msg(message)
-    except ValueError as exc:
-        sent_message = await send_invalid(message, SendAction.ANSWER, DIR, str(exc))
-        await last_message.set(sent_message, state)
-        return
-
-    await state.update_data(edited_rating=input_rating)
+    await state.update_data(edited_question_id=input_question_id)
 
     await process_fields_handler(message, state, send_action=SendAction.ANSWER)
 
@@ -314,7 +336,10 @@ async def question_update_msg_edited_rating_handler(
 
 
 @router.callback_query(SaveCallback.filter(F.dir == DIR))
-async def question_update_cb_save_handler(callback: CallbackQuery, state: TempContext):
+async def formulation_update_cb_save_handler(
+    callback: CallbackQuery,
+    state: TempContext,
+):
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
 
@@ -330,22 +355,31 @@ async def question_update_cb_save_handler(callback: CallbackQuery, state: TempCo
 
     id: int = data["orig_id"]
 
+    edited_question_id: int | None = data.get("edited_question_id", None)
     edited_question_text: str | None = data.get("edited_question_text", None)
-    edited_answer_text: str | None = data.get("edited_answer_text", None)
-    edited_rating: float | None = data.get("edited_rating", None)
+    recompute_embedding: bool | None = data.get("recompute_embedding", None)
 
-    request = UpdateQuestionRequest(
+    request = UpdateFormulationRequest(
+        question_id=edited_question_id,
         question_text=edited_question_text,
-        answer_text=edited_answer_text,
-        rating=edited_rating,
+        recompute_embedding=recompute_embedding,
     )
 
     try:
-        question = await question_gateway.update_question(
+        formulation = await formulation_gateway.update_formulation(
             id,
             **request.model_dump(mode="json", exclude_none=True),
         )
-    except NotFoundError:
+    except NotFoundError as exc:
+        if "Question" in str(exc):
+            await send_invalid(
+                callback.message,  # pyright: ignore[reportArgumentType]
+                SendAction.ANSWER,
+                DIR,
+                str(exc),
+            )
+            return
+
         await state.clear()
         await send_not_found(
             callback.message,  # pyright: ignore[reportArgumentType]
@@ -363,12 +397,11 @@ async def question_update_cb_save_handler(callback: CallbackQuery, state: TempCo
 
     await state.clear()
 
-    logger.debug("Question updated", id=question.id)
+    logger.debug("Formulation updated", id=formulation.id)
     await send_successfully_updated(
         callback.message,  # pyright: ignore[reportArgumentType]
         SendAction.EDIT,
-        question.id,
-        question.question_text,
-        question.answer_text,
-        question.rating,
+        formulation.id,
+        formulation.question_id,
+        formulation.question_text,
     )

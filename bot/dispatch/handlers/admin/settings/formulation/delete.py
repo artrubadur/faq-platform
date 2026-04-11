@@ -3,43 +3,44 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
 from loguru import logger
 
-from bot.core.dirs import QUESTIONS_DELETE
+from bot.core.dirs import FORMULATIONS_DELETE
 from bot.dialogs import SendAction
 from bot.dialogs.rows.common import ConfirmCallback
-from bot.dialogs.rows.question import IdCallback
-from bot.dialogs.send.admin.question import (
+from bot.dialogs.rows.formulation import IdCallback
+from bot.dialogs.send.admin.formulation import (
     send_confirm_deletion,
     send_enter_id,
     send_not_found,
     send_successfully_deleted,
 )
 from bot.dialogs.send.common import send_expired, send_invalid
-from bot.services.question.gateway import question_gateway
-from bot.services.question.process import process_id_msg
+from bot.services.formulation.gateway import formulation_gateway
+from bot.services.formulation.process import process_id_msg
 from bot.utils.state.history import LastMessage, is_expired
 from bot.utils.state.temp import TempContext
 from shared.api.exceptions import NotFoundError
 
 router = Router()
 
-PARENT_DIR, DIR = QUESTIONS_DELETE
+PARENT_DIR, DIR = FORMULATIONS_DELETE
 
 
-class QuestionDeletion(StatesGroup):
+class FormulationDeletion(StatesGroup):
     waiting_for_id = State()
 
 
 @router.callback_query(F.data == DIR)
-async def question_get_cb_handler(
+async def formulation_delete_cb_handler(
     callback: CallbackQuery, last_message: LastMessage, state: TempContext
 ):
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    found_question_id: int | None = await state.storage.get_value(
+    found_formulation_id: int | None = await state.storage.get_value(
         state.key,
-        "found_question_id",
+        "found_formulation_id",
         None,
+        "long",
     )
 
     sent_message = await send_enter_id(
@@ -47,19 +48,19 @@ async def question_get_cb_handler(
         SendAction.EDIT,
         PARENT_DIR,
         DIR,
-        found_question_id,
+        found_formulation_id,
     )
     await last_message.set(sent_message, state)
 
     await state.update_data({"in_operation": True})
-    await state.set_state(QuestionDeletion.waiting_for_id)
+    await state.set_state(FormulationDeletion.waiting_for_id)
 
 
 async def process_id_handler(
     message: Message, state: TempContext, input_id: int, *, send_action: SendAction
 ):
     try:
-        question = await question_gateway.get_question(input_id)
+        formulation = await formulation_gateway.get_formulation(input_id)
     except NotFoundError:
         await send_not_found(message, send_action, input_id)
         await state.set_state(None)
@@ -68,17 +69,16 @@ async def process_id_handler(
     await state.update_data(input_id=input_id)
     await send_confirm_deletion(
         message,
-        SendAction.ANSWER,
-        question.id,
-        question.question_text,
-        question.answer_text,
-        question.formulation_ids,
+        send_action,
+        formulation.id,
+        formulation.question_id,
+        formulation.question_text,
     )
     await state.set_state(None)
 
 
-@router.message(QuestionDeletion.waiting_for_id)
-async def question_delete_msg_id_handler(
+@router.message(FormulationDeletion.waiting_for_id)
+async def formulation_delete_msg_id_handler(
     message: Message, last_message: LastMessage, state: TempContext
 ):
     await last_message.edit_reply_markup(message, state)
@@ -96,8 +96,10 @@ async def question_delete_msg_id_handler(
 
 
 @router.callback_query(IdCallback.filter(F.dir == DIR))
-async def question_delete_cb_identity_handler(
-    callback: CallbackQuery, callback_data: IdCallback, state: TempContext
+async def formulation_delete_cb_id_handler(
+    callback: CallbackQuery,
+    callback_data: IdCallback,
+    state: TempContext,
 ):
     await callback.answer("")
     await callback.message.edit_reply_markup(reply_markup=None)
@@ -113,8 +115,9 @@ async def question_delete_cb_identity_handler(
 
 
 @router.callback_query(ConfirmCallback.filter(F.dir == DIR))
-async def question_delete_cb_confirm_handler(
-    callback: CallbackQuery, state: TempContext
+async def formulation_delete_cb_confirm_handler(
+    callback: CallbackQuery,
+    state: TempContext,
 ):
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
@@ -127,10 +130,11 @@ async def question_delete_cb_confirm_handler(
             SendAction.ANSWER,
             PARENT_DIR,
         )
+
     input_id: int = data["input_id"]
 
     try:
-        question = await question_gateway.delete_question(input_id)
+        formulation = await formulation_gateway.delete_formulation(input_id)
     except NotFoundError:
         await state.clear()
         return await send_not_found(
@@ -141,11 +145,11 @@ async def question_delete_cb_confirm_handler(
 
     await state.clear()
 
-    logger.debug("Question deleted", id=question.id)
+    logger.debug("Formulation deleted", id=formulation.id)
     await send_successfully_deleted(
         callback.message,  # pyright: ignore[reportArgumentType]
         SendAction.EDIT,
-        question.id,
-        question.question_text,
-        question.answer_text,
+        formulation.id,
+        formulation.question_id,
+        formulation.question_text,
     )

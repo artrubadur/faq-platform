@@ -39,7 +39,7 @@ async def question_cancel_cb_handler(callback: CallbackQuery, state: TempContext
     await callback.message.edit_reply_markup(reply_markup=None)
     await callback.message.edit_text(
         messages.format.canceled.format(old=callback.message.html_text),
-        parse_mode="HTML",
+        parse_mode=messages.parse_mode,
     )
 
     await state.clear()

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class QuestionResponse(BaseModel):
@@ -8,6 +8,10 @@ class QuestionResponse(BaseModel):
     question_text: str
     answer_text: str
     rating: float = 0.0
+
+
+class QuestionWithFormulationsResponse(QuestionResponse):
+    formulation_ids: list[int] = Field(default_factory=list)
 
 
 class QuestionSuggestionResponse(BaseModel):

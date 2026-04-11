@@ -15,7 +15,9 @@ class CreateFormulationRequest(BaseModel):
 class UpdateFormulationRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
+    question_id: int | None = Field(default=None, ge=1)
     question_text: str | None = None
+    recompute_embedding: bool | None = None
 
 
 class ListFormulationsRequest(BaseModel):

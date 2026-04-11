@@ -105,6 +105,7 @@ responses: # Messages sent to regular users
         confirm: | # < question
           {constants.emoji.action.select} Confirm deletion?
           {question}
+        formulations_warning: "{constants.emoji.status.warning} Together with this question, {amount} formulations will be deleted: {ids}" # < amount, ids
         successful: | # < question
           {constants.emoji.status.successful} Next question has been successfully deleted:
           {question}
@@ -114,10 +115,54 @@ responses: # Messages sent to regular users
           <pre>{content}</pre>
         not_found: "{constants.emoji.action.list} No questions found in the system"
 
+    formulation: # Formulation flows
+      enter:
+        id: "{constants.emoji.action.enter} Enter the formulation id"
+        question_id: "{constants.emoji.action.enter} Enter the question id"
+        question_text: "{constants.emoji.action.enter} Enter the formulation text"
+        filter_question_id: "{constants.emoji.action.enter} Enter the question id to filter formulations"
+      creation:
+        confirm: | # < formulation
+          {constants.emoji.action.select} Confirm creation?
+          {formulation}
+        successful: | # < formulation
+          {constants.emoji.status.successful} Formulation has been successfully created:
+          {formulation}
+      finding:
+        successful: | # < formulation
+          {constants.emoji.status.successful} The formulation has been successfully found:
+          {formulation}
+      update:
+        confirm: | # < formulation
+          {constants.emoji.action.select} Update this formulation?
+          {formulation}
+        select_field: | # < formulation
+          {formulation}
+          {constants.emoji.action.select} Select the field to edit:
+        confirm_recompute: "{constants.emoji.action.select} Recompute embedding?"
+        successful: |
+          {constants.emoji.status.successful} The formulation has been successfully updated:
+          {formulation}
+      deletion:
+        confirm: | # < formulation
+          {constants.emoji.action.select} Confirm deletion?
+          {formulation}
+        successful: | # < formulation
+          {constants.emoji.status.successful} Next formulation has been successfully deleted:
+          {formulation}
+      listing:
+        successful: | # < content - table of formulations
+          {constants.emoji.action.list} Formulation list: {page}/{max_page}{scope}
+          <pre>{content}</pre>
+        scope: "\n{constants.emoji.action.get} Filtered by question {question_id}" # < question_id
+        not_found: "{constants.emoji.action.list} No formulations found in the system"
+        not_found_scoped: "{constants.emoji.action.list} No formulations found for question {question_id}" # < question_id
+
     settings:
       main: "{constants.emoji.menu.settings} Settings"
       user: "{constants.emoji.menu.user} User"
       question: "{constants.emoji.menu.question} Question"
+      formulation: "{constants.emoji.menu.formulation} Formulation"
 
     misc:
       goto:
@@ -138,6 +183,10 @@ exceptions: # Error messages shown to user
   question:
     not_found: "{constants.emoji.status.failed} Question {id} not found" # < id
     embedding_failed: "Failed to compute vector representation of question"
+
+  formulation:
+    not_found: "{constants.emoji.status.failed} Formulation {id} not found" # < id
+    embedding_failed: "Failed to compute vector representation of formulation"
 
   misc:
     invalid_path: "Failed to go: The path is not set"
@@ -161,6 +210,11 @@ process: # Messages shown during input processing
     answer_text_invalid: "Please send a simple text message with the answer to the question"
     rating_invalid: "Please send a simple text message with the rating"
 
+  formulation: # Invalid formulation input formats
+    id_invalid: "Please send a simple text message with formulation ID"
+    question_id_invalid: "Please send a simple text message with question ID"
+    question_text_invalid: "Please send a simple text message with the formulation text"
+
 validation: # Messages for data integrity validation
   common: # Pagination errors
     page_invalid: "Page is invalid"
@@ -178,6 +232,11 @@ validation: # Messages for data integrity validation
     question_text_long: "The question text is too long"
     answer_text_long: "The answer text is too long"
     rating_incorrect: "Rating is incorrect"
+
+  formulation:
+    id_invalid: "Formulation ID is invalid"
+    question_id_invalid: "Question ID is invalid"
+    question_text_long: "The formulation text is too long"
 
 format: # Templates for consistent data presentation
   field:
@@ -207,8 +266,18 @@ format: # Templates for consistent data presentation
     question_text: "{constants.emoji.symbol.question} Text: {question_text}" # < question_text
     answer_text: "{constants.emoji.symbol.answer} Answer: {answer_text}" # < answer_text
     rating: "{constants.emoji.symbol.rating} Rating: {rating}" # < rating
+    formulations_amount: "{constants.emoji.menu.formulation} Formulations: {amount}" # < amount
+    formulation_ids: "{constants.emoji.action.list} Formulation IDs: {ids}" # < ids
     # recomputed: "{constants.emoji.symbol.embedding} Embedding will be recomputed" 
     # not_recomputed: "{constants.emoji.symbol.embedding} Embedding will NOT be recomputed"
+
+  formulation:
+    id: "{constants.emoji.symbol.index} {id} Formulation:" # < id
+    question_id: "{constants.emoji.action.get} Question ID: {question_id}" # < question_id
+    question_text: "{constants.emoji.symbol.question} Text: {question_text}" # < question_text
+    recompute_embedding: "{constants.emoji.symbol.embedding} Recompute embedding: {recompute_embedding}" # < recompute_embedding
+    recompute_true: "YES"
+    recompute_false: "NO"
 
   edit: # Shows changes during edit operations
     unedited: "{old}" # < old - original value
@@ -225,6 +294,13 @@ button:
     rating: "Rating"
     found: "Found ({id})" # < id
 
+  formulation:
+    question_text: "Formulation Text"
+    question_id: "Question ID"
+    found: "Found ({id})" # < id
+    filter_by_question: "{constants.emoji.action.get} Filter by question"
+    cancel_scope: "{constants.emoji.nav.cancel} Cancel scope"
+
   user:
     username: "Username"
     role: "Role"
@@ -234,6 +310,7 @@ button:
   settings:
     user: "{constants.emoji.menu.user} Users"
     question: "{constants.emoji.menu.question} Questions"
+    formulation: "{constants.emoji.menu.formulation} Formulations"
 
   common:
     close: "{constants.emoji.nav.close} Close"

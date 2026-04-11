@@ -1,3 +1,5 @@
+from typing import Any
+
 from bot.services.http_client import orchestrator_client
 from shared.api.client import ApiClient
 from shared.contracts.user.requests import (
@@ -8,6 +10,8 @@ from shared.contracts.user.requests import (
     UsersByRoleRequest,
 )
 from shared.contracts.user.responses import Role, UserResponse, UsersAmountResponse
+
+_UNSET = object()
 
 
 class UserGateway:
@@ -77,10 +81,13 @@ class UserGateway:
         self,
         id: int,
         role: Role,
-        username: str | None = None,
+        username: str | None | object = _UNSET,
     ) -> UserResponse:
-        payload = {"username": username, "role": role}
-        request = UpdateUserRequest.model_validate(payload)
+        request_data: dict[str, Any] = {"role": role}
+        if username is not _UNSET:
+            request_data["username"] = username
+
+        request = UpdateUserRequest(**request_data)
         data = await self.client.patch(
             f"/users/{id}",
             json_data=request.model_dump(mode="json", exclude_unset=True),

@@ -15,6 +15,7 @@ from shared.contracts.question.requests import (
 )
 from shared.contracts.question.responses import (
     QuestionResponse,
+    QuestionWithFormulationsResponse,
     QuestionsAmountResponse,
     QuestionSuggestionResponse,
 )
@@ -107,9 +108,18 @@ class QuestionsService:
             raise NotFoundError(f"Question {id} not found") from exc
         return self._to_response(question)
 
-    async def get_question(self, id: int) -> QuestionResponse:
+    async def get_question(self, id: int) -> QuestionWithFormulationsResponse:
         question = await self._get_existing_question(id)
-        return self._to_response(question)
+        formulations = await self.formulations_repository.get_by_question_id(
+            question.id
+        )
+        return QuestionWithFormulationsResponse(
+            id=question.id,
+            question_text=question.question_text,
+            answer_text=question.answer_text,
+            rating=question.rating,
+            formulation_ids=[item.id for item in formulations],
+        )
 
     async def get_questions_amount(self) -> QuestionsAmountResponse:
         amount = await self.questions_repository.get_amount()

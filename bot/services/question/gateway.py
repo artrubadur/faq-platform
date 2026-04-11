@@ -9,6 +9,7 @@ from shared.contracts.question.requests import (
 )
 from shared.contracts.question.responses import (
     QuestionResponse,
+    QuestionWithFormulationsResponse,
     QuestionsAmountResponse,
     QuestionSuggestionResponse,
 )
@@ -21,9 +22,9 @@ class QuestionGateway:
     ) -> None:
         self.client = client
 
-    async def get_question(self, id: int) -> QuestionResponse:
+    async def get_question(self, id: int) -> QuestionWithFormulationsResponse:
         data = await self.client.get(f"/questions/{id}")
-        return QuestionResponse.model_validate(data)
+        return QuestionWithFormulationsResponse.model_validate(data)
 
     async def create_question(
         self,
@@ -56,7 +57,7 @@ class QuestionGateway:
         )
         data = await self.client.patch(
             f"/questions/{id}",
-            json_data=request.model_dump(mode="json"),
+            json_data=request.model_dump(mode="json", exclude_none=True),
         )
         return QuestionResponse.model_validate(data)
 

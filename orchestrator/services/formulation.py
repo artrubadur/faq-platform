@@ -103,11 +103,19 @@ class FormulationsService:
         existing = await self._get_existing_formulation(id)
 
         update_fields: dict = {}
+        if (
+            request.question_id is not None
+            and request.question_id != existing.question_id
+        ):
+            await self._ensure_main_question_exists(request.question_id)
+            update_fields["question_id"] = request.question_id
+
         if request.question_text is not None:
             update_fields["question_text"] = request.question_text
-            update_fields["embedding"] = await self._compute_embedding(
-                request.question_text
-            )
+            if request.recompute_embedding:
+                update_fields["embedding"] = await self._compute_embedding(
+                    request.question_text
+                )
 
         if not update_fields:
             return self._to_response(existing)
