@@ -145,6 +145,7 @@ async def send_successfully_found(
     id: int,
     question_text: str,
     answer_text: str,
+    rating: float,
     formulation_ids: list[int] | None = None,
 ) -> Message:
     return await send(
@@ -153,7 +154,8 @@ async def send_successfully_found(
                 id,
                 question_text,
                 answer_text,
-                formulation_ids=formulation_ids,
+                rating,
+                formulation_ids,
             )
         ),
         parse_mode=messages.parse_mode,

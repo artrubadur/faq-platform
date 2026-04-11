@@ -71,6 +71,7 @@ async def process_id_handler(
         question.id,
         question.question_text,
         question.answer_text,
+        question.rating,
         question.formulation_ids,
     )
 
