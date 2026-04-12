@@ -31,7 +31,12 @@ from bot.services.user.process import (
     process_username_msg,
 )
 from bot.utils.state.data import update_data
-from bot.utils.state.history import LastMessage, is_expired
+from bot.utils.state.history import LastMessage
+from bot.utils.state.operation import (
+    extend_operation,
+    is_operation_expired,
+    start_operation,
+)
 from bot.utils.state.temp import TempContext
 from shared.api.exceptions import ConflictError, ForbiddenError, NotFoundError
 from shared.contracts.user.responses import Role
@@ -68,7 +73,6 @@ async def user_update_cb_handler(
     )
     await last_message.set(sent_message, state)
 
-    await state.set_data({"in_operation": True})
     await state.set_state(UserUpdate.waiting_for_identity)
 
 
@@ -86,7 +90,8 @@ async def process_identity_handler(
         await state.clear()
         return await send_not_found(message, send_action, input_id, input_username)
 
-    await state.update_data(
+    await start_operation(
+        state,
         orig_id=user.telegram_id,
         orig_username=user.username,
         orig_role=user.role,
@@ -144,14 +149,14 @@ async def process_fields_handler(
     message: Message, state: TempContext, *, send_action: SendAction
 ):
     data = await state.get_data()
-    if is_expired(data):
+    if is_operation_expired(data):
         await state.clear()
         return await send_expired(
             message,
             SendAction.ANSWER,
             PARENT_DIR,
         )
-    await state.set_data(data)
+    await extend_operation(state)
 
     id: int = data["orig_id"]
     username: str | None = data["orig_username"]
@@ -331,7 +336,7 @@ async def user_update_cb_save_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    if is_expired(data):
+    if is_operation_expired(data):
         await state.clear()
         return await send_expired(
             callback.message,  # pyright: ignore[reportArgumentType]

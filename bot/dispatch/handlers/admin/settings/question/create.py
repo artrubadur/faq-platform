@@ -25,7 +25,12 @@ from bot.services.question.process import (
     process_generation_amount_msg,
     process_question_text_msg,
 )
-from bot.utils.state.history import LastMessage, is_expired
+from bot.utils.state.history import LastMessage
+from bot.utils.state.operation import (
+    extend_operation,
+    is_operation_expired,
+    start_operation,
+)
 from bot.utils.state.temp import TempContext
 from shared.api.exceptions import (
     BadGatewayError,
@@ -72,7 +77,6 @@ async def question_create_cb_handler(
     )
     await last_message.set(sent_message, state)
 
-    await state.set_data({"in_operation": True})
     await state.set_state(QuestionCreation.waiting_for_question_text)
 
 
@@ -91,16 +95,7 @@ async def question_create_msg_question_text_handler(
         await last_message.set(sent_message, state)
         return
 
-    data = await state.get_data()
-    if is_expired(data):
-        await state.clear()
-        return await send_expired(
-            message,
-            SendAction.ANSWER,
-            PARENT_DIR,
-        )
-    data["input_question_text"] = input_question_text
-    await state.set_data(data)
+    await start_operation(state, input_question_text=input_question_text)
 
     sent_message = await send_enter_answer_text(message, SendAction.ANSWER, PARENT_DIR)
     await last_message.set(sent_message, state)
@@ -124,15 +119,14 @@ async def question_create_msg_answer_text_handler(
         return
 
     data = await state.get_data()
-    if is_expired(data):
+    if is_operation_expired(data):
         await state.clear()
         return await send_expired(
             message,
             SendAction.ANSWER,
             PARENT_DIR,
         )
-    data["input_answer_text"] = input_answer_text
-    await state.set_data(data)
+    await state.update_data(input_answer_text=input_answer_text)
 
     sent_message = await send_enter_generation_amount(
         message,
@@ -160,19 +154,17 @@ async def question_create_msg_generation_amount_handler(
         return
 
     data = await state.get_data()
-    if is_expired(data):
+    if is_operation_expired(data):
         await state.clear()
         return await send_expired(
             message,
             SendAction.ANSWER,
             PARENT_DIR,
         )
-    data["input_generation_amount"] = input_generation_amount
-    await state.set_data(data)
+    await state.update_data(input_generation_amount=input_generation_amount)
 
     input_question_text: str = data["input_question_text"]
     input_answer_text: str = data["input_answer_text"]
-    input_generation_amount: int = data["input_generation_amount"]
 
     await send_confirm_creation(
         message,
@@ -193,14 +185,14 @@ async def question_create_cb_create_confirm_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    if is_expired(data):
+    if is_operation_expired(data):
         await state.clear()
         return await send_expired(
             callback.message,  # pyright: ignore[reportArgumentType]
             SendAction.ANSWER,
             PARENT_DIR,
         )
-    await state.set_data(data)
+    await extend_operation(state)
 
     input_question_text: str = data["input_question_text"]
     input_answer_text: str = data["input_answer_text"]
@@ -277,7 +269,7 @@ async def question_create_cb_similar_confirm_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    if is_expired(data):
+    if is_operation_expired(data):
         await state.clear()
         return await send_expired(
             callback.message,  # pyright: ignore[reportArgumentType]

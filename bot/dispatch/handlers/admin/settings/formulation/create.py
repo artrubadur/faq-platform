@@ -19,7 +19,8 @@ from bot.services.formulation.process import (
     process_question_id_msg,
     process_question_text_msg,
 )
-from bot.utils.state.history import LastMessage, is_expired
+from bot.utils.state.history import LastMessage
+from bot.utils.state.operation import is_operation_expired, start_operation
 from bot.utils.state.temp import TempContext
 from shared.api.exceptions import BadGatewayError, NotFoundError
 
@@ -47,7 +48,6 @@ async def formulation_create_cb_handler(
     )
     await last_message.set(sent_message, state)
 
-    await state.set_data({"in_operation": True})
     await state.set_state(FormulationCreation.waiting_for_question_id)
 
 
@@ -66,7 +66,7 @@ async def formulation_create_msg_question_id_handler(
         await last_message.set(sent_message, state)
         return
 
-    await state.update_data(input_question_id=input_question_id)
+    await start_operation(state, input_question_id=input_question_id)
 
     sent_message = await send_enter_question_text(
         message,
@@ -93,17 +93,16 @@ async def formulation_create_msg_question_text_handler(
         await last_message.set(sent_message, state)
         return
 
-    await state.update_data(input_question_text=input_question_text)
-
     data = await state.get_data()
-    if is_expired(data):
+    if is_operation_expired(data):
         await state.clear()
         return await send_expired(
             message,
             SendAction.ANSWER,
             PARENT_DIR,
         )
-    await state.set_data(data)
+
+    await state.update_data(input_question_text=input_question_text)
 
     input_question_id: int = data["input_question_id"]
 
@@ -126,7 +125,7 @@ async def formulation_create_cb_confirm_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    if is_expired(data):
+    if is_operation_expired(data):
         await state.clear()
         return await send_expired(
             callback.message,  # pyright: ignore[reportArgumentType]

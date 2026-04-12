@@ -22,7 +22,8 @@ from bot.services.user.process import (
     process_role_msg,
     process_username_msg,
 )
-from bot.utils.state.history import LastMessage, is_expired
+from bot.utils.state.history import LastMessage
+from bot.utils.state.operation import is_operation_expired, start_operation
 from bot.utils.state.temp import TempContext
 from shared.api.exceptions import ConflictError, ForbiddenError
 from shared.contracts.user.responses import Role
@@ -58,8 +59,6 @@ async def user_create_cb_handler(
         found_username,
     )
     await last_message.set(sent_message, state)
-
-    await state.set_data({"in_operation": True})
     await state.set_state(UserCreation.waiting_for_identity)
 
 
@@ -72,7 +71,7 @@ async def process_identity_handler(
     *,
     send_action: SendAction,
 ):
-    await state.update_data(input_id=input_id, input_username=input_username)
+    await start_operation(state, input_id=input_id, input_username=input_username)
 
     if input_username is None:
         data = await state.get_data()
@@ -205,15 +204,14 @@ async def process_role_handler(
     send_action: SendAction,
 ):
     data = await state.get_data()
-    if is_expired(data):
+    if is_operation_expired(data):
         await state.clear()
         return await send_expired(
             message,
             SendAction.ANSWER,
             PARENT_DIR,
         )
-
-    await state.update_data(input_role=input_role.value, in_operation=True)
+    await state.update_data(input_role=input_role.value)
 
     input_id: int = data["input_id"]
     input_username: str | None = data["input_username"]
@@ -273,7 +271,7 @@ async def user_create_cb_confirm_handler(callback: CallbackQuery, state: TempCon
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    if is_expired(data):
+    if is_operation_expired(data):
         await state.clear()
         return await send_expired(
             callback.message,  # pyright: ignore[reportArgumentType]

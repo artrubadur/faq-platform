@@ -22,7 +22,8 @@ from bot.services.common.process import process_page_msg
 from bot.services.common.validate import resolve_page
 from bot.services.formulation.gateway import formulation_gateway
 from bot.services.formulation.process import process_question_id_msg
-from bot.utils.state.history import LastMessage, is_expired
+from bot.utils.state.history import LastMessage
+from bot.utils.state.operation import is_operation_expired, start_operation
 from bot.utils.state.temp import TempContext
 from shared.api.exceptions import NotFoundError
 from shared.contracts.formulation.requests import FormulationFields
@@ -45,7 +46,7 @@ async def process(
     send_action: SendAction,
 ):
     data = await state.get_data()
-    if is_expired(data):
+    if is_operation_expired(data):
         await state.clear()
         return await send_expired(
             message,
@@ -68,6 +69,7 @@ async def process(
     max_page = (amount + page_size - 1) // page_size
     page = resolve_page(page, max_page)
     await state.update_data(page=page)
+
     if page == 0:
         logger.debug("No formulations found")
         await send_empty_pagination(message, send_action, question_id_scope)
@@ -109,15 +111,13 @@ async def formulation_list_cb_handler(
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    await state.set_data(
-        {
-            "order": "id",
-            "ascending": True,
-            "page": 1,
-            "page_size": 5,
-            "question_id_scope": None,
-            "in_operation": True,
-        }
+    await start_operation(
+        state,
+        order="id",
+        ascending=True,
+        page=1,
+        page_size=5,
+        question_id_scope=None,
     )
 
     await process(
@@ -204,7 +204,7 @@ async def formulation_list_cb_order_handler(
     new_order = callback_data.column
     data = await state.get_data()
     if data.get("order", "") == new_order:
-        await state.update_data(ascending=(not data["ascending"]))
+        await state.update_data(ascending=(not data.get("ascending", False)))
     else:
         await state.update_data(order=new_order)
 

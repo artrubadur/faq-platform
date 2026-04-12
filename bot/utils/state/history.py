@@ -1,5 +1,4 @@
 from contextvars import ContextVar
-from typing import Any
 
 from aiogram import Bot
 from aiogram.types import InlineKeyboardMarkup, Message
@@ -64,7 +63,3 @@ class LastMessage:
 last_message_var: ContextVar[LastMessage | None] = ContextVar(
     "last_message", default=None
 )
-
-
-def is_expired(state_data: dict[str, Any]) -> bool:
-    return not state_data.get("in_operation", False)

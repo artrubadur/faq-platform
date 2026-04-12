@@ -82,6 +82,3 @@ class TempContext(FSMContext):
 
     def __init__(self, storage: TempStorage, key: StorageKey) -> None:
         super().__init__(storage, key)
-
-    async def clear(self):
-        await self.storage.clear(self.key)

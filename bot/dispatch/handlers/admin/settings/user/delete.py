@@ -16,7 +16,8 @@ from bot.dialogs.send.admin.user import (
 from bot.dialogs.send.common import send_access_denied, send_expired, send_invalid
 from bot.services.user.gateway import user_gateway
 from bot.services.user.process import process_identity_msg
-from bot.utils.state.history import LastMessage, is_expired
+from bot.utils.state.history import LastMessage
+from bot.utils.state.operation import is_operation_expired, start_operation
 from bot.utils.state.temp import TempContext
 from shared.api.exceptions import ForbiddenError, NotFoundError
 
@@ -50,7 +51,6 @@ async def user_delete_cb_handler(
     )
     await last_message.set(sent_message, state)
 
-    await state.set_data({"in_operation": True})
     await state.set_state(UserDeletion.waiting_for_identity)
 
 
@@ -70,7 +70,7 @@ async def process_identity_handler(
         await state.set_state(None)
         return
 
-    await state.update_data(input_id=input_id)
+    await start_operation(state, input_id=input_id)
     await send_confirm_deletion(
         message,
         send_action,
@@ -126,7 +126,7 @@ async def user_delete_cb_confirm_handler(callback: CallbackQuery, state: TempCon
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    if is_expired(data):
+    if is_operation_expired(data):
         await state.clear()
         return await send_expired(
             callback.message,  # pyright: ignore[reportArgumentType]

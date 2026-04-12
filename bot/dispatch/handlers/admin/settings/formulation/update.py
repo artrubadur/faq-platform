@@ -31,7 +31,12 @@ from bot.services.formulation.process import (
     process_question_id_msg,
     process_question_text_msg,
 )
-from bot.utils.state.history import LastMessage, is_expired
+from bot.utils.state.history import LastMessage
+from bot.utils.state.operation import (
+    extend_operation,
+    is_operation_expired,
+    start_operation,
+)
 from bot.utils.state.temp import TempContext
 from shared.api.exceptions import BadGatewayError, NotFoundError
 from shared.contracts.formulation.requests import UpdateFormulationRequest
@@ -67,7 +72,6 @@ async def formulation_update_cb_handler(
     )
     await last_message.set(sent_message, state)
 
-    await state.set_data({"in_operation": True})
     await state.set_state(FormulationUpdate.waiting_for_id)
 
 
@@ -81,7 +85,8 @@ async def process_id_handler(
         await state.set_state(None)
         return
 
-    await state.update_data(
+    await start_operation(
+        state,
         orig_id=formulation.id,
         orig_question_id=formulation.question_id,
         orig_question_text=formulation.question_text,
@@ -139,14 +144,14 @@ async def process_fields_handler(
     message: Message, state: TempContext, *, send_action: SendAction
 ):
     data = await state.get_data()
-    if is_expired(data):
+    if is_operation_expired(data):
         await state.clear()
         return await send_expired(
             message,
             SendAction.ANSWER,
             PARENT_DIR,
         )
-    await state.set_data(data)
+    await extend_operation(state)
 
     id: int = data["orig_id"]
     question_id: int = data["orig_question_id"]
@@ -344,7 +349,7 @@ async def formulation_update_cb_save_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    if is_expired(data):
+    if is_operation_expired(data):
         await state.clear()
         await send_expired(
             callback.message,  # pyright: ignore[reportArgumentType]

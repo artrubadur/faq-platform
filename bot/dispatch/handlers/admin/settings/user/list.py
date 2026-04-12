@@ -15,7 +15,8 @@ from bot.dialogs.send.common import send_expired, send_invalid
 from bot.services.common.process import process_page_msg
 from bot.services.common.validate import resolve_page
 from bot.services.user.gateway import user_gateway
-from bot.utils.state.history import LastMessage, is_expired
+from bot.utils.state.history import LastMessage
+from bot.utils.state.operation import is_operation_expired, start_operation
 from bot.utils.state.temp import TempContext
 from shared.contracts.user.requests import UserFields
 
@@ -36,7 +37,7 @@ async def process(
     send_action: SendAction
 ):
     data = await state.get_data()
-    if is_expired(data):
+    if is_operation_expired(data):
         await state.clear()
         await send_expired(
             message,
@@ -44,7 +45,6 @@ async def process(
             PARENT_DIR,
         )
         return
-    await state.set_data(data)
 
     order: UserFields = data["order"]
     ascending: bool = data["ascending"]
@@ -60,6 +60,7 @@ async def process(
     max_page = (amount + page_size - 1) // page_size
     page = resolve_page(page, max_page)
     await state.update_data(page=page)
+
     if page == 0:
         logger.debug("No users found")
         return await send_empty_pagination(message, send_action)
@@ -86,14 +87,12 @@ async def user_list_cb_handler(
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    await state.set_data(
-        {
-            "order": "id",
-            "ascending": True,
-            "page": 1,
-            "page_size": 5,
-            "in_operation": True,
-        }
+    await start_operation(
+        state,
+        order="id",
+        ascending=True,
+        page=1,
+        page_size=5,
     )
 
     await process(
@@ -103,7 +102,6 @@ async def user_list_cb_handler(
         send_action=SendAction.EDIT,
     )
 
-    await state.update_data(in_operation=True)
     await state.set_state(UserListing.waiting_for_page)
 
 
@@ -179,7 +177,7 @@ async def user_list_cb_order_handler(
     new_order = callback_data.column
     data = await state.get_data()
     if data["order"] == new_order:
-        await state.update_data(ascending=(not data["ascending"]))
+        await state.update_data(ascending=(not data.get("ascending", False)))
     else:
         await state.update_data(order=new_order)
 

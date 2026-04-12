@@ -36,9 +36,7 @@ async def user_get_cb_handler(
 
     sender_id = callback.from_user.id
     sender_username = callback.from_user.username
-    data = await state.storage.get_data(
-        state.key,
-    )
+    data = await state.storage.get_data(state.key, "long")
     found_user_id: int | None = data.get("found_user_id", None)
     found_username: str | None = data.get("found_username", None)
 

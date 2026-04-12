@@ -61,7 +61,9 @@ async def process_id_handler(
         return
 
     await state.storage.update_data(
-        state.key, {"found_question_id": question.id}, "long"
+        state.key,
+        {"found_question_id": question.id},
+        "long",
     )
 
     logger.debug("Question obtained", id=question.id)

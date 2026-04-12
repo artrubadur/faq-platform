@@ -37,7 +37,12 @@ from bot.services.question.process import (
     process_question_text_msg,
     process_rating_msg,
 )
-from bot.utils.state.history import LastMessage, is_expired
+from bot.utils.state.history import LastMessage
+from bot.utils.state.operation import (
+    extend_operation,
+    is_operation_expired,
+    start_operation,
+)
 from bot.utils.state.temp import TempContext
 from shared.api.exceptions import (
     BadGatewayError,
@@ -93,7 +98,6 @@ async def question_update_cb_handler(
     )
     await last_message.set(sent_message, state)
 
-    await state.update_data({"in_operation": True})
     await state.set_state(QuestionUpdate.waiting_for_id)
 
 
@@ -107,7 +111,8 @@ async def process_id_handler(
         await state.set_state(None)
         return
 
-    await state.update_data(
+    await start_operation(
+        state,
         orig_id=question.id,
         orig_question_text=question.question_text,
         orig_answer_text=question.answer_text,
@@ -163,14 +168,14 @@ async def process_fields_handler(
     message: Message, state: TempContext, *, send_action: SendAction
 ):
     data = await state.get_data()
-    if is_expired(data):
+    if is_operation_expired(data):
         await state.clear()
         return await send_expired(
             message,
             SendAction.ANSWER,
             PARENT_DIR,
         )
-    await state.set_data(data)
+    await extend_operation(state)
 
     id: int = data["orig_id"]
     question_text: str = data["orig_question_text"]
@@ -385,7 +390,7 @@ async def question_update_cb_save_handler(callback: CallbackQuery, state: TempCo
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    if is_expired(data):
+    if is_operation_expired(data):
         await state.clear()
         await send_expired(
             callback.message,  # pyright: ignore[reportArgumentType]

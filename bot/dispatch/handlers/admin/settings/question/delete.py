@@ -16,7 +16,8 @@ from bot.dialogs.send.admin.question import (
 from bot.dialogs.send.common import send_expired, send_invalid
 from bot.services.question.gateway import question_gateway
 from bot.services.question.process import process_id_msg
-from bot.utils.state.history import LastMessage, is_expired
+from bot.utils.state.history import LastMessage
+from bot.utils.state.operation import is_operation_expired, start_operation
 from bot.utils.state.temp import TempContext
 from shared.api.exceptions import NotFoundError
 
@@ -37,9 +38,7 @@ async def question_get_cb_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     found_question_id: int | None = await state.storage.get_value(
-        state.key,
-        "found_question_id",
-        None,
+        state.key, "found_question_id", None, "long"
     )
 
     sent_message = await send_enter_id(
@@ -51,7 +50,6 @@ async def question_get_cb_handler(
     )
     await last_message.set(sent_message, state)
 
-    await state.update_data({"in_operation": True})
     await state.set_state(QuestionDeletion.waiting_for_id)
 
 
@@ -65,7 +63,8 @@ async def process_id_handler(
         await state.set_state(None)
         return
 
-    await state.update_data(input_id=input_id)
+    await start_operation(state, input_id=input_id)
+
     await send_confirm_deletion(
         message,
         SendAction.ANSWER,
@@ -120,7 +119,7 @@ async def question_delete_cb_confirm_handler(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
-    if is_expired(data):
+    if is_operation_expired(data):
         await state.clear()
         return await send_expired(
             callback.message,  # pyright: ignore[reportArgumentType]
