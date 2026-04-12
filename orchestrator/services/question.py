@@ -4,9 +4,20 @@ from sqlalchemy.exc import NoResultFound
 from orchestrator.core.config import config
 from orchestrator.core.requests import ComposeCandidate, RerankCandidate
 from orchestrator.db.models.question import Question
-from orchestrator.integrations import ComposeProvider, EmbeddingProvider, RerankProvider
+from orchestrator.integrations import (
+    ComposeProvider,
+    EmbeddingProvider,
+    GenerationProvider,
+    RerankProvider,
+)
 from orchestrator.repositories import FormulationsRepository, QuestionsRepository
-from shared.api.exceptions import BadGatewayError, ConflictError, NotFoundError
+from shared.api.exceptions import (
+    BadGatewayError,
+    ConflictError,
+    NotFoundError,
+    TemporaryUnavailableError,
+    ValidationError,
+)
 from shared.contracts.question.requests import (
     CreateQuestionRequest,
     ListQuestionsRequest,
@@ -14,10 +25,10 @@ from shared.contracts.question.requests import (
     UpdateQuestionRequest,
 )
 from shared.contracts.question.responses import (
+    QuestionFormulationsResponse,
     QuestionResponse,
     QuestionsAmountResponse,
     QuestionSuggestionResponse,
-    QuestionWithFormulationsResponse,
 )
 
 
@@ -27,16 +38,20 @@ class QuestionsService:
         questions_repository: QuestionsRepository,
         formulations_repository: FormulationsRepository,
         embedding_provider: EmbeddingProvider,
+        generation_provider: GenerationProvider | None,
         rerank_provider: RerankProvider | None,
         compose_provider: ComposeProvider | None,
+        generation_max_amount: int,
         best_match_threshold: float,
         related_threshold: float,
     ):
         self.questions_repository = questions_repository
         self.formulations_repository = formulations_repository
         self.embedding_provider = embedding_provider
+        self.generation_provider = generation_provider
         self.rerank_provider = rerank_provider
         self.compose_provider = compose_provider
+        self.generation_max_amount = generation_max_amount
         self.best_match_distance = 1 - best_match_threshold
         self.related_distance = 1 - related_threshold
 
@@ -56,7 +71,71 @@ class QuestionsService:
         except NoResultFound as exc:
             raise NotFoundError(f"Question {id} not found") from exc
 
-    async def create_question(self, request: CreateQuestionRequest) -> QuestionResponse:
+    async def _generate_formulations(
+        self,
+        question_text: str,
+        amount: int,
+    ) -> list[str]:
+        if amount <= 0:
+            return []
+
+        if amount > self.generation_max_amount:
+            raise ValidationError(
+                "Generation amount exceeds the maximum allowed value",
+                {
+                    "scope": "formulation_generation",
+                    "max_amount": self.generation_max_amount,
+                },
+            )
+
+        if self.generation_provider is None:
+            raise TemporaryUnavailableError(
+                "Alternative formulations generation is unavailable",
+                {"scope": "formulation_generation"},
+            )
+
+        try:
+            return await self.generation_provider.generate(question_text, amount)
+        except Exception as exc:
+            logger.exception("Failed to generate alternative formulations")
+            raise BadGatewayError(
+                "Failed to generate alternative formulations",
+                {"scope": "formulation_generation"},
+            ) from exc
+
+    async def _create_formulations(
+        self,
+        question_id: int,
+        formulations: list[tuple[str, list[float]]],
+    ) -> list[int]:
+        formulation_ids: list[int] = []
+        for formulation_text, embedding in formulations:
+            formulation = await self.formulations_repository.create(
+                question_id,
+                formulation_text,
+                embedding,
+            )
+            formulation_ids.append(formulation.id)
+
+        return formulation_ids
+
+    async def _prepare_generated_formulations(
+        self,
+        question_text: str,
+        amount: int,
+    ) -> list[tuple[str, list[float]]]:
+        formulations = await self._generate_formulations(question_text, amount)
+        prepared = []
+
+        for formulation_text in formulations:
+            embedding = await self._compute_embedding(formulation_text)
+            prepared.append((formulation_text, embedding))
+
+        return prepared
+
+    async def create_question(
+        self, request: CreateQuestionRequest
+    ) -> QuestionFormulationsResponse:
         embedding = await self._compute_embedding(request.question_text)
 
         if request.check_similarity:
@@ -73,6 +152,11 @@ class QuestionsService:
                     {"id": similar.id, "question_text": similar.question_text},
                 )
 
+        prepared_generated_formulations = await self._prepare_generated_formulations(
+            request.question_text,
+            request.generate_formulations_amount,
+        )
+
         question = await self.questions_repository.create(
             request.question_text,
             request.answer_text,
@@ -82,13 +166,24 @@ class QuestionsService:
             request.question_text,
             embedding,
         )
-        return self._to_response(question)
+        formulation_ids = await self._create_formulations(
+            question.id,
+            prepared_generated_formulations,
+        )
+
+        return QuestionFormulationsResponse(
+            id=question.id,
+            question_text=question.question_text,
+            answer_text=question.answer_text,
+            rating=question.rating,
+            formulation_ids=formulation_ids,
+        )
 
     async def update_question(
         self,
         id: int,
         request: UpdateQuestionRequest,
-    ) -> QuestionResponse:
+    ) -> QuestionFormulationsResponse:
         existing = await self._get_existing_question(id)
 
         update_fields: dict = {}
@@ -99,21 +194,39 @@ class QuestionsService:
         if request.rating is not None:
             update_fields["rating"] = request.rating
 
-        if not update_fields:
-            return self._to_response(existing)
+        question = existing
+        generation_amount = request.generate_formulations_amount or 0
+        target_question_text = request.question_text or existing.question_text
+        prepared_generated_formulations = await self._prepare_generated_formulations(
+            target_question_text,
+            generation_amount,
+        )
 
-        try:
-            question = await self.questions_repository.update(id, **update_fields)
-        except NoResultFound as exc:
-            raise NotFoundError(f"Question {id} not found") from exc
-        return self._to_response(question)
+        if update_fields:
+            try:
+                question = await self.questions_repository.update(id, **update_fields)
+            except NoResultFound as exc:
+                raise NotFoundError(f"Question {id} not found") from exc
 
-    async def get_question(self, id: int) -> QuestionWithFormulationsResponse:
+        formulation_ids = await self._create_formulations(
+            question.id,
+            prepared_generated_formulations,
+        )
+
+        return QuestionFormulationsResponse(
+            id=question.id,
+            question_text=question.question_text,
+            answer_text=question.answer_text,
+            rating=question.rating,
+            formulation_ids=formulation_ids,
+        )
+
+    async def get_question(self, id: int) -> QuestionFormulationsResponse:
         question = await self._get_existing_question(id)
         formulations = await self.formulations_repository.get_by_question_id(
             question.id
         )
-        return QuestionWithFormulationsResponse(
+        return QuestionFormulationsResponse(
             id=question.id,
             question_text=question.question_text,
             answer_text=question.answer_text,

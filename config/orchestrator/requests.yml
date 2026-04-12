@@ -108,3 +108,50 @@ compose:
   path:
     target: ["messages", 1, "text"]
     source: ["result", "alternatives", 0, "message", "text"]
+
+
+generation:
+  method: "POST"
+  url: "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
+
+  headers:
+    Authorization: "Bearer {iam_token}"
+    Content-Type: "application/json"
+
+  body:
+    modelUri: "gpt://{folder_id}/yandexgpt-5-lite/latest"
+    messages:
+      - role: "system"
+        text: |
+          You generate alternative FAQ question formulations.
+
+          Rules:
+          - Preserve exact intent and scope.
+          - Use the same language as the input question.
+          - Generate diverse phrasings (different wording and sentence structure).
+          - Keep phrasing natural and human, avoid robotic style.
+          - Do not add new facts or assumptions.
+          - Avoid duplicates and near-duplicates.
+          - Each item is one standalone question.
+          - Return up to `amount` items.
+
+      - role: "user"
+        text: '{{"question_text": {question_text}, "amount": {amount}}}'
+
+    jsonSchema:
+      schema:
+        type: "object"
+        properties:
+          result:
+            type: "array"
+            items:
+              type: "string"
+
+    completionOptions:
+      stream: false
+      temperature: 1
+      maxTokens: 1024
+
+  path:
+    target: ["messages", 1, "text"]
+    source: ["result", "alternatives", 0, "message", "text"]

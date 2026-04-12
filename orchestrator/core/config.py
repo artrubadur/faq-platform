@@ -65,6 +65,13 @@ class RerankConfig(BaseModel):
     enabled: bool = True
 
 
+class GenerationConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = True
+    max_amount: int = Field(default=16, ge=0)
+
+
 class ComposeConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -83,6 +90,7 @@ class SuggestionConfig(BaseModel):
     search: SearchConfig = Field(default_factory=SearchConfig)
     rerank: RerankConfig = Field(default_factory=RerankConfig)
     compose: ComposeConfig = Field(default_factory=ComposeConfig)
+    generation: GenerationConfig = Field(default_factory=GenerationConfig)
 
 
 class ClientsConfig(BaseModel):
@@ -91,6 +99,7 @@ class ClientsConfig(BaseModel):
     embedding: ApiClientConfig = Field(default_factory=ApiClientConfig)
     rerank: ApiClientConfig = Field(default_factory=ApiClientConfig)
     compose: ApiClientConfig = Field(default_factory=ApiClientConfig)
+    generation: ApiClientConfig = Field(default_factory=ApiClientConfig)
 
 
 class ApiConfig(BaseModel):

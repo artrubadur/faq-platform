@@ -49,6 +49,10 @@ field_save_update = InlineKeyboardMarkup(
         [
             rows.FieldButton(messages.button.question.question_text, "question_text"),
             rows.FieldButton(messages.button.question.answer_text, "answer_text"),
+            rows.FieldButton(
+                messages.button.question.generation_amount,
+                "generation_amount",
+            ),
             rows.FieldButton(messages.button.question.rating, "rating"),
         ],
     )

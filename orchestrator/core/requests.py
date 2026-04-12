@@ -202,12 +202,57 @@ class ComposeRequestTemplate(RequestTemplate):
         return result
 
 
+class GenerationRequestTemplate(RequestTemplate):
+    def build(self, question_text: str, amount: int) -> dict:
+        body = deepcopy(self.body)
+        tokens = self.path.target
+        question_text_str = json.dumps(question_text, ensure_ascii=False)
+        amount_str = json.dumps(amount)
+
+        current = body
+        for token in tokens[:-1]:
+            current = current[token]
+        current[tokens[-1]] = current[tokens[-1]].format(
+            question_text=question_text_str,
+            amount=amount_str,
+        )
+        logger.debug("Generation request prepared")
+        return body
+
+    def extract(self, data) -> list[str]:
+        current = data
+        for token in self.path.source:
+            try:
+                current = current[token]
+            except (KeyError, IndexError, TypeError) as exc:
+                raise ValueError(
+                    f"Failed to extract generated formulations from '{self.path.source}' at token '{token}'"
+                ) from exc
+        try:
+            parsed = json.loads(current)
+            result = parsed["result"]
+            if not isinstance(result, list):
+                raise ValueError("`result` is not a list")
+            if not all(isinstance(item, str) for item in result):
+                raise ValueError("`result` must contain strings only")
+        except (json.JSONDecodeError, TypeError, KeyError, ValueError) as exc:
+            logger.warning(
+                "Failed to parse generation response payload",
+                source_path=self.path.source,
+            )
+            raise ValueError("Failed to parse generation response payload") from exc
+
+        logger.debug("Generation response parsed")
+        return result
+
+
 class RequestTemplates(YamlSettings):
     model_config = SettingsConfigDict(yaml_file=REQUESTS_PATH, frozen=True)
 
     embedding: EmbeddingRequestTemplate
     rerank: RerankRequestTemplate | None = None
     compose: ComposeRequestTemplate | None = None
+    generation: GenerationRequestTemplate | None = None
 
     @model_validator(mode="after")
     def validate_steps(self):
@@ -218,6 +263,10 @@ class RequestTemplates(YamlSettings):
         if config.suggestion.compose.enabled and self.compose is None:
             raise ValueError(
                 "`compose` template is required when SUGGESTION__COMPOSE__ENABLED=true"
+            )
+        if config.suggestion.generation.enabled and self.generation is None:
+            raise ValueError(
+                "`generation` template is required when SUGGESTION__GENERATION__ENABLED=true"
             )
         return self
 

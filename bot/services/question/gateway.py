@@ -8,10 +8,10 @@ from shared.contracts.question.requests import (
     UpdateQuestionRequest,
 )
 from shared.contracts.question.responses import (
+    QuestionFormulationsResponse,
     QuestionResponse,
     QuestionsAmountResponse,
     QuestionSuggestionResponse,
-    QuestionWithFormulationsResponse,
 )
 
 
@@ -22,26 +22,28 @@ class QuestionGateway:
     ) -> None:
         self.client = client
 
-    async def get_question(self, id: int) -> QuestionWithFormulationsResponse:
+    async def get_question(self, id: int) -> QuestionFormulationsResponse:
         data = await self.client.get(f"/questions/{id}")
-        return QuestionWithFormulationsResponse.model_validate(data)
+        return QuestionFormulationsResponse.model_validate(data)
 
     async def create_question(
         self,
         question_text: str,
         answer_text: str,
         check_similarity: bool,
-    ) -> QuestionResponse:
+        generate_formulations_amount: int,
+    ) -> QuestionFormulationsResponse:
         request = CreateQuestionRequest(
             question_text=question_text,
             answer_text=answer_text,
             check_similarity=check_similarity,
+            generate_formulations_amount=generate_formulations_amount,
         )
         data = await self.client.post(
             "/questions",
             json_data=request.model_dump(mode="json"),
         )
-        return QuestionResponse.model_validate(data)
+        return QuestionFormulationsResponse.model_validate(data)
 
     async def update_question(
         self,
@@ -49,17 +51,19 @@ class QuestionGateway:
         question_text: str | None = None,
         answer_text: str | None = None,
         rating: float | None = None,
-    ) -> QuestionResponse:
+        generate_formulations_amount: int | None = None,
+    ) -> QuestionFormulationsResponse:
         request = UpdateQuestionRequest(
             question_text=question_text,
             answer_text=answer_text,
             rating=rating,
+            generate_formulations_amount=generate_formulations_amount,
         )
         data = await self.client.patch(
             f"/questions/{id}",
             json_data=request.model_dump(mode="json", exclude_none=True),
         )
-        return QuestionResponse.model_validate(data)
+        return QuestionFormulationsResponse.model_validate(data)
 
     async def get_questions_amount(self) -> int:
         data = await self.client.get("/questions/count")

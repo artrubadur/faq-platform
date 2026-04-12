@@ -3,6 +3,7 @@ from aiogram.types import Message
 
 from bot.core.customization import messages
 from bot.services.question.validate import (
+    validate_generate_formulations_amount,
     validate_id,
     validate_question_text,
     validate_rating,
@@ -58,3 +59,13 @@ def process_rating_msg(message: Message):
     formatted_rating = format_input(input_rating)
     valid_rating = validate_rating(formatted_rating)
     return valid_rating
+
+
+def process_generation_amount_msg(message: Message):
+    input_amount = message.text
+    if input_amount is None:
+        raise ValueError(messages.process.question.generation_amount_invalid)
+
+    formatted_amount = format_input(input_amount)
+    valid_amount = validate_generate_formulations_amount(formatted_amount)
+    return valid_amount

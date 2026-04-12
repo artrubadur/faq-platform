@@ -12,7 +12,7 @@ class QuestionResponse(BaseModel):
     rating: float = 0.0
 
 
-class QuestionWithFormulationsResponse(QuestionResponse):
+class QuestionFormulationsResponse(QuestionResponse):
     formulation_ids: list[Int64Id] = Field(default_factory=list)
 
 

@@ -136,6 +136,7 @@ def format_question(
     question_text: str | None = None,
     answer_text: str | None = None,
     rating: str | float | None = None,
+    generation_amount: int | None = None,
     formulation_ids: list[int] | None = None,
 ) -> str:
     result = []
@@ -160,6 +161,11 @@ def format_question(
     if rating is not None:
         result.append(
             messages.format.question.rating.format(rating=format_rating(rating))
+        )
+
+    if generation_amount is not None:
+        result.append(
+            messages.format.question.generation_amount.format(amount=generation_amount)
         )
 
     if formulation_ids is not None:
@@ -269,6 +275,7 @@ def format_edited_question(
     edited_answer_text: str,
     rating: float,
     edited_rating: float,
+    generation_amount: int,
 ):
     is_question_text_changed = question_text != edited_question_text
     is_answer_text_changed = answer_text != edited_answer_text
@@ -316,6 +323,10 @@ def format_edited_question(
                 else messages.format.edit.unedited.format(old=format_rating(rating))
             )
         )
+    )
+
+    result.append(
+        messages.format.question.generation_amount.format(amount=generation_amount)
     )
 
     return "\n".join(result)

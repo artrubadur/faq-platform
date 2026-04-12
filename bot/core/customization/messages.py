@@ -99,6 +99,9 @@ class EnterQstAdmRsp(BaseModel):
     id: str = "📝 Enter the question id"
     question_text: str = "📝 Enter the question text"
     answer_text: str = "📝 Enter the answer text"
+    generation_amount: str = (
+        "📝 Enter amount of alternative formulations to generate (0 - skip generation)"
+    )
     rating: str = "📝 Enter the rating"
 
 
@@ -256,6 +259,13 @@ class UserExc(BaseModel):
 class QuestionExc(BaseModel):
     not_found: str = "Question {id} not found"
     embedding_failed: str = "Failed to compute vector representation of question"
+    generation_amount_limit_exceeded: str = (
+        "Generation amount exceeds maximum allowed: {max_amount}"
+    )
+    formulations_generation_unavailable: str = (
+        "Alternative formulations generation is currently unavailable"
+    )
+    formulations_generation_failed: str = "Failed to generate alternative formulations"
 
 
 class FormulationExc(BaseModel):
@@ -306,6 +316,9 @@ class QuestionPrc(BaseModel):
     answer_text_invalid: str = (
         "Please send a simple text message with the answer to the question"
     )
+    generation_amount_invalid: str = (
+        "Please send a simple text message with amount of formulations to generate"
+    )
     rating_invalid: str = "Please send a simple text message with the rating"
 
 
@@ -344,6 +357,8 @@ class QuestionVal(BaseModel):
     id_invalid: str = "ID is invalid"
     question_text_long: str = "The question text is too long"
     answer_text_long: str = "The answer text is too long"
+    generation_amount_incorrect: str = "Generation amount is incorrect"
+    generation_amount_min: str = "Generation amount cannot be less than 0"
     rating_incorrect: str = "Rating is incorrect"
 
 
@@ -366,6 +381,7 @@ class Validation(BaseModel):
 class QuestionSet(BaseModel):
     question_text: str = "Question Text"
     answer_text: str = "Answer Text"
+    generation_amount: str = "Generate Formulations"
     rating: str = "Rating"
 
     found: str = "Found ({id})"
@@ -451,6 +467,7 @@ class QuestionFmt(BaseModel):
     question_text: str = "🔍 Text: {question_text}"
     answer_text: str = "💡 Answer: {answer_text}"
     rating: str = "🚀 Rating: {rating}"
+    generation_amount: str = "🧩 Generate formulations: {amount}"
     formulations_amount: str = "🧩 Formulations: {amount}"
     formulation_ids: str = "🧾 Formulation IDs: {ids}"
 

@@ -73,6 +73,7 @@ responses: # Messages sent to regular users
         id: "{constants.emoji.action.enter} Enter the question id"
         question_text: "{constants.emoji.action.enter} Enter a question text"
         answer_text: "{constants.emoji.action.enter} Enter a answer text"
+        generation_amount: "{constants.emoji.action.enter} Enter amount of alternative formulations to generate (0 - skip generation)"
         rating: "{constants.emoji.action.enter} Enter a rating"
       creation:
         confirm: | # < question
@@ -183,6 +184,9 @@ exceptions: # Error messages shown to user
   question:
     not_found: "{constants.emoji.status.failed} Question {id} not found" # < id
     embedding_failed: "Failed to compute vector representation of question"
+    generation_amount_limit_exceeded: "Generation amount exceeds maximum allowed: {max_amount}" # < max_amount
+    formulations_generation_unavailable: "Alternative formulations generation is currently unavailable"
+    formulations_generation_failed: "Failed to generate alternative formulations"
 
   formulation:
     not_found: "{constants.emoji.status.failed} Formulation {id} not found" # < id
@@ -208,6 +212,7 @@ process: # Messages shown during input processing
     msg_question_text_invalid: "Please send a simple text message with the question"
     cmd_question_text_invalid: "Please specify the question text after the command"
     answer_text_invalid: "Please send a simple text message with the answer to the question"
+    generation_amount_invalid: "Please send a simple text message with amount of formulations to generate"
     rating_invalid: "Please send a simple text message with the rating"
 
   formulation: # Invalid formulation input formats
@@ -231,6 +236,8 @@ validation: # Messages for data integrity validation
     id_invalid: "ID is invalid"
     question_text_long: "The question text is too long"
     answer_text_long: "The answer text is too long"
+    generation_amount_incorrect: "Generation amount is incorrect"
+    generation_amount_min: "Generation amount cannot be less than 0"
     rating_incorrect: "Rating is incorrect"
 
   formulation:
@@ -266,6 +273,7 @@ format: # Templates for consistent data presentation
     question_text: "{constants.emoji.symbol.question} Text: {question_text}" # < question_text
     answer_text: "{constants.emoji.symbol.answer} Answer: {answer_text}" # < answer_text
     rating: "{constants.emoji.symbol.rating} Rating: {rating}" # < rating
+    generation_amount: "{constants.emoji.menu.formulation} Generate formulations: {amount}" # < amount
     formulations_amount: "{constants.emoji.menu.formulation} Formulations: {amount}" # < amount
     formulation_ids: "{constants.emoji.action.list} Formulation IDs: {ids}" # < ids
     # recomputed: "{constants.emoji.symbol.embedding} Embedding will be recomputed" 
@@ -291,6 +299,7 @@ button:
   question: 
     question_text: "Question Text"
     answer_text: "Answer Text"
+    generation_amount: "Generate Formulations"
     rating: "Rating"
     found: "Found ({id})" # < id
 

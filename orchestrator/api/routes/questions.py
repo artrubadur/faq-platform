@@ -10,20 +10,20 @@ from shared.contracts.question.requests import (
     UpdateQuestionRequest,
 )
 from shared.contracts.question.responses import (
+    QuestionFormulationsResponse,
     QuestionResponse,
     QuestionsAmountResponse,
     QuestionSuggestionResponse,
-    QuestionWithFormulationsResponse,
 )
 
 router = APIRouter(prefix="/questions", tags=["questions"])
 
 
-@router.post("", response_model=QuestionResponse)
+@router.post("", response_model=QuestionFormulationsResponse)
 async def create_question(
     request: CreateQuestionRequest,
     service: QuestionsServiceDep,
-) -> QuestionResponse:
+) -> QuestionFormulationsResponse:
     return await service.create_question(request)
 
 
@@ -56,20 +56,20 @@ async def get_popular_questions(
     return await service.get_popular_questions(amount)
 
 
-@router.get("/{question_id}", response_model=QuestionWithFormulationsResponse)
+@router.get("/{question_id}", response_model=QuestionFormulationsResponse)
 async def get_question(
     question_id: Annotated[int, Path(ge=1)],
     service: QuestionsServiceDep,
-) -> QuestionWithFormulationsResponse:
+) -> QuestionFormulationsResponse:
     return await service.get_question(question_id)
 
 
-@router.patch("/{question_id}", response_model=QuestionResponse)
+@router.patch("/{question_id}", response_model=QuestionFormulationsResponse)
 async def update_question(
     question_id: Annotated[int, Path(ge=1)],
     request: UpdateQuestionRequest,
     service: QuestionsServiceDep,
-) -> QuestionResponse:
+) -> QuestionFormulationsResponse:
     return await service.update_question(question_id, request)
 
 

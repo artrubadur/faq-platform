@@ -63,6 +63,19 @@ async def send_enter_answer_text(
 
 
 @with_message_action
+async def send_enter_generation_amount(
+    send: Callable[..., Awaitable[Message]],
+    cancel_dir: str,
+) -> Message:
+    reply_markup = InlineKeyboardMarkup(inline_keyboard=brows.cancel_row(cancel_dir))
+    return await send(
+        text=messages.responses.admin.question.enter.generation_amount,
+        parse_mode=messages.parse_mode,
+        reply_markup=reply_markup,
+    )
+
+
+@with_message_action
 async def send_enter_rating(
     send: Callable[..., Awaitable[Message]], dir: str
 ) -> Message:
@@ -81,11 +94,14 @@ async def send_confirm_creation(
     send: Callable[..., Awaitable[Message]],
     question_text: str,
     answer_text: str,
+    generation_amount: int,
 ) -> Message:
     return await send(
         text=messages.responses.admin.question.creation.confirm.format(
             question=format_question(
-                question_text=question_text, answer_text=answer_text
+                question_text=question_text,
+                answer_text=answer_text,
+                generation_amount=generation_amount,
             )
         ),
         parse_mode=messages.parse_mode,
@@ -99,10 +115,16 @@ async def send_successfully_created(
     id: int,
     question_text: str,
     answer_text: str,
+    formulation_ids: list[int] | None = None,
 ) -> Message:
     return await send(
         text=messages.responses.admin.question.creation.successful.format(
-            question=format_question(id, question_text, answer_text)
+            question=format_question(
+                id=id,
+                question_text=question_text,
+                answer_text=answer_text,
+                formulation_ids=formulation_ids,
+            )
         ),
         parse_mode=messages.parse_mode,
         reply_markup=mu.back,
@@ -138,6 +160,48 @@ async def send_embedding_failed(
     )
 
 
+@with_message_action
+async def send_generation_amount_limit_exceeded(
+    send: Callable[..., Awaitable[Message]],
+    cancel_dir: str,
+    max_amount: int,
+) -> Message:
+    reply_markup = InlineKeyboardMarkup(inline_keyboard=brows.cancel_row(cancel_dir))
+    return await send(
+        text=messages.exceptions.question.generation_amount_limit_exceeded.format(
+            max_amount=max_amount
+        ),
+        parse_mode=messages.parse_mode,
+        reply_markup=reply_markup,
+    )
+
+
+@with_message_action
+async def send_formulations_generation_unavailable(
+    send: Callable[..., Awaitable[Message]],
+    cancel_dir: str,
+) -> Message:
+    reply_markup = InlineKeyboardMarkup(inline_keyboard=brows.cancel_row(cancel_dir))
+    return await send(
+        text=messages.exceptions.question.formulations_generation_unavailable,
+        parse_mode=messages.parse_mode,
+        reply_markup=reply_markup,
+    )
+
+
+@with_message_action
+async def send_formulations_generation_failed(
+    send: Callable[..., Awaitable[Message]],
+    cancel_dir: str,
+) -> Message:
+    reply_markup = InlineKeyboardMarkup(inline_keyboard=brows.cancel_row(cancel_dir))
+    return await send(
+        text=messages.exceptions.question.formulations_generation_failed,
+        parse_mode=messages.parse_mode,
+        reply_markup=reply_markup,
+    )
+
+
 # Finding
 @with_message_action
 async def send_successfully_found(
@@ -151,11 +215,11 @@ async def send_successfully_found(
     return await send(
         text=messages.responses.admin.question.finding.successful.format(
             question=format_question(
-                id,
-                question_text,
-                answer_text,
-                rating,
-                formulation_ids,
+                id=id,
+                question_text=question_text,
+                answer_text=answer_text,
+                rating=rating,
+                formulation_ids=formulation_ids,
             )
         ),
         parse_mode=messages.parse_mode,
@@ -251,7 +315,7 @@ async def send_changes(
     edited_answer_text: str,
     rating: float,
     edited_rating: float,
-    # recompute_embedding: bool,
+    generation_amount: int,
 ) -> Message:
     changes_text = format_edited_question(
         id,
@@ -261,7 +325,7 @@ async def send_changes(
         edited_answer_text,
         rating,
         edited_rating,
-        # recompute_embedding,
+        generation_amount,
     )
     return await send(
         text=messages.responses.admin.question.update.select_field.format(
@@ -272,17 +336,6 @@ async def send_changes(
     )
 
 
-# @with_message_action
-# async def send_confirm_recompute(
-#     send: Callable[..., Awaitable[Message]],
-# ) -> Message:
-#     return await send(
-#         text=messages.responses.admin.question.update.confirm_recompute,
-#         parse_mode=messages.parse_mode,
-#         reply_markup=mu.confirm_recompute,
-#     )
-
-
 @with_message_action
 async def send_successfully_updated(
     send: Callable[..., Awaitable[Message]],
@@ -290,10 +343,17 @@ async def send_successfully_updated(
     question_text: str,
     answer_text: str,
     rating: float,
+    formulation_ids: list[int] | None = None,
 ) -> Message:
     return await send(
         text=messages.responses.admin.question.update.successful.format(
-            question=format_question(id, question_text, answer_text, rating)
+            question=format_question(
+                id=id,
+                question_text=question_text,
+                answer_text=answer_text,
+                rating=rating,
+                formulation_ids=formulation_ids,
+            )
         ),
         parse_mode=messages.parse_mode,
         reply_markup=mu.back,

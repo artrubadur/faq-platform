@@ -26,3 +26,17 @@ def validate_rating(rating: str) -> float:
         return float(rating)
     except ValueError as exc:
         raise ValueError(messages.validation.question.rating_incorrect) from exc
+
+
+def validate_generate_formulations_amount(amount: str | int) -> int:
+    try:
+        parsed = int(amount)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(
+            messages.validation.question.generation_amount_incorrect
+        ) from exc
+
+    if parsed < 0:
+        raise ValueError(messages.validation.question.generation_amount_min)
+
+    return parsed

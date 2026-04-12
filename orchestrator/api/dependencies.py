@@ -9,6 +9,7 @@ from orchestrator.db.session import async_session
 from orchestrator.integrations import (
     compose_provider,
     embedding_provider,
+    generation_provider,
     rerank_provider,
 )
 from orchestrator.repositories import (
@@ -76,8 +77,10 @@ def get_questions_service(
         questions_repository,
         formulations_repository,
         embedding_provider,
+        generation_provider,
         rerank_provider,
         compose_provider,
+        config.suggestion.generation.max_amount,
         config.suggestion.search.best_match_threshold,
         config.suggestion.search.related_threshold,
     )

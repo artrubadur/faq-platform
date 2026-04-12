@@ -11,6 +11,7 @@ class CreateQuestionRequest(BaseModel):
     question_text: str
     answer_text: str
     check_similarity: bool
+    generate_formulations_amount: int = Field(default=0, ge=0)
 
 
 class UpdateQuestionRequest(BaseModel):
@@ -19,6 +20,7 @@ class UpdateQuestionRequest(BaseModel):
     question_text: str | None = None
     answer_text: str | None = None
     rating: float | None = None
+    generate_formulations_amount: int | None = Field(default=None, ge=0)
 
 
 class ListQuestionsRequest(BaseModel):
