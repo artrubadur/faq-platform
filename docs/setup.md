@@ -14,7 +14,7 @@ For migration workflows and advanced revision tasks, see
 - Poetry
 - Docker and Docker Compose
 - Telegram bot token
-- Credentials for embedding/rerank/compose providers
+- Credentials for external API providers
 
 ## 1. Prepare files
 

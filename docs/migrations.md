@@ -66,7 +66,7 @@ poetry run alembic -x old_a_len=384 -x new_a_len=256 revision -m "a_len_256"
 # Change embedding vector dim (downgrade is manual)
 poetry run alembic -x new_dim=512 revision -m "embedding_dim_512"
 
-# Set questions.embedding to NOT NULL after recompute
+# Set formulations.embedding to NOT NULL after recompute
 poetry run alembic -x embedding_not_null revision -m "embedding_not_null"
 ```
 

@@ -22,7 +22,8 @@ If you want your FAQ bot to handle real language (not only exact keyword matches
 
 - 🔎 Semantic question search using external embeddings.
 - 🧠 Optional LLM reranking and answer composition for high-confidence replies.
-- 🗄️ PostgreSQL + `pgvector` storage for questions and embeddings.
+- 🧩 Optional generation of alternative question formulations on question create/update.
+- 🗄️ PostgreSQL + `pgvector` storage for questions and formulation embeddings.
 - ⚡ Redis-backed state with separate short and long TTL scopes.
 - 🛠️ Admin workflows for question/user CRUD, pagination, bans, and diagnostics.
 - 📝 Runtime text customization via YAML (`messages`, `constants`, `commands`).

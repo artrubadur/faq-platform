@@ -119,21 +119,15 @@ Suggestion behavior:
 - `SUGGESTION__COMPOSE__ENABLED` default `true`
 - `SUGGESTION__COMPOSE__SUPPORTING_MARGIN` default `0.15`
 - `SUGGESTION__COMPOSE__SUPPORTING_TOP_K` default `2`
+- `SUGGESTION__GENERATION__ENABLED` default `true`
+- `SUGGESTION__GENERATION__MAX_AMOUNT` default `16`
 
-Provider clients:
+Provider clients (`EMBEDDING`, `RERANK`, `COMPOSE`, `GENERATION`):
 
-- `CLIENTS__EMBEDDING__BASE_URL` optional
-- `CLIENTS__EMBEDDING__TIMEOUT` default `5`
-- `CLIENTS__EMBEDDING__RETRIES` default `1`
-- `CLIENTS__EMBEDDING__RETRY_DELAY` default `0.2`
-- `CLIENTS__RERANK__BASE_URL` optional
-- `CLIENTS__RERANK__TIMEOUT` default `5`
-- `CLIENTS__RERANK__RETRIES` default `1`
-- `CLIENTS__RERANK__RETRY_DELAY` default `0.2`
-- `CLIENTS__COMPOSE__BASE_URL` optional
-- `CLIENTS__COMPOSE__TIMEOUT` default `5`
-- `CLIENTS__COMPOSE__RETRIES` default `1`
-- `CLIENTS__COMPOSE__RETRY_DELAY` default `0.2`
+- `CLIENTS__*__BASE_URL` optional
+- `CLIENTS__*__TIMEOUT` default `5`
+- `CLIENTS__*__RETRIES` default `1`
+- `CLIENTS__*__RETRY_DELAY` default `0.2`
 
 Request template variables:
 
@@ -150,7 +144,8 @@ Admin/API:
 
 ### `config/requests.yml` (required)
 
-Defines request/response templates for embedding, rerank, and compose flows:
+Defines request/response templates for embedding, rerank, compose, and
+generation flows:
 
 - request method, URL, headers, body
 - payload insertion path (`path.target`)
@@ -161,8 +156,9 @@ Section requirements:
 - `embedding` always required
 - `rerank` required only when rerank is enabled
 - `compose` required only when compose is enabled
+- `generation` required only when generation is enabled
 
-Reference template: `config/orchestrator/requests.yml`
+Reference template in repository: `config/orchestrator/requests.yml`
 
 ### `config/messages.yml` (optional)
 

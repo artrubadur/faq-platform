@@ -10,7 +10,7 @@
 - `orchestrator/api`: REST routes, dependency injection, error handlers.
 - `orchestrator/repositories`: SQLAlchemy-based DB access layer.
 - `orchestrator/db`: models, async session/engine, schema reconciliation.
-- `orchestrator/integrations`: external embedding/rerank/compose provider clients and templates.
+- `orchestrator/integrations`: external API provider clients and templates.
 - `shared/api`: reusable async HTTP API client and shared API exceptions.
 
 ## Request Flows
@@ -25,49 +25,53 @@
 
 ### Suggestion Pipeline (Orchestrator)
 
-#### 1. Candidate Retrieval
+#### 1. Formulation-Level Similarity and Max Pooling
 
 1. Compute embedding for the input question.
-2. Query DB by cosine distance with `SUGGESTION__SEARCH__RELATED_THRESHOLD`.
-3. Fetch up to `QUESTION_LIMITS__MAX_SIMILAR_AMOUNT + 1` similar candidates.
-4. Build `similarity_by_question_id` map from retrieved rows.
-5. If no similar candidates exist, return only popular questions and
-   `is_confident=false`.
+2. Query `formulations` by cosine distance with
+   `SUGGESTION__SEARCH__RELATED_THRESHOLD`.
+3. Aggregate matches to question level with max pooling:
+   each question keeps its best-matching formulation score.
 
-#### 2. Obvious-Match Shortcut
+#### 2. Candidate Retrieval
+
+1. Fetch top pooled question candidates (up to `request.max_similar_amount + 1`).
+2. If no similar candidates exist, return popular questions (up to
+   `request.max_popular_amount`) with `is_confident=false`.
+
+#### 3. Obvious-Match Shortcut
 
 1. Check obvious-match condition:
    `best_similarity >= 1 - 1e-6`, or
    `best_similarity >= SUGGESTION__SEARCH__BEST_MATCH_THRESHOLD` and
    `(best_similarity - second_similarity) >= SUGGESTION__SEARCH__OBVIOUS_MARGIN`.
-2. If obvious, skip rerank and skip compose.
+2. If obvious, skip rerank and compose.
 3. Increase rating of top candidate.
-4. Return top similar questions (trimmed to `max_similar_amount` = `QUESTION_LIMITS__MAX_SIMILAR_AMOUNT`) plus popular
-   completion, with `is_confident=true`.
+4. Trim similar list to `request.max_similar_amount`, then complete with popular
+   questions and return `is_confident=true`.
 
-#### 3. Reranking Phase
+#### 4. Reranking
 
 1. Enter reranking only when obvious-match shortcut is not triggered.
-2. If `SUGGESTION__RERANK__ENABLED=true`, send candidates (`id`, question text,
-   base similarity) to rerank provider.
+2. If rerank is enabled, send candidates (`id`, `question_text`, base
+   similarity) to rerank provider.
 3. Provider returns ordered candidate IDs (most relevant first).
 4. Service reorders candidates by returned ID order.
 5. IDs missing in rerank output are pushed to the end.
-6. If rerank provider is disabled or rerank request fails, original candidate
-   order is preserved.
+6. If rerank is disabled or fails, original candidate order is preserved.
 
-#### 4. Confidence Check (After Rerank/Original Order)
+#### 5. Confidence Check (After Rerank/Original Order)
 
 1. Evaluate confident-match condition:
    `best_similarity >= SUGGESTION__SEARCH__BEST_MATCH_THRESHOLD` and
    `(best_similarity - second_similarity) >= SUGGESTION__SEARCH__BEST_MATCH_MARGIN`.
-2. If not confident, trim similar list to `max_similar_amount`, skip rating
+2. If not confident, trim similar list to `request.max_similar_amount`, skip rating
    update, skip compose, and continue to final assembly.
 
-#### 5. Composition Phase (Confident Path Only)
+#### 6. Composition (Confident Path Only)
 
-1. Composition runs only for confident matches from phase 4.
-2. If `SUGGESTION__COMPOSE__ENABLED=false`, top answer stays unchanged.
+1. Composition runs only for confident matches from phase 5.
+2. If compose is disabled, top answer stays unchanged.
 3. `best_candidate` is the top question after rerank/original order.
 4. Supporting candidates are selected from
    `questions[1 : 1 + SUGGESTION__COMPOSE__SUPPORTING_TOP_K]`.
@@ -77,18 +81,18 @@
    `supporting_candidates`, and returns a single composed answer.
 7. On compose failure, service falls back to the original top answer text.
 
-#### 6. Rating Update
+#### 7. Rating Update
 
-1. Rating is updated only in confident branches (obvious or phase-4 confident).
+1. Rating is updated only in obvious/confident branches.
 2. Only top candidate rating is increased.
 3. Gain formula:
-   if `best_similarity < threshold` -> `0`,
+   if `best_similarity < threshold - 1e-6` -> `0`,
    if `threshold == 1` -> `1`,
    else `norm^2`, where
    `norm = (best_similarity - threshold) / (1 - threshold)` and
    `threshold = SUGGESTION__SEARCH__BEST_MATCH_THRESHOLD`.
 
-#### 7. Final Assembly
+#### 8. Final Assembly
 
 1. Fill response with popular questions using remaining capacity:
    `min(max_amount - len(similar), max_popular_amount)`.
@@ -102,6 +106,14 @@
 3. Multi-step operations are tracked in FSM state.
 4. Confirm/save callbacks apply DB writes.
 5. List screens support ordering, page size, and page navigation.
+
+### Question Create/Update with Formulation Generation
+
+1. Admin create/update flow collects `generate_formulations_amount` (0 means skip).
+2. Orchestrator validates amount against `SUGGESTION__GENERATION__MAX_AMOUNT`.
+3. If generation is enabled, provider returns alternative question texts.
+4. Each generated text gets an embedding and is stored in `formulations`.
+5. Base formulation from canonical question text is always stored on create.
 
 ## Storage Model
 
@@ -120,6 +132,12 @@
 - `question_text` (varchar, size from env schema config)
 - `answer_text` (varchar, size from env schema config)
 - `rating` (float, default `0.0`)
+
+### `formulations`
+
+- `id` (PK)
+- `question_id` (FK -> `questions.id`, indexed, `ON DELETE CASCADE`)
+- `question_text` (varchar, size from env schema config)
 - `embedding` (`vector(dim)`, dim from env schema config)
 
 ## Redis
@@ -153,7 +171,7 @@ YAML-driven runtime customization:
 - `messages.yml` -> response texts and format templates
 - `constants.yml` -> startup-resolved constants
 - `commands.yml` -> dynamic public commands
-- `requests.yml` -> embedding, rerank, and compose API request templates
+- `requests.yml` -> external API request templates
 
 ## Schema Synchronization
 
