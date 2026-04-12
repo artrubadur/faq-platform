@@ -13,6 +13,7 @@ from bot.dialogs.rows.common import (
 from bot.dialogs.send.admin.user import send_empty_pagination, send_pagination
 from bot.dialogs.send.common import send_expired, send_invalid
 from bot.services.common.process import process_page_msg
+from bot.services.common.validate import resolve_page
 from bot.services.user.gateway import user_gateway
 from bot.utils.state.history import LastMessage, is_expired
 from bot.utils.state.temp import TempContext
@@ -57,7 +58,8 @@ async def process(
         amount = data["amount"]
 
     max_page = (amount + page_size - 1) // page_size
-    page = min(max_page, page)
+    page = resolve_page(page, max_page)
+    await state.update_data(page=page)
     if page == 0:
         logger.debug("No users found")
         return await send_empty_pagination(message, send_action)

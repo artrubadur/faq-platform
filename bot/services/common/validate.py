@@ -17,11 +17,26 @@ def validate_int64_id(value: str | int, error_message: str) -> int:
 
 
 def validate_page(page: str):
-    if not page.isdigit():
+    try:
+        int_page = int(page)
+    except ValueError:
         raise ValueError(messages.validation.common.page_invalid)
-    int_page = int(page)
 
-    if int_page < 1:
-        raise ValueError(messages.validation.common.page_negative)
+    if int_page == 0:
+        raise ValueError(messages.validation.common.page_invalid)
 
     return int_page
+
+
+def resolve_page(page: int, max_page: int) -> int:
+    if max_page <= 0:
+        return 0
+
+    resolved_page = page
+    if page < 0:
+        resolved_page = max_page + page + 1
+
+    if resolved_page < 1:
+        return 1
+
+    return min(max_page, resolved_page)
