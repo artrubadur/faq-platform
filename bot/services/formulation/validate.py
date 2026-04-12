@@ -1,15 +1,10 @@
 from bot.core.config import config
 from bot.core.customization import messages
+from bot.services.common.validate import validate_int64_id
 
 
 def _validate_positive_int(value: str | int, error_message: str) -> int:
-    if isinstance(value, int):
-        return value
-
-    if value.isdigit():
-        return int(value)
-
-    raise ValueError(error_message)
+    return validate_int64_id(value, error_message)
 
 
 def validate_id(id: str | int) -> int:

@@ -1,17 +1,12 @@
 import re
 
 from bot.core.customization import messages
+from bot.services.common.validate import validate_int64_id
 from shared.contracts.user.responses import Role
 
 
 def validate_id(id: str | int) -> int:
-    if isinstance(id, int):
-        return id
-
-    if id.isdigit():
-        return int(id)
-
-    raise ValueError(messages.validation.user.id_invalid)
+    return validate_int64_id(id, messages.validation.user.id_invalid)
 
 
 def validate_username(username: str | None) -> str | None:

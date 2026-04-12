@@ -2,13 +2,14 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from shared.contracts.types import Int64Id
 from shared.contracts.user.responses import Role
 
 UserFields = Literal["id", "telegram_id", "username", "role"]
 
 
 class CreateUserRequest(BaseModel):
-    id: int
+    id: Int64Id
     username: str | None
     role: Role
 

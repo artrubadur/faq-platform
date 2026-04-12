@@ -2,6 +2,8 @@ from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict
 
+from shared.contracts.types import Int64Id
+
 
 class Role(StrEnum):
     BANNED = "banned"
@@ -12,8 +14,8 @@ class Role(StrEnum):
 class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
-    telegram_id: int
+    id: Int64Id
+    telegram_id: Int64Id
     username: str | None
     role: Role
 

@@ -1,15 +1,10 @@
 from bot.core.config import config
 from bot.core.customization import messages
+from bot.services.common.validate import validate_int64_id
 
 
 def validate_id(id: str | int) -> int:
-    if isinstance(id, int):
-        return id
-
-    if id.isdigit():
-        return int(id)
-
-    raise ValueError(messages.validation.question.id_invalid)
+    return validate_int64_id(id, messages.validation.question.id_invalid)
 
 
 def validate_question_text(question_text: str) -> str:
